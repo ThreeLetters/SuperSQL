@@ -1,5 +1,5 @@
 # SQL-Library
-SlickInject and Medoo on sterioids - The most advanced and compact library available.
+SlickInject and Medoo on steroids - The most advanced and compact library available.
 
 ## Purpose
 
@@ -12,9 +12,13 @@ SlickInject and Medoo on sterioids - The most advanced and compact library avail
 
 #### Multi-queries
 
+#### Cache
+
 
 ### SELECT
 > **SQLib->SELECT($table, $columns, $where[,$join);**
+
+
 
 ### INSERT
 > **SQLib->INSERT($table, $data);**
