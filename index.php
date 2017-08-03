@@ -2,7 +2,7 @@
 
 class SQLib {
   
-  private static $structure
+  private static $connector
   
   function __construct() {
     
