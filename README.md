@@ -11,7 +11,7 @@ SlickInject and Medoo on steroids - The most advanced and compact library availa
 #### Conditionals
 Conditional statements are extremly customisable. WHERE and JOIN clauses are conditional statements. 
 
-```
+```php
 $where = array(
  "arg1" => "val1", // AND arg1 = val1
  "[>>]arg2" => "val2", // AND arg2 > val2
@@ -22,14 +22,34 @@ $where = array(
  "[!!]arg7" => "val7", // NOT arg7 = val 7
  "[||][>>]arg8" => "val8" // OR arg8 > val8
 );
-
 ```
 
-
 #### Multi-queries
+Multiqueries can be done too. This allows for highly efficient repetative queries. Note: Only the values of WHERE, JOIN, and INSERT work with this. VALUES, not KEYS.
+
+```php
+// Way 1
+
+array(
+array( // NOTE: While the all the arrays dont have to be identical, the first one should have the most items
+"arg1"=> "val1",
+"arg2"=> "val2"
+),
+array(
+"arg2"=> "val3"
+}
+); // -> [["val1","val2"],["val1","val3"]] - Two queries
+
+// Way 2
+
+array(
+"arg1" => "val1",
+"arg2" => array("val2","val3")
+); // -> [["val1","val2"],["val1","val3"]] - Two queries
+```
 
 #### Cache
-
+Performance is boosted for a query if an identical query before it (with different values [EG where vals, join, insert]), is made right before
 
 ### SELECT
 > **SQLib->SELECT($table, $columns, $where[,$join);**
