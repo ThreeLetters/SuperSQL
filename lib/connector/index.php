@@ -1,4 +1,6 @@
 <?php
+namespace SQLib;
+
 /*
 MIT License
 
@@ -22,29 +24,155 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 Contact GitHub API Training Shop Blog About
-
-
 */
-namespace SQLib
 
-class Connector {
-  private $db
-  __construct($host,$user,$pass,$name) {
-    self::$db = mysqli_connect($host,$user,$pass,$name);
-  }
-  
-  query() {
-  
-  }
-  _query($isql,$sqls) {
-   $q = self::$db->prepare($isql);
-    foreach ($sqls as $key => $value) {
-      
+/*
+ Author: Andrews54757
+ License: MIT
+ Source: https://github.com/Andrews54757/SQL-Library
+*/
+
+class Response
+{
+    public $result;
+    public $affected;
+    public $ind;
+    public $error;
+    public $errorData;
+    
+   /**
+    * Gets data from a query
+    */
+    function __construct($data, $error)
+    {
+        
+        $this->error = !$error;
+        if (!$error) {
+            $this->errorData = $data->errorInfo();
+        } else {
+            $this->result   = $data->fetchAll();
+            $this->affected = $data->rowCount();
+        }
+        $this->ind = 0;
     }
     
-  }
-  
-  
+   /**
+    * Returns error data if there is one
+    */
+    function error()
+    {
+        return $this->error ? $this->errorData : false;
+    }
+
+   /**
+    * Gets data from the query
+    *
+    * @returns {Array}
+    */
+    function getData()
+    {
+        return $this->result;
+    }
+    
+   /**
+    * Gets number of affected rows from the query
+    *
+    * @returns {Int}
+    */
+    function getAffected() {
+        return $this->affected;
+    }
+    
+   /**
+    * Gets next row
+    */
+    function next()
+    {
+        return $this->result[$this->ind++];
+    }
+    
+   /**
+    * Resets ititerator
+    */
+    function reset()
+    {
+        $this->ind = 0;
+    }
+    
 }
-  
-  ?>
+
+class Connector
+{
+    private $lastSQL;
+    private $last;
+    public $db;
+    
+   /**
+    * Creates a connection
+    * @param {String} dsn - DSN of the connection
+    * @param {String} user - Username
+    * @param {String} pass - Password
+    */
+    function __construct($dsn, $user, $pass)
+    {
+        $this->db = new \PDO($dsn, $user, $pass);
+    }
+    
+   /**
+    * Queries database
+    * @param {String} query - Query to make
+    *
+    * @returns {SQLResponse}
+    */
+    function query($query)
+    {
+        $q = $this->$db->prepare($query);
+        $q->execute();
+        return new Response($q);
+    }
+    
+   /**
+    * Queries database efficiently
+    * @param {String} sql - Base query
+    * @param {Array} insert - array of args
+    *
+    * @returns {SQLResponse|SQLResponse[]}
+    */
+    function _query($sql, $insert)
+    {
+        
+        //  echo json_encode(array($sql,$insert));
+        //  return;
+        if ($sql == $this->lastSQL) { // Cache
+            $q = $this->last;
+        } else {
+            $q             = $this->db->prepare($sql);
+            $this->lastSQL = $sql;
+            $this->last    = $q;
+        }
+        
+        if (count($insert) == 1) { // Single query
+            $e = $q->execute($insert[0]);
+            return new Response($q, $e);
+        } else { // Multi Query
+            $responses = array();
+            foreach ($insert as $key => $value) {
+                $e = $q->execute($insert[0]);
+                array_push($responses, new Response($q, $e));
+            }
+            return responses;
+        }
+    }
+    
+   /**
+    * Closes the connection
+    */
+    function close()
+    {
+        $this->$db = null;
+    }
+    
+    
+}
+
+?>
