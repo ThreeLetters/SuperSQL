@@ -1,13 +1,13 @@
 # SQL-Library
-SlickInject and Medoo on sterioids - Experimental...
+SlickInject and Medoo on sterioids - The most advanced and compact library available.
 
 ## Purpose
 
 1. To provide a very fast and efficient way to edit sql databases
 2. To provide a easy method of access
 
-## Notes
+## Documentation
 
-1. Use simple or advanced. Simple - SlickInject type queries, Advanced - Medoo type queries
-2. Cacheing.
-3. Structure checking
+### SELECT
+> SQLib->SELECT($table, $columns, $where[,$join);
+
