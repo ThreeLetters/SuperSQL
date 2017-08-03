@@ -29,7 +29,7 @@ Contact GitHub API Training Shop Blog About
 /*
  Author: Andrews54757
  License: MIT
- Source: https://github.com/Andrews54757/SQL-Library
+ Source: https://github.com/ThreeLetters/SQL-Library
 */
 
 class Response
