@@ -7,6 +7,11 @@ SlickInject and Medoo on sterioids - The most advanced and compact library avail
 2. To provide a easy method of access
 
 ## Documentation
+### Notes
+#### Conditionals
+
+#### Multi-queries
+
 
 ### SELECT
 > **SQLib->SELECT($table, $columns, $where[,$join);**
