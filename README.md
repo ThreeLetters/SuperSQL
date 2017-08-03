@@ -9,5 +9,13 @@ SlickInject and Medoo on sterioids - The most advanced and compact library avail
 ## Documentation
 
 ### SELECT
-> SQLib->SELECT($table, $columns, $where[,$join);
+> **SQLib->SELECT($table, $columns, $where[,$join);**
 
+### INSERT
+> **SQLib->INSERT($table, $data);**
+
+### UPDATE
+> **SQLib->UPDATE($table, $data, $where);**
+
+### DELETE
+> **SQLib->DELETE($table, $where);**
