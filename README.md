@@ -10,3 +10,4 @@ SlickInject and Medoo on sterioids - Experimental...
 
 1. Use simple or advanced. Simple - SlickInject type queries, Advanced - Medoo type queries
 2. Cacheing.
+3. Structure checking
