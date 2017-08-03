@@ -136,6 +136,11 @@ class Parser
                     $arg = self::parseArg($key);
                     $sql .= " OR ";
                     break;
+                case "!!]":
+                    $key = substr($key, 4);
+                    $arg = self::parseArg($key);
+                    $sql .= " NOT ";
+                    break;
                 default:
                     if ($arg == "&&]") {
                         $key = substr($key, 4);
