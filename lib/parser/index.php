@@ -63,14 +63,14 @@ class Parser
         $type = gettype($val);
         if ($type == "array") {
             foreach ($val as $k => $v) {
-                $k = (int) $k;
+                $k = (int)$k;
                 if (!isset($args[$k]))
                     $args[$k] = array_slice($args[0], 0);
                 if (!$first)
                     $first = $v;
             }
             foreach ($args as $k => $v) {
-                $k = (int) $k;
+                $k = (int)$k;
                 if (isset($val[$k])) {
                     array_push($args[$k], $val[$k]);
                 } else {
