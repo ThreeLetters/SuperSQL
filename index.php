@@ -27,16 +27,16 @@ SOFTWARE.
 /*
  Author: Andrews54757
  License: MIT
- Source: https://github.com/ThreeLetters/SQL-Library
+ Source: https://github.com/ThreeLetters/SuperSQL
 */
 
 include "lib/parser/index.php";
 include "lib/connector/index.php";
 
-use SQLib\Parser as Parser;
-use SQLib\Connector as Connector;
+use SuperSQL\Parser as Parser;
+use SuperSQL\Connector as Connector;
 
-class SQLib
+class SuperSQL
 {
     public $connector;
     
