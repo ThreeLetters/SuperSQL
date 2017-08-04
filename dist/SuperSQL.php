@@ -54,6 +54,8 @@ class Response
             $this->affected = $data->rowCount();
         }
         $this->ind = 0;
+        
+        $data->closeCursor();
     }
     
    /**
@@ -103,8 +105,7 @@ class Response
 
 class Connector
 {
-    private $lastSQL;
-    private $last;
+    public $queries;
     public $db;
     
    /**
@@ -116,6 +117,7 @@ class Connector
     function __construct($dsn, $user, $pass)
     {
        $this->db = new \PDO($dsn, $user, $pass);
+       $this->queries = array();
     }
     
    /**
@@ -126,7 +128,7 @@ class Connector
     */
     function query($query)
     {
-        $q = $this->$db->prepare($query);
+        $q = $this->db->prepare($query);
         $q->execute();
         return new Response($q);
     }
@@ -143,12 +145,11 @@ class Connector
         
           //echo json_encode(array($sql,$insert));
           //return;
-        if ($sql == $this->lastSQL) { // Cache
-            $q = $this->last;
+        if (isset($this->queries[$sql])) { // Cache
+            $q = $this->queries[$sql];
         } else {
             $q             = $this->db->prepare($sql);
-            $this->lastSQL = $sql;
-            $this->last    = $q;
+            $this->queries[$sql] = $q;
         }
         
         if (count($insert) == 1) { // Single query
@@ -169,9 +170,9 @@ class Connector
     */
     function close()
     {
-        $this->$db = null;
-        $this->last = null;
-        $this->lastSQL = null;
+        $this->db = null;
+        $this->queries = null;
+        
     }
     
     
