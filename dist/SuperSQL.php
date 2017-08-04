@@ -672,9 +672,9 @@ class SuperSQL
     *
     * @returns {SQLResponse|SQLResponse[]}
     */
-    function SELECT($table, $columns, $where, $join = null, $limit = "")
+    function SELECT($table, $columns, $where, $join = null, $limit = false)
     {
-     if (gettype($join) == "string") {
+     if (gettype($join) == "integer") {
             $limit = $join;
             $join = null;
         }
