@@ -7,6 +7,17 @@ SlickInject and Medoo on steroids - The most advanced and compact library availa
 2. To provide a easy method of access
 
 ## Documentation
+```php
+// MySql setup
+$host = "localhost";
+$db = "test";
+$user = "root";
+$pass = "1234";
+
+$dsn = "mysql:host=$host;port=3306;dbname=$db;charset=utf8";
+$s = new SQLib($dsn,$user,$pass);
+```
+
 ### Notes
 #### Conditionals
 Conditional statements are extremly customisable. WHERE and JOIN clauses are conditional statements. 
@@ -53,7 +64,6 @@ Performance is boosted for a query if an identical query before it (with differe
 
 ### SELECT
 > **SQLib->SELECT($table, $columns, $where[,$join);**
-
 
 
 ### INSERT
