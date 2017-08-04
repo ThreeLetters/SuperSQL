@@ -43,15 +43,39 @@ class Parser
     *
     * @returns {String|Boolean}
     */
-    private static function parseArg($str)
+    private static function parseArg(&$str)
     {
         if (substr($str, 0, 1) == "[") {
-            return substr($str, 1, 3);
+            $out = substr($str, 1, 3);
+             $str = substr($str,4);
+            return $out;
         } else {
             return false;
         }
     }
     
+   /**
+    * Reads argument data from a string
+    *
+    * @param {String} str - String to read from
+    *
+    * @returns {String|Boolean}
+    */
+    private static function parseArgs(&$str)
+    {
+        $arr = array();
+        
+        for ($i = 0; $i < 5; $i++) {
+            
+        if (substr($str, 0, 1) == "[") {
+          array_push($arr,substr($str, 1, 3));
+         $str = substr($str,4);
+        } else {
+            return $arr;
+        }
+            
+        }
+    }
    /**
     * Appends value(s) to arguments
     *
@@ -94,17 +118,42 @@ class Parser
     
     private static function append2(&$insert, $indexes, $dt)
     {
+        function recurse(&$holder,$val,$indexes,$par,$lvl) {
+            foreach ($val as $k => $v) {
+                if (gettype($v) == "array") {
+                    $a = substr($k,0,4);
+                    $b = strrpos($k,"]", -1);
+                     if ($b != false) {
+                     $k = substr($k,$b+1);
+                     }
+                    if ($a != "[||]" && $a != "[&&]") {
+                    $d = $indexes[$k . "#" . $lvl . "." . $par . "*"];
+                        if (!$d) $d = $indexes[$k . "*"];
+                     foreach ($v as $i => $j) {
+                         $holder[$d + $i] = $j;
+                     }   
+                    } else {
+                    recurse($holder,$v,$indexes,$k, $lvl + 1);
+                    }
+                } else {
+                     $b = strrpos($k,"]", -1);
+                     if ($b != false) {
+                     $k = substr($k,$b+1);
+                     }
+                    $d = $indexes[$k . "#" . $lvl . "." . $par];
+                    if (!$d) $d = $indexes[$k];
+                $holder[$d] = $v;
+                }
+            }
+        }
+        
         $last = false;
         foreach ($dt as $key => $val) {
             if (!isset($insert[$key]))
                 $insert[$key] = array();
             $holder = $last ? array_slice($last, 0) : array();
             
-            foreach ($val as $k => $v) {
-                
-                $holder[$indexes[$k]] = $v;
-            }
-            
+            recurse($holder,$val,$indexes,"",0);
             if (!$last)
                 $last = $holder;
             $c = count($holder);
@@ -126,83 +175,101 @@ class Parser
     */
     private static function conditions($arr, &$args, $quotes = true)
     {
-        
-        $cond = function($i, $key, &$sql, &$indexes,$quotes)
-        {
-            $arg = self::parseArg($key);
-            switch ($arg) {
-                case "||]":
-                    $key = substr($key, 4);
-                    $arg = self::parseArg($key);
-                    $sql .= " OR ";
-                    break;
-                case "!!]":
-                    $key = substr($key, 4);
-                    $arg = self::parseArg($key);
-                    $sql .= " NOT ";
-                    break;
-                default:
-                    if ($arg == "&&]") {
-                        $key = substr($key, 4);
+     
+        $cond = function(&$cond,&$arr,&$args,$quotes,$statement,$default,&$indexes,&$i,$lvl,$parent,$append = false) {
+            
+            $b = 0;
+            foreach ($arr as $key => $value) {
+                
+                $arg = self::parseArg($key);
+                
+                $type = gettype($value);
+                
+                $s = $statement;
+                
+                $o = $default;
+                
+                $useBind = false;
+                
+                if ($type == "array") {
+                switch ($arg) {
+                    case "&&]":
+                        $s = " AND ";
                         $arg = self::parseArg($key);
-                        $sql .= " AND ";
-                    } else if ($i != 0) {
-                        $sql .= " AND ";
+                        $useBind = true;
+                        break;
+                    case "||]":
+                        $s = " OR ";
+                        $arg = self::parseArg($key);
+                        $useBind = true;
+                         break;
                     }
-                    
-                    break;
-            }
-         
-            if ($quotes) {
-                $sql .= "`" . $key . "`";
-            } else {
-                $sql .= $key;
-            }
-         
-            switch ($arg) {
+                }
+                
+                    switch ($arg) {
                 case ">>]":
-                    $key = substr($key, 4);
-                    $sql .= " > ?";
+                    $o = " > ?";
+             
                     break;
                 case "<<]":
-                    $key = substr($key, 4);
-                    $sql .= " < ?";
+                    $o = " < ?";
+            
                     break;
                 case ">=]":
-                    $key = substr($key, 4);
-                    $sql .= " >= ?";
+                    $o = " >= ?";
+                
                     break;
                 case "<=]":
-                    $key = substr($key, 4);
-                    $sql .= " <= ?";
+                    $o = " <= ?";
                     break;
-                default:
-                    if ($arg == "==]")
-                        $key = substr($key, 4);
-                    $sql .= " = ?";
+                default:      
+                if ($useBind) $o = " = ?";
                     break;
-            }
-            $indexes[$key] = $i;
+                    }
+                
+                if ($b != 0) $sql .= $statement;
+                
+                if ($type == "array") {
+                  if ($useBind) {
+                    $sql .= "(" .$cond($cond,$value,$args,$quotes,$s,$o,$indexes,$i,$lvl + 1,$key,$append) . ")";
+                  } else {
+                       $indexes[$key . "*"] = $i;
+                       $indexes[$key . "#" . $lvl . "." . $parent . "*"] = $i;
+                      foreach ($value as $k => $v) {
+                        if ($k != 0) $sql .= $statement;
+                            $sql .= $key . $o;
+                          $i++;   
+                          if ($append) {
+                               array_push($args[0],$v); 
+                          }
+                      }
+                  }
+                } else {
+                    $sql .= $key . $o;
+                    if ($append) {
+                      array_push($args[0],$value);
+                    } 
+                     $indexes[$key] = $i;
+                      $indexes[$key . "#" . $lvl . "." . $parent] = $i++;
+                }
+                $b++;
+                }
+            
+              return $sql;
+            
         };
         
-        $sql     = "";
-        // $args = array(array());
-        $i       = 0;
-        $indexes = array();
-        
-        if (isset($arr[0])) {
-            foreach ($arr[0] as $key => $val) {
-                $cond($i++, $key, $sql, $indexes, $quotes);
-            }
-            self::append2($args, $indexes, $arr);
-        } else {
-            foreach ($arr as $key => $val) {
-                $cond($i++, $key, $sql, $indexes, $quotes);
-                self::append($args, $val);
-            }
-        }
+$indexes = array();
+     $i = 0;
+      if (isset($arr[0])) {
+           $sql = $cond($cond,$arr[0],$args,$quotes," AND ", " = ?",$indexes,$i,0,false);
+           self::append2($args,$indexes,$arr);
+      } else {
+            $sql = $cond($cond,$arr,$args,$quotes," AND ", " = ?",$indexes,$i,0,false,true);
+     
+          
+      }
         return $sql;
-        
     }
     
    /**
@@ -256,21 +323,19 @@ class Parser
                 $arg = self::parseArg($key);
                 switch ($arg) {
                     case "<<]":
-                        $key = substr($key, 4);
+                       
                         $sql .= " RIGHT JOIN ";
                         break;
                     case ">>]":
-                        $key = substr($key, 4);
+                  
                         $sql .= " LEFT JOIN ";
                         break;
                     case "<>]":
-                        $key = substr($key, 4);
+                    
                         $sql .= " FULL JOIN ";
                         break;
                     default: // inner join
                         
-                        if ($arg == "><]")
-                            $key = substr($key, 4);
                         $sql .= " JOIN ";
                         break;
                 }

@@ -115,7 +115,7 @@ class Connector
     */
     function __construct($dsn, $user, $pass)
     {
-        $this->db = new \PDO($dsn, $user, $pass);
+       // $this->db = new \PDO($dsn, $user, $pass);
     }
     
    /**
@@ -141,8 +141,8 @@ class Connector
     function _query($sql, $insert)
     {
         
-        //  echo json_encode(array($sql,$insert));
-        //  return;
+          echo json_encode(array($sql,$insert));
+          return;
         if ($sql == $this->lastSQL) { // Cache
             $q = $this->last;
         } else {
