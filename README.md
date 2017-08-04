@@ -31,7 +31,7 @@ $user = "root";
 $pass = "1234";
 
 $dsn = "mysql:host=$host;port=3306;dbname=$db;charset=utf8";
-$s = new SuperSQL($dsn,$user,$pass);
+$SuperSQL = new SuperSQL($dsn,$user,$pass);
 ```
 
 ### Notes
@@ -71,7 +71,7 @@ array(
 }
 ); // -> [["val1","val2"],["val1","val3"]] - Two queries
 
-// Way 2 (only works with INSERT)
+// Way 2 (only works with the data argument in INSERT and UPDATE)
 
 array(
 "arg1" => "val1",
@@ -91,15 +91,12 @@ Performance is boosted for a query if an identical query before it (with differe
 * `(Array)join` - Array of conditions for JOIN. Usage:
 
 ```php
-SuperSQL->SELECT($table, $columns, $where, array(
-
-    "table2" => array("table.something" => "table2.something"), // JOIN
-    
+$SuperSQL->SELECT("horizon", [], [], array(
     // [>>] - Right join
     // [<<] - Left join
     // [><] - Inner join (Default)
     // [<>] - Full join
-    "[>>]table3" => array("table.something" => "table3.something"), // RIGHT JOIN
+    "[><]meteors" => array("horizon.object" => "meteors.object"), // JOIN
 ));
 ```
 
@@ -107,10 +104,38 @@ SuperSQL->SELECT($table, $columns, $where, array(
 > **SuperSQL->INSERT($table, $data);**
 
 * `(String)table` - Table to insert to
-* `(Data)` - Data to insert
+* `(Array)data` - Data to insert
 
+```php
+$SuperSQL->INSERT("table",array(
+"hello" => "world",
+"SuperSQL" => "rocks"
+));
+```
 ### UPDATE
 > **SuperSQL->UPDATE($table, $data, $where);**
 
+* `(String)table` - Table to insert to
+* `(Array)data` - Data to update
+* `(Array)where` - Conditional statements
+
+```php
+$SuperSQL->UPDATE("citizens",array(
+"SuperSQL" => "To the rescue!"
+),array(
+"needs_help" => 1
+));
+```
+
 ### DELETE
 > **SuperSQL->DELETE($table, $where);**
+
+* `(String)table` - Table to insert to
+* `(Array)where` - Conditional statements
+
+```php
+$SuperSQL->DELETE("persons",
+"is_villain" => 1
+));
+```
+
