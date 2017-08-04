@@ -1,5 +1,5 @@
 <?php
-namespace SQLib;
+namespace SuperSQL;
 
 /*
 MIT License
@@ -23,13 +23,12 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-Contact GitHub API Training Shop Blog About
 */
 
 /*
  Author: Andrews54757
  License: MIT
- Source: https://github.com/ThreeLetters/SQL-Library
+ Source: https://github.com/ThreeLetters/SuperSQL
 */
 
 class Response
