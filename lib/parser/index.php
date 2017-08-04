@@ -124,10 +124,10 @@ class Parser
     *
     * @returns {String}
     */
-    private static function conditions($arr, &$args)
+    private static function conditions($arr, &$args, $quotes = true)
     {
         
-        $cond = function($i, $key, &$sql, &$indexes)
+        $cond = function($i, $key, &$sql, &$indexes,$quotes)
         {
             $arg = self::parseArg($key);
             switch ($arg) {
@@ -152,27 +152,34 @@ class Parser
                     
                     break;
             }
+         
+            if ($quotes) {
+                $sql .= "`" . $key . "`";
+            } else {
+                $sql .= $key;
+            }
+         
             switch ($arg) {
                 case ">>]":
                     $key = substr($key, 4);
-                    $sql .= "`" . $key . "` > ?";
+                    $sql .= " > ?";
                     break;
                 case "<<]":
                     $key = substr($key, 4);
-                    $sql .= "`" . $key . "` < ?";
+                    $sql .= " < ?";
                     break;
                 case ">=]":
                     $key = substr($key, 4);
-                    $sql .= "`" . $key . "` >= ?";
+                    $sql .= " >= ?";
                     break;
                 case "<=]":
                     $key = substr($key, 4);
-                    $sql .= "`" . $key . "` <= ?";
+                    $sql .= " <= ?";
                     break;
                 default:
                     if ($arg == "==]")
                         $key = substr($key, 4);
-                    $sql .= "`" . $key . "` = ?";
+                    $sql .= " = ?";
                     break;
             }
             $indexes[$key] = $i;
@@ -185,12 +192,12 @@ class Parser
         
         if (isset($arr[0])) {
             foreach ($arr[0] as $key => $val) {
-                $cond($i++, $key, $sql, $indexes);
+                $cond($i++, $key, $sql, $indexes, $quotes);
             }
             self::append2($args, $indexes, $arr);
         } else {
             foreach ($arr as $key => $val) {
-                $cond($i++, $key, $sql, $indexes);
+                $cond($i++, $key, $sql, $indexes, $quotes);
                 self::append($args, $val);
             }
         }
@@ -270,7 +277,7 @@ class Parser
                 
                 $sql .= "`" . $key . "` ON ";
                 
-                $c = self::conditions($val, $insert);
+                $c = self::conditions($val, $insert,false);
                 $sql .= $c;
             }
         }
