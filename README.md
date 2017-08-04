@@ -1,4 +1,4 @@
-# SQL-Library
+# SuperSQL
 SlickInject and Medoo on steroids - The most advanced and compact library available.
 
 ## Purpose
@@ -15,7 +15,7 @@ $user = "root";
 $pass = "1234";
 
 $dsn = "mysql:host=$host;port=3306;dbname=$db;charset=utf8";
-$s = new SQLib($dsn,$user,$pass);
+$s = new SuperSQL($dsn,$user,$pass);
 ```
 
 ### Notes
@@ -67,7 +67,7 @@ array(
 Performance is boosted for a query if an identical query before it (with different values [EG where vals, join, insert]), is made right before
 
 ### SELECT
-> **SQLib->SELECT($table, $columns, $where[,$join);**
+> **SuperSQL->SELECT($table, $columns, $where[,$join);**
 
 * `(String)table` - Table name to query
 * `(Array)columns` - Array of columns to return. `[]` will query using the `*` selector. Also note, that you may use the `DISTINCT` keyword by putting it first in the array.
@@ -75,7 +75,7 @@ Performance is boosted for a query if an identical query before it (with differe
 * `(Array)join` - Array of conditions for JOIN. Usage:
 
 ```php
-SQLib->SELECT($table, $columns, $where, array(
+SuperSQL->SELECT($table, $columns, $where, array(
 
     "table2" => array("table.something" => "table2.something"), // JOIN
     
@@ -88,13 +88,13 @@ SQLib->SELECT($table, $columns, $where, array(
 ```
 
 ### INSERT
-> **SQLib->INSERT($table, $data);**
+> **SuperSQL->INSERT($table, $data);**
 
 * `(String)table` - Table to insert to
 * `(Data)` - Data to insert
 
 ### UPDATE
-> **SQLib->UPDATE($table, $data, $where);**
+> **SuperSQL->UPDATE($table, $data, $where);**
 
 ### DELETE
-> **SQLib->DELETE($table, $where);**
+> **SuperSQL->DELETE($table, $where);**
