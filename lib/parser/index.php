@@ -58,7 +58,7 @@ class Parser
     * @param {&Array} args - Arguments to append to
     * @param {String|Int|Boolean|Array} val - Value(s) to append
     */
-    private static function append(&$args, $val)
+    private static function append(&$args, $val, $p = "")
     {
         $type = gettype($val);
         if ($type == "array") {
@@ -72,14 +72,14 @@ class Parser
             foreach ($args as $k => $v) {
                 $k = (int)$k;
                 if (isset($val[$k])) {
-                    array_push($args[$k], $val[$k]);
+                    array_push($args[$k], $p . $val[$k]);
                 } else {
-                    array_push($args[$k], $first);
+                    array_push($args[$k], $p . $first);
                 }
             }
         } else {
             foreach ($args as $k => $v) {
-                array_push($args[$k], $val);
+                array_push($args[$k], $p . $val);
             }
         }
     }
@@ -124,10 +124,10 @@ class Parser
     *
     * @returns {String}
     */
-    private static function conditions($arr, &$args)
+    private static function conditions($arr, &$args,$prepend = "",$prep2 = "")
     {
         
-        $cond = function($i, $key, &$sql, &$indexes)
+        $cond = function($i, $key, &$sql, &$indexes,$prepend)
         {
             $arg = self::parseArg($key);
             switch ($arg) {
@@ -155,24 +155,24 @@ class Parser
             switch ($arg) {
                 case ">>]":
                     $key = substr($key, 4);
-                    $sql .= "`" . $key . "` > ?";
+                    $sql .= $prepend . "`" . $key . "` > ?";
                     break;
                 case "<<]":
                     $key = substr($key, 4);
-                    $sql .= "`" . $key . "` < ?";
+                    $sql .= $prepend . "`" . $key . "` < ?";
                     break;
                 case ">=]":
                     $key = substr($key, 4);
-                    $sql .= "`" . $key . "` >= ?";
+                    $sql .= $prepend . "`" . $key . "` >= ?";
                     break;
                 case "<=]":
                     $key = substr($key, 4);
-                    $sql .= "`" . $key . "` <= ?";
+                    $sql .= $prepend . "`" . $key . "` <= ?";
                     break;
                 default:
                     if ($arg == "==]")
                         $key = substr($key, 4);
-                    $sql .= "`" . $key . "` = ?";
+                    $sql .= $prepend . "`" . $key . "` = ?";
                     break;
             }
             $indexes[$key] = $i;
@@ -185,12 +185,12 @@ class Parser
         
         if (isset($arr[0])) {
             foreach ($arr[0] as $key => $val) {
-                $cond($i++, $key, $sql, $indexes);
+                $cond($i++, $key, $sql, $indexes, $prepend);
             }
-            self::append2($args, $indexes, $arr);
+            self::append2($args, $indexes, $arr, $prep2);
         } else {
             foreach ($arr as $key => $val) {
-                $cond($i++, $key, $sql, $indexes);
+                $cond($i++, $key, $sql, $indexes, $prepend, $prep2);
                 self::append($args, $val);
             }
         }
@@ -270,7 +270,7 @@ class Parser
                 
                 $sql .= "`" . $key . "` ON ";
                 
-                $c = self::conditions($val, $insert);
+                $c = self::conditions($val, $insert,"`" . $table . "`.","`" . $key . "`.");
                 $sql .= $c;
             }
         }
