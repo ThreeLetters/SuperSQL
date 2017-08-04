@@ -237,7 +237,11 @@ class Parser
                        $indexes[$key . "#" . $lvl . "." . $parent . "*"] = $i;
                       foreach ($value as $k => $v) {
                         if ($k != 0) $sql .= $statement;
+                         if ($quotes) {
+                          $sql .= "`" . $key . "`" . $o;
+                         } else {
                             $sql .= $key . $o;
+                         }
                           $i++;   
                           if ($append) {
                                array_push($args[0],$v); 
@@ -245,7 +249,11 @@ class Parser
                       }
                   }
                 } else {
-                    $sql .= $key . $o;
+                 if ($quotes) {
+                  $sql .= "`" . $key . "`" . $o;
+                 } else {
+                   $sql .= $key . $o;
+                 }
                     if ($append) {
                       array_push($args[0],$value);
                     } 
