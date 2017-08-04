@@ -65,6 +65,8 @@ Performance is boosted for a query if an identical query before it (with differe
 ### SELECT
 > **SQLib->SELECT($table, $columns, $where[,$join);**
 
+#### $table
+The name of the table, as a string.
 
 ### INSERT
 > **SQLib->INSERT($table, $data);**
