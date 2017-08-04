@@ -1,6 +1,6 @@
 <?php
 
-namespace SQLib;
+namespace SuperSQL;
 
 /*
 MIT License
@@ -30,7 +30,7 @@ SOFTWARE.
 /*
  Author: Andrews54757
  License: MIT
- Source: https://github.com/ThreeLetters/SQL-Library
+ Source: https://github.com/ThreeLetters/SuperSQL
 */
 
 
