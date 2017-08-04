@@ -74,7 +74,7 @@ Performance is boosted for a query if an identical query before it (with differe
 * `(Array)where` - Array of conditions for WHERE (See above for documentation on WHERE)
 * `(Array)join` - Array of conditions for JOIN. Usage:
 
-```
+```php
 SQLib->SELECT($table, $columns, $where, array(
 
     "table2" => array("table.something" => "table2.something"), // JOIN
@@ -85,11 +85,13 @@ SQLib->SELECT($table, $columns, $where, array(
     // [<>] - Full join
     "[>>]table3" => array("table.something" => "table3.something"), // RIGHT JOIN
 ));
-
 ```
 
 ### INSERT
 > **SQLib->INSERT($table, $data);**
+
+* `(String)table` - Table to insert to
+* `(Data)` - Data to insert
 
 ### UPDATE
 > **SQLib->UPDATE($table, $data, $where);**
