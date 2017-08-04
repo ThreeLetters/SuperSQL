@@ -29,9 +29,13 @@ $where = array(
  "[<<]arg3" => "val3", // AND arg3 < val3
  "[>=]arg4" => "val4", // AND arg4 >= val4
  "[<=]arg5" => "val5", // AND arg5 <= val5
- "[||]arg6" => "val6", // OR arg6 = val 6
- "[!!]arg7" => "val7", // NOT arg7 = val 7
- "[||][>>]arg8" => "val8" // OR arg8 > val8
+ "[||]" => [ // Bind ||.
+     "arg6" => "val6"
+ ],
+ "[&&][>>]" => [ // Bind >.
+     "arg7" => "val7"
+ ],
+ "arg8" => ["val8a","val8b"]
 );
 ```
 
@@ -51,7 +55,7 @@ array(
 }
 ); // -> [["val1","val2"],["val1","val3"]] - Two queries
 
-// Way 2
+// Way 2 (only works with INSERT)
 
 array(
 "arg1" => "val1",
