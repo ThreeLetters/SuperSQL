@@ -69,8 +69,24 @@ Performance is boosted for a query if an identical query before it (with differe
 ### SELECT
 > **SQLib->SELECT($table, $columns, $where[,$join);**
 
-#### $table
-The name of the table, as a string.
+* `(String)table` - Table name to query
+* `(Array)columns` - Array of columns to return. `[]` will query using the `*` selector. Also note, that you may use the `DISTINCT` keyword by putting it first in the array.
+* `(Array)where` - Array of conditions for WHERE (See above for documentation on WHERE)
+* `(Array)join` - Array of conditions for JOIN. Usage:
+
+```
+SQLib->SELECT($table, $columns, $where, array(
+
+    "table2" => array("table.something" => "table2.something"), // JOIN
+    
+    // [>>] - Right join
+    // [<<] - Left join
+    // [><] - Inner join (Default)
+    // [<>] - Full join
+    "[>>]table3" => array("table.something" => "table3.something"), // RIGHT JOIN
+));
+
+```
 
 ### INSERT
 > **SQLib->INSERT($table, $data);**
