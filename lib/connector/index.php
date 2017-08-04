@@ -170,6 +170,8 @@ class Connector
     function close()
     {
         $this->$db = null;
+        $this->last = null;
+        $this->lastSQL = null;
     }
     
     
