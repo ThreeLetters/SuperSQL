@@ -6,6 +6,22 @@ SlickInject and Medoo on steroids - The most advanced and compact library availa
 1. To provide a very fast and efficient way to edit sql databases
 2. To provide a easy method of access
 
+## Usage
+You may either
+
+1. Use the built file (/dist/SuperSQL.php)
+2. Use the library (include index.php)
+
+```php
+new SuperSQL($dsn,$user,$pass);
+```
+## Build
+To build this library, do 
+
+> node builder.js
+
+It will build to /dist/SuperSQL.php
+
 ## Documentation
 ```php
 // MySql setup
