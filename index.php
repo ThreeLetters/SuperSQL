@@ -59,12 +59,17 @@ class SuperSQL
     * @param {Array} columns - Columns to return
     * @param {Object|Array} where - Where clause
     * @param {Object|null} join - Join clause 
-    * 
+    * @param {String} limit - Limit clause 
+    *
     * @returns {SQLResponse|SQLResponse[]}
     */
-    function SELECT($table, $columns, $where, $join = null)
+    function SELECT($table, $columns, $where, $join = null, $limit = false)
     {
-        $d = Parser::SELECT($table, $columns, $where, $join);
+     if (gettype($join) == "integer") {
+            $limit = $join;
+            $join = null;
+        }
+        $d = Parser::SELECT($table, $columns, $where, $join, $limit);
         return $this->connector->_query($d[0], $d[1]);
     }
     

@@ -83,12 +83,13 @@ array(
 Performance is boosted for a query if an identical query before it (with different values [EG where vals, join, insert]), is made right before
 
 ### SELECT
-> **SuperSQL->SELECT($table, $columns, $where[,$join);**
+> **SuperSQL->SELECT($table, $columns, $where[,$join[, $limit);**
 
 * `(String)table` - Table name to query
 * `(Array)columns` - Array of columns to return. `[]` will query using the `*` selector. Also note, that you may use the `DISTINCT` keyword by putting it first in the array.
 * `(Array)where` - Array of conditions for WHERE (See above for documentation on WHERE)
-* `(Array)join` - Array of conditions for JOIN. Usage:
+* `(Array)join` - Array of conditions for JOIN. Usage below
+* `{Int}limit` - Number of rows to retrieve. Usage below. Note, you may also do `SuperSQL->SELECT($table, $columns, $where, $limit)`
 
 ```php
 $SuperSQL->SELECT("horizon", [], [], array(
@@ -97,7 +98,7 @@ $SuperSQL->SELECT("horizon", [], [], array(
     // [><] - Inner join (Default)
     // [<>] - Full join
     "[><]meteors" => array("horizon.object" => "meteors.object"), // JOIN
-));
+),5); // only 5 rows
 ```
 
 ### INSERT

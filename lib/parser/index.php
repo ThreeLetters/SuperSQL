@@ -179,7 +179,9 @@ class Parser
         $cond = function(&$cond,&$arr,&$args,$quotes,$statement,$default,&$indexes,&$i,$lvl,$parent,$append = false) {
             
             $b = 0;
+            
             foreach ($arr as $key => $value) {
+                
                 
                 $arg = self::parseArg($key);
                 
@@ -274,8 +276,6 @@ $indexes = array();
            self::append2($args,$indexes,$arr);
       } else {
             $sql = $cond($cond,$arr,$args,$quotes," AND ", " = ?",$indexes,$i,0,false,true);
-     
-          
       }
         return $sql;
     }
@@ -287,10 +287,11 @@ $indexes = array();
     * @param {Array} columns - Columns to return
     * @param {Object|Array} where - Where clause
     * @param {Object|null} join - Join clause 
+    * @param {Int} limit - Limit clause
     * 
     * @returns {Array}
     */
-    static function SELECT($table, $columns, $where, $join)
+    static function SELECT($table, $columns, $where, $join, $limit)
     {
         
         $sql = "SELECT ";
@@ -354,12 +355,14 @@ $indexes = array();
                 $sql .= $c;
             }
         }
-        
+    
         if (count($where) != 0) {
             $sql .= " WHERE ";
             $c = self::conditions($where, $insert);
             $sql .= $c;
         }
+        
+       if ($limit) $sql .= " LIMIT " . $limit;
         
         return array(
             $sql,
