@@ -54,7 +54,7 @@ class SuperSQL
     {
         $this->connector = new Connector($dsn, $user, $pass);
     }
-    
+    // BUILD ADVANCED BETWEEN
     /**
      * Queries a SQL table (SELECT)
      *
@@ -118,7 +118,9 @@ class SuperSQL
         $d = Parser::DELETE($table, $where);
         return $this->connector->_query($d[0], $d[1]);
     }
+    // BUILD ADVANCED BETWEEN
     
+    // BUILD SIMPLE BETWEEN
     /**
      * Queries a SQL table (SELECT) (Simple)
      *
@@ -177,6 +179,8 @@ class SuperSQL
         $d = SimpleParser::DELETE($table, $where);
         return $this->connector->_query($d[0], $d[1]);
     }
+    
+    // BUILD SIMPLE BETWEEN
     
     /**
      * Query

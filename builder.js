@@ -17,7 +17,7 @@ function removeComments(str) {
 
     str = str.split("");
     var len = str.length;
-    out = [];
+    var out = [];
     var i = 0
 
     function skip(char) {
@@ -94,7 +94,8 @@ var startstr = "// BUILD BETWEEN";
 simple = removeComments(simple.split(startstr)[1]);
 adv = removeComments(adv.split(startstr)[1]);
 connector = removeComments(connector.split(startstr)[1]);
-main = removeComments(main.split(startstr)[1]);
+var index = main.split(startstr)[1];
+main = removeComments(index);
 
 var out = `<?php\n\
 /*\n\
@@ -128,8 +129,9 @@ SOFTWARE.\n\
  Source: https://github.com/ThreeLetters/SQL-Library\n\
  Build: v${version}\n\
  Built on: ${date}\n\
-*/\n\n\
-// lib/connector/index.php\
+*/\n\n`;
+
+var complete = `// lib/connector/index.php\
 ${connector}\n\
 // lib/parser/Simple.php\
 ${simple}\n\
@@ -139,4 +141,29 @@ ${adv}\n\
 ${main}\
 ?>`;
 
-fs.writeFileSync(__dirname + "/dist/SuperSQL.php", out);
+var smain = index.split("// BUILD ADVANCED BETWEEN");
+smain = (smain[0] + smain[2]);
+smain = removeComments(smain);
+var simpleOnly = `// lib/connector/index.php\
+${connector}\n\
+// lib/parser/Simple.php\
+${simple}\n\
+// index.php\
+${smain}\
+?>`;
+
+var amain = index.split("// BUILD SIMPLE BETWEEN");
+amain = (amain[0] + amain[2]);
+amain = removeComments(amain);
+var advancedOnly = `// lib/connector/index.php\
+${connector}\n\
+// lib/parser/Advanced.php\
+${adv}\n\
+// index.php\
+${amain}\
+?>`;
+
+
+fs.writeFileSync(__dirname + "/dist/SuperSQL.php", out + complete);
+fs.writeFileSync(__dirname + "/dist/SuperSQL_simple.php", out + simpleOnly);
+fs.writeFileSync(__dirname + "/dist/SuperSQL_advanced.php", out + advancedOnly);
