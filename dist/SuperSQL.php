@@ -330,9 +330,30 @@ class AdvancedParser
             }
         }
     }
-    private static function conditions($arr, &$args, $quotes = true)
+    private static function quote($str) {
+       $str = explode(".", $str);
+        $out = "";
+        for ($i = 0; $i < count($str); $i++) {
+            if ($i != 0) $out .= ".";
+            $out .= "`" . $str[$i] . "`";
+        }
+        return $out;
+    }
+    private static function table($table) {
+        if (gettype($table) == "array") {
+             $sql = "";
+            for ($i = 0; $i < count($table); $i++) {
+                if ($i != 0) $sql .= ", ";
+                $sql .= self::quote($table[$i]);
+            }
+            return $sql;
+        } else {
+        return self::quote($table);
+        }
+    }
+    private static function conditions($arr, &$args)
     {
-        $cond = function(&$cond, &$arr, &$args, $quotes, $statement, $default, &$indexes, &$i, $parent, $append = false)
+        $cond = function(&$cond, &$arr, &$args, $statement, $default, &$indexes, &$i, $parent, $append = false)
         {
             $b = 0;
             $sql = "";
@@ -378,18 +399,14 @@ class AdvancedParser
                     $sql .= $statement;
                 if ($type == "array") {
                     if ($useBind) {
-                        $sql .= "(" . $cond($cond, $value, $args, $quotes, $s, $o, $indexes, $i, $parent . "/" . $key, $append) . ")";
+                        $sql .= "(" . $cond($cond, $value, $args, $s, $o, $indexes, $i, $parent . "/" . $key, $append) . ")";
                     } else {
                         $indexes[$key . "*"]                              = $i;
                         $indexes[$key . "#" . $parent . "*"] = $i;
                         foreach ($value as $k => $v) {
                             if ($k != 0)
                                 $sql .= $statement;
-                            if ($quotes) {
-                                $sql .= "`" . $key . "`" . $o;
-                            } else {
-                                $sql .= $key . $o;
-                            }
+                                $sql .= self::quote($key) . $o;
                             $i++;
                             if ($append) {
                                 array_push($args[0], $v);
@@ -397,11 +414,7 @@ class AdvancedParser
                         }
                     }
                 } else {
-                    if ($quotes) {
-                        $sql .= "`" . $key . "`" . $o;
-                    } else {
-                        $sql .= $key . $o;
-                    }
+                    $sql .= self::quote($key) . $o;
                     if ($append) {
                         array_push($args[0], $value);
                     }
@@ -415,10 +428,10 @@ class AdvancedParser
         $indexes = array();
         $i       = 0;
         if (isset($arr[0])) {
-            $sql = $cond($cond, $arr[0], $args, $quotes, " AND ", " = ?", $indexes, $i, "");
+            $sql = $cond($cond, $arr[0], $args, " AND ", " = ?", $indexes, $i, "");
             self::append2($args, $indexes, $arr);
         } else {
-            $sql = $cond($cond, $arr, $args, $quotes, " AND ", " = ?", $indexes, $i, "", true);
+            $sql = $cond($cond, $arr, $args, " AND ", " = ?", $indexes, $i, "", true);
         }
         return $sql;
     }
@@ -453,13 +466,13 @@ class AdvancedParser
                     if ($i > $req) {
                         $sql .= ", ";
                     }
-                    $sql .= "`" . $columns[$i] . "`";
+                    $sql .= self::quote($columns[$i]);
                 }
             } else
                 $sql .= "*";
             $sql .= $into;
         }
-        $sql .= " FROM `" . $table . "`";
+        $sql .= " FROM " . self::table($table);
         if ($join) {
             foreach ($join as $key => $val) {
                 $arg = self::parseArg($key);
@@ -477,8 +490,8 @@ class AdvancedParser
                         $sql .= " JOIN ";
                         break;
                 }
-                $sql .= "`" . $key . "` ON ";
-                $c = self::conditions($val, $insert, false);
+                $sql .= self::quote($key) . " ON ";
+                $c = self::conditions($val, $insert);
                 $sql .= $c;
             }
         }
@@ -496,7 +509,7 @@ class AdvancedParser
     }
     static function INSERT($table, $data)
     {
-        $sql    = "INSERT INTO `" . $table . "` (";
+        $sql    = "INSERT INTO " . self::table($table) . " (";
         $insert = array(
             array()
         );
@@ -509,7 +522,7 @@ class AdvancedParser
                     $sql .= ", ";
                     $values .= ", ";
                 }
-                $sql .= "`" . $key . "`";
+                $sql .= self::quote($key);
                 $values .= "?";
                 $indexes[$key] = $i++;
             }
@@ -520,7 +533,7 @@ class AdvancedParser
                     $sql .= ", ";
                     $values .= ", ";
                 }
-                $sql .= "`" . $key . "`";
+                $sql .= self::quote($key);
                 $values .= "?";
                 $i++;
                 self::append($insert, $val);
@@ -534,7 +547,7 @@ class AdvancedParser
     }
     static function UPDATE($table, $data, $where)
     {
-        $sql    = "UPDATE `" . $table . "` SET ";
+        $sql    = "UPDATE " . self::table($table) . " SET ";
         $insert = array(
             array()
         );
@@ -546,7 +559,7 @@ class AdvancedParser
                     $sql .= ", ";
                 }
                 $indexes[$key] = $i++;
-                $sql .= "`" . $key . "` = ?";
+                $sql .= self::quote($key) . " = ?";
             }
             self::append2($insert, $indexes, $data);
         } else {
@@ -555,7 +568,7 @@ class AdvancedParser
                     $sql .= ", ";
                 }
                 $i++;
-                $sql .= "`" . $key . "` = ?";
+                $sql .= self::quote($key) . " = ?";
                 self::append($insert, $val);
             }
         }
@@ -571,7 +584,7 @@ class AdvancedParser
     }
     static function DELETE($table, $where)
     {
-        $sql    = "DELETE FROM `" . $table . "`";
+        $sql    = "DELETE FROM " . self::table($table);
         $insert = array(
             array()
         );
