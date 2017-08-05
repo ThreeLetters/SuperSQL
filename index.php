@@ -30,11 +30,14 @@ SOFTWARE.
  Source: https://github.com/ThreeLetters/SuperSQL
 */
 
-include "lib/parser/index.php";
+include "lib/parser/Advanced.php";
+include "lib/parser/Simple.php";
 include "lib/connector/index.php";
 
-use SuperSQL\Parser as Parser;
+use SuperSQL\AdvancedParser as Parser;
+use SuperSQL\SimpleParser as Simple;
 use SuperSQL\Connector as Connector;
+
 
 // BUILD BETWEEN
 class SuperSQL
@@ -116,6 +119,92 @@ class SuperSQL
         return $this->connector->_query($d[0], $d[1]);
     }
     
+   /**
+    * Queries a SQL table (SELECT) (Simple)
+    *
+    * @param {String} table - SQL Table
+    * @param {Array} columns - Columns to return
+    * @param {Object} where - Where clause
+    * @param {String} append - SQL append
+    *
+    * @returns {SQLResponse}
+    */
+    function sSELECT($table, $columns, $where, $append = "")
+    {
+        $d = Simple::SELECT($table, $columns, $where, $append);
+        return $this->connector->_query($d[0], $d[1]);
+    }
+    
+   /**
+    * Inserts data into a SQL table (Simple)
+    *
+    * @param {String} table - SQL Table
+    * @param {Object} data - Data to insert
+    *
+    * @returns {SQLResponse}
+    */
+    function sINSERT($table, $data)
+    {
+        $d = Simple::INSERT($table, $data);
+        return $this->connector->_query($d[0], $d[1]);
+    }
+    
+   /**
+    * Updates a SQL table (Simple)
+    *
+    * @param {String} table - SQL Table
+    * @param {Object} data - Data to update
+    * @param {Object} where - Where clause
+    *
+    * @returns {SQLResponse}
+    */
+    function sUPDATE($table, $data, $where)
+    {
+        $d = Simple::UPDATE($table, $data, $where);
+        return $this->connector->_query($d[0], $d[1]);
+    }
+    
+   /**
+    * Deletes from a SQL table (Simple)
+    *
+    * @param {String} table - SQL Table
+    * @param {Object} where - Where clause
+    *
+    * @returns {SQLResponse}
+    */
+    function sDELETE($table, $where)
+    {
+        $d = Simple::DELETE($table, $where);
+        return $this->connector->_query($d[0], $d[1]);
+    }
+    
+   /**
+    * Query
+    */
+    function query($query) {
+        return $this->connector->query($query);
+    }
+   /**
+    * Closes the connection
+    */
+    function close() {
+        $this->connector->close();
+    }
+    
+   /**
+    * Turns on dev mode
+    */
+    function dev() {
+        $this->connector->dev = true;
+    }
+    
+   /**
+    * Get log
+    */
+    function getLog() {
+        return $this->connector->log;
+    }
+        
     
 }
 // BUILD BETWEEN

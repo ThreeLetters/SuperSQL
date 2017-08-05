@@ -79,6 +79,19 @@ array(
 ); // -> [["val1","val2"],["val1","val3"]] - Two queries
 ```
 
+#### Simple
+If you are making simple queries, you may use simple functions to boost performance. Use simple functions by attatching an `s` in front of the function. The syntax is very similar to SlickInject.
+
+```php
+$SuperSQL->sSELECT($table,$columns,$where);
+
+$SuperSQL->sINSERT($table,$data);
+
+$SuperSQL->sUPDATE($table,$data,$where);
+
+$SuperSQL->sDELETE($table,$where);
+```
+
 #### Cache
 Performance is boosted for a query if an identical query before it (with different values [EG where vals, join, insert]), is made right before
 

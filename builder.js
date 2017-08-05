@@ -1,4 +1,4 @@
-var version = "1.0.0";
+var version = "2.0.0";
 
 var today = new Date();
 var dd = today.getDate();
@@ -16,14 +16,17 @@ var date = dd + '/' + mm + '/' + yyyy;
 
 var fs = require("fs");
 
-var parser = fs.readFileSync(__dirname + "/lib/parser/index.php", "utf8");
+var simple = fs.readFileSync(__dirname + "/lib/parser/Simple.php", "utf8");
+
+var adv = fs.readFileSync(__dirname + "/lib/parser/Advanced.php", "utf8");
 
 var connector = fs.readFileSync(__dirname + "/lib/connector/index.php", "utf8");
 
 var main = fs.readFileSync(__dirname + "/index.php", "utf8");
 
 var startstr = "// BUILD BETWEEN";
-parser = parser.split(startstr)[1];
+simple = simple.split(startstr)[1];
+adv = adv.split(startstr)[1];
 connector = connector.split(startstr)[1];
 main = main.split(startstr)[1];
 
@@ -62,8 +65,10 @@ SOFTWARE.\n\
 */\n\n\
 // lib/connector/index.php\
 ${connector}\n\
-// lib/parser/index.php\
-${parser}\n\
+// lib/parser/Simple.php\
+${simple}\n\
+// lib/parser/Advanced.php\
+${adv}\n\
 // index.php\
 ${main}\
 ?>`;

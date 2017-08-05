@@ -27,8 +27,8 @@ SOFTWARE.
  Author: Andrews54757
  License: MIT
  Source: https://github.com/ThreeLetters/SQL-Library
- Build: v1.0.0
- Built on: 04/08/2017
+ Build: v2.0.0
+ Built on: 05/08/2017
 */
 
 // lib/connector/index.php
@@ -105,8 +105,10 @@ class Response
 
 class Connector
 {
-    public $queries;
+    public $queries = [];
     public $db;
+    public $log = [];
+    public $dev = false;
     
    /**
     * Creates a connection
@@ -116,8 +118,8 @@ class Connector
     */
     function __construct($dsn, $user, $pass)
     {
-       $this->db = new \PDO($dsn, $user, $pass);
-       $this->queries = array();
+        $this->db = new \PDO($dsn, $user, $pass);
+        $this->log = array();
     }
     
    /**
@@ -130,6 +132,8 @@ class Connector
     {
         $q = $this->db->prepare($query);
         $q->execute();
+        
+        if ($this->dev) array_push($this->log,[$query]);
         return new Response($q);
     }
     
@@ -142,14 +146,15 @@ class Connector
     */
     function _query($sql, $insert)
     {
-        
-          //echo json_encode(array($sql,$insert));
-          //return;
+         // echo json_encode(array($sql,$insert));
+         // return;
         if (isset($this->queries[$sql])) { // Cache
             $q = $this->queries[$sql];
+            if ($this->dev) array_push($this->log,["fromcache",$sql,$insert]);
         } else {
             $q             = $this->db->prepare($sql);
             $this->queries[$sql] = $q;
+            if ($this->dev) array_push($this->log,[$sql,$insert]);
         }
         
         if (count($insert) == 1) { // Single query
@@ -174,12 +179,106 @@ class Connector
         $this->queries = null;
         
     }
-    
-    
+   /**
+    * Clears cache
+    */
+    function clear()
+    {
+        $this->queries = [];   
+    }
 }
 
-// lib/parser/index.php
-class Parser
+// lib/parser/Simple.php
+class SimpleParser {
+    public static function WHERE($where, &$sql, &$insert) {
+         if (count($where) != 0) {
+        $sql .= " WHERE ";
+        $i = 0;
+        foreach ($where as $key => $value) {
+        
+            if ($i != 0) {
+                $sql .= " AND ";
+            }
+            $sql .= "`" . $key . "` = ?";
+            array_push($insert[0],$value);
+            $i++;
+        }
+        }
+    }
+    public static function SELECT($table,$columns,$where,$append) {
+        $sql = "SELECT ";
+        $insert = array(array());
+        $len = count($columns);
+        if ($len == 0) { // none
+            $sql .= "*";
+        } else { // some
+           for ($i = 0; $i < $len; $i++) {
+                    if ($i != 0) {
+                        $sql .= ", ";
+                    }
+                    $sql .= "`" . $columns[$i] . "`";
+                }
+        }
+        
+        $sql .= "FROM `" . $table . "`";
+        
+        self::WHERE($where,$sql,$insert);
+        
+        $sql .= " " . $append;
+        
+        return array($sql,$insert);
+    }
+    public static function INSERT($table,$data) {
+        $sql = "INSERT INTO `" . $table . "` (";
+        $add = ") VALUES (";
+        $insert = array(array());
+        
+        $i = 0;
+        
+        foreach ($data as $key => $value) {
+        
+            if ($i != 0) {
+                $sql .= ", ";
+                $add .= ", ";
+            }
+            $sql .= "`" . $key . "`";
+            $add .= "?";
+            array_push($insert[0],$value);
+            $i++;
+        }
+        
+        $sql .= $add;
+        
+        return array($sql,$insert);
+    }
+    public static function UPDATE($table,$data,$where) {
+        $sql = "UPDATE `" . $table . "` SET ";
+        $insert = array(array());
+        
+        $i = 0;
+        foreach ($data as $key => $value) {
+            if ($i != 0) {
+                $sql .= ", ";
+            }
+           $sql .= "`" . $key . "` = ?"; 
+           array_push($insert[0],$value);
+               $i++;
+        }
+        
+        self::WHERE($where,$sql,$insert);
+        return array($sql,$insert);
+    }
+    public static function DELETE($table,$where) {
+        $sql = "DELETE FROM `" . $table . "`";
+        $insert = array(array());
+        
+        self::WHERE($where,$sql,$insert);
+        return array($sql,$insert);
+    }
+}
+
+// lib/parser/Advanced.php
+class AdvancedParser
 {
    /**
     * Reads argument data from a string
@@ -448,19 +547,32 @@ $indexes = array();
         );
         
         
+        
         if ($len == 0) { // none
             $sql .= "*";
         } else { // some
+            $i = 0;
+            $req = 0;
+            $into = "";
             if ($columns[0] == "DISTINCT") {
-                $dis = true;
+                $i = 1;
+                $req = 1;
                 $sql .= "DISTINCT ";
+            } else if (substr($columns[0],0,11) == "INSERT INTO") {
+                $i = 1;
+                $req = 1;
+                $sql = $columns[0] . " " . $sql;
+            } else if (substr($columns[0],0,4) == "INTO") {
+                $i = 1;
+                $req = 1;
+                $into = " " . $columns[0] . " ";
             }
             
-            if (!$dis || $len != 2) { // has var
+            if ($len > $req) { // has var
                 
-                for ($i = $dis ? 1 : 0; $i < $len; $i++) {
+                for (; $i < $len; $i++) {
                     
-                    if ($i != 0 && (!$dis || $i != 1)) {
+                    if ($i > $req) {
                         $sql .= ", ";
                     }
                     $sql .= "`" . $columns[$i] . "`";
@@ -468,6 +580,8 @@ $indexes = array();
                 
             } else
                 $sql .= "*";
+            
+            $sql .= $into;
         }
         
         $sql .= " FROM `" . $table . "`";
@@ -726,6 +840,92 @@ class SuperSQL
         return $this->connector->_query($d[0], $d[1]);
     }
     
+   /**
+    * Queries a SQL table (SELECT) (Simple)
+    *
+    * @param {String} table - SQL Table
+    * @param {Array} columns - Columns to return
+    * @param {Object} where - Where clause
+    * @param {String} append - SQL append
+    *
+    * @returns {SQLResponse}
+    */
+    function sSELECT($table, $columns, $where, $append = "")
+    {
+        $d = Simple::SELECT($table, $columns, $where, $append);
+        return $this->connector->_query($d[0], $d[1]);
+    }
+    
+   /**
+    * Inserts data into a SQL table (Simple)
+    *
+    * @param {String} table - SQL Table
+    * @param {Object} data - Data to insert
+    *
+    * @returns {SQLResponse}
+    */
+    function sINSERT($table, $data)
+    {
+        $d = Simple::INSERT($table, $data);
+        return $this->connector->_query($d[0], $d[1]);
+    }
+    
+   /**
+    * Updates a SQL table (Simple)
+    *
+    * @param {String} table - SQL Table
+    * @param {Object} data - Data to update
+    * @param {Object} where - Where clause
+    *
+    * @returns {SQLResponse}
+    */
+    function sUPDATE($table, $data, $where)
+    {
+        $d = Simple::UPDATE($table, $data, $where);
+        return $this->connector->_query($d[0], $d[1]);
+    }
+    
+   /**
+    * Deletes from a SQL table (Simple)
+    *
+    * @param {String} table - SQL Table
+    * @param {Object} where - Where clause
+    *
+    * @returns {SQLResponse}
+    */
+    function sDELETE($table, $where)
+    {
+        $d = Simple::DELETE($table, $where);
+        return $this->connector->_query($d[0], $d[1]);
+    }
+    
+   /**
+    * Query
+    */
+    function query($query) {
+        return $this->connector->query($query);
+    }
+   /**
+    * Closes the connection
+    */
+    function close() {
+        $this->connector->close();
+    }
+    
+   /**
+    * Turns on dev mode
+    */
+    function dev() {
+        $this->connector->dev = true;
+    }
+    
+   /**
+    * Get log
+    */
+    function getLog() {
+        return $this->connector->log;
+    }
+        
     
 }
 ?>

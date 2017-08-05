@@ -105,8 +105,10 @@ class Response
 
 class Connector
 {
-    public $queries;
+    public $queries = [];
     public $db;
+    public $log = [];
+    public $dev = false;
     
    /**
     * Creates a connection
@@ -116,8 +118,8 @@ class Connector
     */
     function __construct($dsn, $user, $pass)
     {
-       $this->db = new \PDO($dsn, $user, $pass);
-       $this->queries = array();
+        $this->db = new \PDO($dsn, $user, $pass);
+        $this->log = array();
     }
     
    /**
@@ -130,6 +132,8 @@ class Connector
     {
         $q = $this->db->prepare($query);
         $q->execute();
+        
+        if ($this->dev) array_push($this->log,[$query]);
         return new Response($q);
     }
     
@@ -142,14 +146,15 @@ class Connector
     */
     function _query($sql, $insert)
     {
-        
-          //echo json_encode(array($sql,$insert));
-          //return;
+         // echo json_encode(array($sql,$insert));
+         // return;
         if (isset($this->queries[$sql])) { // Cache
             $q = $this->queries[$sql];
+            if ($this->dev) array_push($this->log,["fromcache",$sql,$insert]);
         } else {
             $q             = $this->db->prepare($sql);
             $this->queries[$sql] = $q;
+            if ($this->dev) array_push($this->log,[$sql,$insert]);
         }
         
         if (count($insert) == 1) { // Single query
@@ -174,8 +179,13 @@ class Connector
         $this->queries = null;
         
     }
-    
-    
+   /**
+    * Clears cache
+    */
+    function clear()
+    {
+        $this->queries = [];   
+    }
 }
 // BUILD BETWEEN
 ?>
