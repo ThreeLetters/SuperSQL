@@ -33,8 +33,22 @@ class Helper {
     $this->s = $SuperSQL;
   }
   
-  static function connect($host,$db,$user,$pass) {
-    
+  static function connect($host,$db,$user,$pass,$options = []) {
+      
+      $dbtype = "";
+      if (gettype($options) == "string") $dbtype = strtolower($options);
+      else if (isset($options["dbtype"])) $dbtype = strtolower($options["dbtype"]);
+          
+      if (!$dbtype) $dbtype = "mysql";
+      
+      switch ($dbtype) {
+          case "mysql":
+              $data = array(
+              "driver" => "mysql",
+              "db"=>);
+              break;
+              
+      }
     
   }
   
