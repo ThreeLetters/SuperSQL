@@ -78,6 +78,12 @@ array(
 "arg2" => array("val2","val3")
 ); // -> [["val1","val2"],["val1","val3"]] - Two queries
 ```
+#### Multi-Table support
+If you want to query multiple tables at once, put the tables in as an array
+
+```php
+$SuperSQL->SELECT(["table1","table2"],[],[]);
+```
 
 #### Simple
 If you are making simple queries, you may use simple functions to boost performance. Use simple functions by attatching an `s` in front of the function. The syntax is very similar to SlickInject.
@@ -93,7 +99,7 @@ $SuperSQL->sDELETE($table,$where);
 ```
 
 #### Cache
-Performance is boosted for a query if an identical query before it (with different values [EG where vals, join, insert]), is made right before
+Performance is boosted for a query if an identical query before it (with different values [EG where vals, join, insert]), is made right before. You can also clear the cache by doing: `$SuperSQL->clearCache()`
 
 ### SELECT
 > **SuperSQL->SELECT($table, $columns, $where[,$join[, $limit);**
