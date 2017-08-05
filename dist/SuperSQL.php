@@ -129,7 +129,7 @@ class Connector
         $this->db      = null;
         $this->queries = null;
     }
-    function clear()
+    function clearCache()
     {
         $this->queries = array();
     }
@@ -664,6 +664,10 @@ class SuperSQL
     function getLog()
     {
         return $this->connector->log;
+    }
+    function clearCache() 
+    {
+        $this->connector->clearCache();
     }
 }
 ?>

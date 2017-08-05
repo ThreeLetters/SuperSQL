@@ -195,7 +195,7 @@ class Connector
     /**
      * Clears cache
      */
-    function clear()
+    function clearCache()
     {
         $this->queries = array();
     }

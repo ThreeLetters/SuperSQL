@@ -208,7 +208,13 @@ class SuperSQL
     {
         return $this->connector->log;
     }
-    
+    /**
+     * Clear cache
+     */
+    function clearCache() 
+    {
+        $this->connector->clearCache();
+    }
     
 }
 // BUILD BETWEEN
