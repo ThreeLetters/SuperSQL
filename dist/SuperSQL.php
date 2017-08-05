@@ -95,9 +95,7 @@ class Connector
     }
     function _query($sql, $insert)
     {
-        n_encode(array($sql,$insert));
-        return;
-        if (isset($this->queries[$sql])) { ries[$sql];
+                        if (isset($this->queries[$sql])) {             $q = $this->queries[$sql];
             if ($this->dev)
                 array_push($this->log, array(
                     "fromcache",
@@ -113,11 +111,9 @@ class Connector
                     $insert
                 ));
         }
-        if (count($insert) == 1) { ngle query
-            $e = $q->execute($insert[0]);
+        if (count($insert) == 1) {             $e = $q->execute($insert[0]);
             return new Response($q, $e);
-        } else { ry
-            $responses = array();
+        } else {             $responses = array();
             foreach ($insert as $key => $value) {
                 $e = $q->execute($insert[0]);
                 array_push($responses, new Response($q, $e));
@@ -161,9 +157,8 @@ class SimpleParser
             array()
         );
         $len    = count($columns);
-        if ($len == 0) { none
-            $sql .= "*";
-        } else { r ($i = 0; $i < $len; $i++) {
+        if ($len == 0) {             $sql .= "*";
+        } else {             for ($i = 0; $i < $len; $i++) {
                 if ($i != 0) {
                     $sql .= ", ";
                 }
@@ -289,7 +284,6 @@ class AdvancedParser
     }
     private static function append2(&$insert, $indexes, $dt)
     {
-        function recurse(&$holder, $val, $indexes, $par)
         {
             foreach ($val as $k => $v) {
                 if (gettype($v) == "array") {
@@ -429,9 +423,9 @@ class AdvancedParser
         $insert = array(
             array()
         );
-        if ($len == 0) { none
-            $sql .= "*";
-        } else { req  = 0;
+        if ($len == 0) {             $sql .= "*";
+        } else {             $i    = 0;
+            $req  = 0;
             $into = "";
             if ($columns[0] == "DISTINCT") {
                 $i   = 1;
@@ -446,7 +440,7 @@ class AdvancedParser
                 $req  = 1;
                 $into = " " . $columns[0] . " ";
             }
-            if ($len > $req) { r
+            if ($len > $req) {                 
                 for (; $i < $len; $i++) {
                     if ($i > $req) {
                         $sql .= ", ";
@@ -471,7 +465,7 @@ class AdvancedParser
                     case "<>]":
                         $sql .= " FULL JOIN ";
                         break;
-                    default: nner join
+                    default:                         
                         $sql .= " JOIN ";
                         break;
                 }
@@ -599,17 +593,17 @@ class SuperSQL
             $limit = $join;
             $join  = null;
         }
-        $d = Parser::SELECT($table, $columns, $where, $join, $limit);
+        $d = AdvancedParser::SELECT($table, $columns, $where, $join, $limit);
         return $this->connector->_query($d[0], $d[1]);
     }
     function INSERT($table, $data)
     {
-        $d = Parser::INSERT($table, $data);
+        $d = AdvancedParser::INSERT($table, $data);
         return $this->connector->_query($d[0], $d[1]);
     }
     function UPDATE($table, $data, $where)
     {
-        $d = Parser::UPDATE($table, $data, $where);
+        $d = AdvancedParser::UPDATE($table, $data, $where);
         return $this->connector->_query($d[0], $d[1]);
     }
     function DELETE($table, $where)
@@ -619,22 +613,22 @@ class SuperSQL
     }
     function sSELECT($table, $columns, $where, $append = "")
     {
-        $d = Simple::SELECT($table, $columns, $where, $append);
+        $d = SimpleParser::SELECT($table, $columns, $where, $append);
         return $this->connector->_query($d[0], $d[1]);
     }
     function sINSERT($table, $data)
     {
-        $d = Simple::INSERT($table, $data);
+        $d = SimpleParser::INSERT($table, $data);
         return $this->connector->_query($d[0], $d[1]);
     }
     function sUPDATE($table, $data, $where)
     {
-        $d = Simple::UPDATE($table, $data, $where);
+        $d = SimpleParser::UPDATE($table, $data, $where);
         return $this->connector->_query($d[0], $d[1]);
     }
     function sDELETE($table, $where)
     {
-        $d = Simple::DELETE($table, $where);
+        $d = SimpleParser::DELETE($table, $where);
         return $this->connector->_query($d[0], $d[1]);
     }
     function query($query)
