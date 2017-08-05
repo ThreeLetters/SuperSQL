@@ -118,7 +118,7 @@ class AdvancedParser
     
     private static function append2(&$insert, $indexes, $dt)
     {
-        function recurse(&$holder, $val, $indexes, $par, $lvl)
+        function recurse(&$holder, $val, $indexes, $par)
         {
             foreach ($val as $k => $v) {
                 if (gettype($v) == "array") {
@@ -128,23 +128,20 @@ class AdvancedParser
                         $k = substr($k, $b + 1);
                     }
                     if ($a != "[||]" && $a != "[&&]") {
-                        $d = $indexes[$k . "#" . $lvl . "." . $par . "*"];
-                        if (!$d)
-                            $d = $indexes[$k . "*"];
+                        if (isset($indexes[$k . "#" . $par . "*"])) $d = $indexes[$k . "#" . $par . "*"]; else $d = $indexes[$k . "*"];
+                 
                         foreach ($v as $i => $j) {
                             $holder[$d + $i] = $j;
                         }
                     } else {
-                        recurse($holder, $v, $indexes, $k, $lvl + 1);
+                        recurse($holder, $v, $indexes, $par . "/" . $k);
                     }
                 } else {
                     $b = strrpos($k, "]", -1);
                     if ($b != false) {
                         $k = substr($k, $b + 1);
                     }
-                    $d = $indexes[$k . "#" . $lvl . "." . $par];
-                    if (!$d)
-                        $d = $indexes[$k];
+                     if (isset($indexes[$k . "#" . $par])) $d = $indexes[$k . "#" . $par]; else $d = $indexes[$k];
                     $holder[$d] = $v;
                 }
             }
@@ -156,7 +153,7 @@ class AdvancedParser
                 $insert[$key] = array();
             $holder = $last ? array_slice($last, 0) : array();
             
-            recurse($holder, $val, $indexes, "", 0);
+            recurse($holder, $val, $indexes, "");
             if (!$last)
                 $last = $holder;
             $c = count($holder);
@@ -179,10 +176,11 @@ class AdvancedParser
     private static function conditions($arr, &$args, $quotes = true)
     {
         
-        $cond = function(&$cond, &$arr, &$args, $quotes, $statement, $default, &$indexes, &$i, $lvl, $parent, $append = false)
+        $cond = function(&$cond, &$arr, &$args, $quotes, $statement, $default, &$indexes, &$i, $parent, $append = false)
         {
             
             $b = 0;
+            $sql = "";
             
             foreach ($arr as $key => $value) {
                 
@@ -239,10 +237,10 @@ class AdvancedParser
                 
                 if ($type == "array") {
                     if ($useBind) {
-                        $sql .= "(" . $cond($cond, $value, $args, $quotes, $s, $o, $indexes, $i, $lvl + 1, $key, $append) . ")";
+                        $sql .= "(" . $cond($cond, $value, $args, $quotes, $s, $o, $indexes, $i, $parent . "/" . $key, $append) . ")";
                     } else {
                         $indexes[$key . "*"]                              = $i;
-                        $indexes[$key . "#" . $lvl . "." . $parent . "*"] = $i;
+                        $indexes[$key . "#" . $parent . "*"] = $i;
                         foreach ($value as $k => $v) {
                             if ($k != 0)
                                 $sql .= $statement;
@@ -267,7 +265,7 @@ class AdvancedParser
                         array_push($args[0], $value);
                     }
                     $indexes[$key]                              = $i;
-                    $indexes[$key . "#" . $lvl . "." . $parent] = $i++;
+                    $indexes[$key . "#" . $parent] = $i++;
                 }
                 $b++;
             }
@@ -279,10 +277,10 @@ class AdvancedParser
         $indexes = array();
         $i       = 0;
         if (isset($arr[0])) {
-            $sql = $cond($cond, $arr[0], $args, $quotes, " AND ", " = ?", $indexes, $i, 0, false);
+            $sql = $cond($cond, $arr[0], $args, $quotes, " AND ", " = ?", $indexes, $i, "");
             self::append2($args, $indexes, $arr);
         } else {
-            $sql = $cond($cond, $arr, $args, $quotes, " AND ", " = ?", $indexes, $i, 0, false, true);
+            $sql = $cond($cond, $arr, $args, $quotes, " AND ", " = ?", $indexes, $i, "", true);
         }
         return $sql;
     }

@@ -179,7 +179,7 @@ class Connector
                 $e = $q->execute($insert[0]);
                 array_push($responses, new Response($q, $e));
             }
-            return responses;
+            return $responses;
         }
     }
     
