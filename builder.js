@@ -49,6 +49,7 @@ function removeComments(str) {
                 for (++i; i < len; i++) {
                     var c = str[i];
                     if (c == "\n") {
+                        out.push("\n")
                         break;
                     }
                 }

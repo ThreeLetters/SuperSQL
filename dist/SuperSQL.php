@@ -95,7 +95,8 @@ class Connector
     }
     function _query($sql, $insert)
     {
-                        if (isset($this->queries[$sql])) {             $q = $this->queries[$sql];
+        if (isset($this->queries[$sql])) { 
+            $q = $this->queries[$sql];
             if ($this->dev)
                 array_push($this->log, array(
                     "fromcache",
@@ -111,9 +112,11 @@ class Connector
                     $insert
                 ));
         }
-        if (count($insert) == 1) {             $e = $q->execute($insert[0]);
+        if (count($insert) == 1) { 
+            $e = $q->execute($insert[0]);
             return new Response($q, $e);
-        } else {             $responses = array();
+        } else { 
+            $responses = array();
             foreach ($insert as $key => $value) {
                 $e = $q->execute($insert[0]);
                 array_push($responses, new Response($q, $e));
@@ -157,8 +160,10 @@ class SimpleParser
             array()
         );
         $len    = count($columns);
-        if ($len == 0) {             $sql .= "*";
-        } else {             for ($i = 0; $i < $len; $i++) {
+        if ($len == 0) { 
+            $sql .= "*";
+        } else { 
+            for ($i = 0; $i < $len; $i++) {
                 if ($i != 0) {
                     $sql .= ", ";
                 }
@@ -284,6 +289,7 @@ class AdvancedParser
     }
     private static function append2(&$insert, $indexes, $dt)
     {
+        function recurse(&$holder, $val, $indexes, $par)
         {
             foreach ($val as $k => $v) {
                 if (gettype($v) == "array") {
@@ -423,8 +429,10 @@ class AdvancedParser
         $insert = array(
             array()
         );
-        if ($len == 0) {             $sql .= "*";
-        } else {             $i    = 0;
+        if ($len == 0) { 
+            $sql .= "*";
+        } else { 
+            $i    = 0;
             $req  = 0;
             $into = "";
             if ($columns[0] == "DISTINCT") {
@@ -440,7 +448,7 @@ class AdvancedParser
                 $req  = 1;
                 $into = " " . $columns[0] . " ";
             }
-            if ($len > $req) {                 
+            if ($len > $req) { 
                 for (; $i < $len; $i++) {
                     if ($i > $req) {
                         $sql .= ", ";
@@ -465,7 +473,7 @@ class AdvancedParser
                     case "<>]":
                         $sql .= " FULL JOIN ";
                         break;
-                    default:                         
+                    default: 
                         $sql .= " JOIN ";
                         break;
                 }
