@@ -26,9 +26,9 @@ SOFTWARE.
 */
 
 /*
- Author: Andrews54757
- License: MIT
- Source: https://github.com/ThreeLetters/SuperSQL
+Author: Andrews54757
+License: MIT
+Source: https://github.com/ThreeLetters/SuperSQL
 */
 
 // BUILD BETWEEN
@@ -40,9 +40,9 @@ class Response
     public $error;
     public $errorData;
     
-   /**
-    * Gets data from a query
-    */
+    /**
+     * Gets data from a query
+     */
     function __construct($data, $error)
     {
         
@@ -58,44 +58,45 @@ class Response
         $data->closeCursor();
     }
     
-   /**
-    * Returns error data if there is one
-    */
+    /**
+     * Returns error data if there is one
+     */
     function error()
     {
         return $this->error ? $this->errorData : false;
     }
-
-   /**
-    * Gets data from the query
-    *
-    * @returns {Array}
-    */
+    
+    /**
+     * Gets data from the query
+     *
+     * @returns {Array}
+     */
     function getData()
     {
         return $this->result;
     }
     
-   /**
-    * Gets number of affected rows from the query
-    *
-    * @returns {Int}
-    */
-    function getAffected() {
+    /**
+     * Gets number of affected rows from the query
+     *
+     * @returns {Int}
+     */
+    function getAffected()
+    {
         return $this->affected;
     }
     
-   /**
-    * Gets next row
-    */
+    /**
+     * Gets next row
+     */
     function next()
     {
         return $this->result[$this->ind++];
     }
     
-   /**
-    * Resets ititerator
-    */
+    /**
+     * Resets ititerator
+     */
     function reset()
     {
         $this->ind = 0;
@@ -105,56 +106,68 @@ class Response
 
 class Connector
 {
-    public $queries = [];
+    public $queries = array();
     public $db;
-    public $log = [];
+    public $log = array();
     public $dev = false;
     
-   /**
-    * Creates a connection
-    * @param {String} dsn - DSN of the connection
-    * @param {String} user - Username
-    * @param {String} pass - Password
-    */
+    /**
+     * Creates a connection
+     * @param {String} dsn - DSN of the connection
+     * @param {String} user - Username
+     * @param {String} pass - Password
+     */
     function __construct($dsn, $user, $pass)
     {
-        $this->db = new \PDO($dsn, $user, $pass);
+        $this->db  = new \PDO($dsn, $user, $pass);
         $this->log = array();
     }
     
-   /**
-    * Queries database
-    * @param {String} query - Query to make
-    *
-    * @returns {SQLResponse}
-    */
+    /**
+     * Queries database
+     * @param {String} query - Query to make
+     *
+     * @returns {SQLResponse}
+     */
     function query($query)
     {
         $q = $this->db->prepare($query);
         $q->execute();
         
-        if ($this->dev) array_push($this->log,[$query]);
+        if ($this->dev)
+            array_push($this->log, array(
+                $query
+            ));
         return new Response($q);
     }
     
-   /**
-    * Queries database efficiently
-    * @param {String} sql - Base query
-    * @param {Array} insert - array of args
-    *
-    * @returns {SQLResponse|SQLResponse[]}
-    */
+    /**
+     * Queries database efficiently
+     * @param {String} sql - Base query
+     * @param {Array} insert - array of args
+     *
+     * @returns {SQLResponse|SQLResponse[]}
+     */
     function _query($sql, $insert)
     {
-         // echo json_encode(array($sql,$insert));
-         // return;
+        // echo json_encode(array($sql,$insert));
+        // return;
         if (isset($this->queries[$sql])) { // Cache
             $q = $this->queries[$sql];
-            if ($this->dev) array_push($this->log,["fromcache",$sql,$insert]);
+            if ($this->dev)
+                array_push($this->log, array(
+                    "fromcache",
+                    $sql,
+                    $insert
+                ));
         } else {
-            $q             = $this->db->prepare($sql);
+            $q                   = $this->db->prepare($sql);
             $this->queries[$sql] = $q;
-            if ($this->dev) array_push($this->log,[$sql,$insert]);
+            if ($this->dev)
+                array_push($this->log, array(
+                    $sql,
+                    $insert
+                ));
         }
         
         if (count($insert) == 1) { // Single query
@@ -170,21 +183,21 @@ class Connector
         }
     }
     
-   /**
-    * Closes the connection
-    */
+    /**
+     * Closes the connection
+     */
     function close()
     {
-        $this->db = null;
+        $this->db      = null;
         $this->queries = null;
         
     }
-   /**
-    * Clears cache
-    */
+    /**
+     * Clears cache
+     */
     function clear()
     {
-        $this->queries = [];   
+        $this->queries = array();
     }
 }
 // BUILD BETWEEN
