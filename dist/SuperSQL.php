@@ -358,26 +358,24 @@ class AdvancedParser
             $b = 0;
             $sql = "";
             foreach ($arr as $key => $value) {
-                $arg = self::parseArg($key);
+                $arg = self::parseArg($key); 
                 $type = gettype($value);
                 $s = $statement;
                 $o = $default;
-                $useBind = false;
+                $useBind = ($type == "array" && isset($value[0]));
                 if ($type == "array") {
                     switch ($arg) {
-                        case "&&]":
+                        case "&&]": 
                             $s       = " AND ";
                             $arg     = self::parseArg($key);
-                            $useBind = true;
                             break;
-                        case "||]":
+                        case "||]": 
                             $s       = " OR ";
                             $arg     = self::parseArg($key);
-                            $useBind = true;
                             break;
                     }
                 }
-                switch ($arg) {
+                switch ($arg) { 
                     case ">>]":
                         $o = " > ?";
                         break;
@@ -391,17 +389,14 @@ class AdvancedParser
                         $o = " <= ?";
                         break;
                     default:
-                        if ($useBind)
-                            $o = " = ?";
+                        if ($useBind) $o = " = ?"; 
                         break;
                 }
                 if ($b != 0)
                     $sql .= $statement;
                 if ($type == "array") {
-                    if ($useBind) {
-                        $sql .= "(" . $cond($cond, $value, $args, $s, $o, $indexes, $i, $parent . "/" . $key, $append) . ")";
-                    } else {
-                        $indexes[$key . "*"]                              = $i;
+                    if ($useBind) { 
+                        $indexes[$key . "*"] = $i;
                         $indexes[$key . "#" . $parent . "*"] = $i;
                         foreach ($value as $k => $v) {
                             if ($k != 0)
@@ -412,13 +407,15 @@ class AdvancedParser
                                 array_push($args[0], $v);
                             }
                         }
+                    } else { 
+                    $sql .= "(" . $cond($cond, $value, $args, $s, $o, $indexes, $i, $parent . "/" . $key, $append) . ")"; 
                     }
                 } else {
                     $sql .= self::quote($key) . $o;
                     if ($append) {
                         array_push($args[0], $value);
                     }
-                    $indexes[$key]                              = $i;
+                    $indexes[$key] = $i;
                     $indexes[$key . "#" . $parent] = $i++;
                 }
                 $b++;
@@ -427,10 +424,10 @@ class AdvancedParser
         };
         $indexes = array();
         $i       = 0;
-        if (isset($arr[0])) {
+        if (isset($arr[0])) { 
             $sql = $cond($cond, $arr[0], $args, " AND ", " = ?", $indexes, $i, "");
             self::append2($args, $indexes, $arr);
-        } else {
+        } else { 
             $sql = $cond($cond, $arr, $args, " AND ", " = ?", $indexes, $i, "", true);
         }
         return $sql;

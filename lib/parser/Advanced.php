@@ -220,7 +220,7 @@ class AdvancedParser
             foreach ($arr as $key => $value) {
                 
                 
-                $arg = self::parseArg($key);
+                $arg = self::parseArg($key); // get string inside brackets
                 
                 $type = gettype($value);
                 
@@ -228,24 +228,22 @@ class AdvancedParser
                 
                 $o = $default;
                 
-                $useBind = false;
+                $useBind = ($type == "array" && isset($value[0]));
                 
                 if ($type == "array") {
                     switch ($arg) {
-                        case "&&]":
+                        case "&&]": // AND bind
                             $s       = " AND ";
                             $arg     = self::parseArg($key);
-                            $useBind = true;
                             break;
-                        case "||]":
+                        case "||]": // OR bind
                             $s       = " OR ";
                             $arg     = self::parseArg($key);
-                            $useBind = true;
                             break;
                     }
                 }
                 
-                switch ($arg) {
+                switch ($arg) { // different conditionals
                     case ">>]":
                         $o = " > ?";
                         
@@ -262,8 +260,7 @@ class AdvancedParser
                         $o = " <= ?";
                         break;
                     default:
-                        if ($useBind)
-                            $o = " = ?";
+                        if ($useBind) $o = " = ?"; // reset
                         break;
                 }
                 
@@ -271,10 +268,8 @@ class AdvancedParser
                     $sql .= $statement;
                 
                 if ($type == "array") {
-                    if ($useBind) {
-                        $sql .= "(" . $cond($cond, $value, $args, $s, $o, $indexes, $i, $parent . "/" . $key, $append) . ")";
-                    } else {
-                        $indexes[$key . "*"]                              = $i;
+                    if ($useBind) { // Same key, diff out
+                        $indexes[$key . "*"] = $i;
                         $indexes[$key . "#" . $parent . "*"] = $i;
                         foreach ($value as $k => $v) {
                             if ($k != 0)
@@ -285,30 +280,29 @@ class AdvancedParser
                                 array_push($args[0], $v);
                             }
                         }
+                    } else { // Recurse
+                    $sql .= "(" . $cond($cond, $value, $args, $s, $o, $indexes, $i, $parent . "/" . $key, $append) . ")"; 
                     }
                 } else {
-
                     $sql .= self::quote($key) . $o;
                     
                     if ($append) {
                         array_push($args[0], $value);
                     }
-                    $indexes[$key]                              = $i;
+                    $indexes[$key] = $i;
                     $indexes[$key . "#" . $parent] = $i++;
                 }
                 $b++;
             }
-            
             return $sql;
-            
         };
         
         $indexes = array();
         $i       = 0;
-        if (isset($arr[0])) {
+        if (isset($arr[0])) { // multi-query
             $sql = $cond($cond, $arr[0], $args, " AND ", " = ?", $indexes, $i, "");
             self::append2($args, $indexes, $arr);
-        } else {
+        } else { // single-query
             $sql = $cond($cond, $arr, $args, " AND ", " = ?", $indexes, $i, "", true);
         }
         return $sql;
@@ -327,7 +321,6 @@ class AdvancedParser
      */
     static function SELECT($table, $columns, $where, $join, $limit)
     {
-        
         $sql = "SELECT ";
         
         $len = count($columns);
@@ -335,8 +328,6 @@ class AdvancedParser
         $insert = array(
             array()
         );
-        
-        
         
         if ($len == 0) { // none
             $sql .= "*";
