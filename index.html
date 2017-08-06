@@ -251,6 +251,12 @@
                     <a href="#cache" class="toc-h2 toc-link" data-title="Documentation">Cache</a>
                   </li>
                   <li>
+                    <a href="#raw-queries" class="toc-h2 toc-link" data-title="Documentation">Raw Queries</a>
+                  </li>
+                  <li>
+                    <a href="#responses" class="toc-h2 toc-link" data-title="Documentation">Responses</a>
+                  </li>
+                  <li>
                     <a href="#select" class="toc-h2 toc-link" data-title="Documentation">SELECT</a>
                   </li>
                   <li>
@@ -380,6 +386,24 @@ To make duplicate keys work for binds, you can add a name to the bind. Ex: `[&&]
 <p>If you are making simple queries, you may use simple functions to boost performance. Use simple functions by attatching an <code>s</code> in front of the function. The syntax is very similar to SlickInject.</p>
 <h3 id='cache'>Cache</h3>
 <p>Performance is boosted for a query if an identical query before it (with different values [EG where vals, join, insert]), is made right before. You can also clear the cache by doing: <code>$SuperSQL-&gt;clearCache()</code></p>
+<h3 id='raw-queries'>Raw Queries</h3>
+<p>Raw queries can be made using <code>$SuperSQL-&gt;query($query)</code>.</p>
+<h2 id='responses'>Responses</h2>
+<p>When you make a query, SuperSQL will return a SQLResponse object.</p>
+<h3 id='response-gt-getdata'>Response-&gt;getData()</h3>
+<p>Get all rows</p>
+<h3 id='response-gt-error'>Response-&gt;error()</h3>
+<p>Returns error object if there is one. False otherwise</p>
+<h3 id='response-gt-getaffected'>Response-&gt;getAffected()</h3>
+<p>Get number of rows affected by the query</p>
+<h3 id='response-gt-next'>Response-&gt;next()</h3>
+<p>Get next row</p>
+<h3 id='response-gt-reset'>Response-&gt;reset()</h3>
+<p>Reset ititerator.</p>
+
+<aside class="notice">
+Note: All rows are retrieved and stored at object initialisation. `Response->next()` or `Response->reset()` does not affect the database or connection
+</aside>
 <h2 id='select'>SELECT</h2><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">SELECT</span><span class="p">(</span><span class="s2">"horizon"</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[],</span> <span class="k">array</span><span class="p">(</span>
     <span class="c1">// [&gt;&gt;] - Right join
