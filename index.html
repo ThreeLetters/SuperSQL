@@ -1,0 +1,455 @@
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>SuperSQL</title>
+
+    <style>
+      .highlight table td { padding: 5px; }
+.highlight table pre { margin: 0; }
+.highlight .gh {
+  color: #999999;
+}
+.highlight .sr {
+  color: #f6aa11;
+}
+.highlight .go {
+  color: #888888;
+}
+.highlight .gp {
+  color: #555555;
+}
+.highlight .gs {
+}
+.highlight .gu {
+  color: #aaaaaa;
+}
+.highlight .nb {
+  color: #f6aa11;
+}
+.highlight .cm {
+  color: #75715e;
+}
+.highlight .cp {
+  color: #75715e;
+}
+.highlight .c1 {
+  color: #75715e;
+}
+.highlight .cs {
+  color: #75715e;
+}
+.highlight .c, .highlight .cd {
+  color: #75715e;
+}
+.highlight .err {
+  color: #960050;
+}
+.highlight .gr {
+  color: #960050;
+}
+.highlight .gt {
+  color: #960050;
+}
+.highlight .gd {
+  color: #49483e;
+}
+.highlight .gi {
+  color: #49483e;
+}
+.highlight .ge {
+  color: #49483e;
+}
+.highlight .kc {
+  color: #66d9ef;
+}
+.highlight .kd {
+  color: #66d9ef;
+}
+.highlight .kr {
+  color: #66d9ef;
+}
+.highlight .no {
+  color: #66d9ef;
+}
+.highlight .kt {
+  color: #66d9ef;
+}
+.highlight .mf {
+  color: #ae81ff;
+}
+.highlight .mh {
+  color: #ae81ff;
+}
+.highlight .il {
+  color: #ae81ff;
+}
+.highlight .mi {
+  color: #ae81ff;
+}
+.highlight .mo {
+  color: #ae81ff;
+}
+.highlight .m, .highlight .mb, .highlight .mx {
+  color: #ae81ff;
+}
+.highlight .sc {
+  color: #ae81ff;
+}
+.highlight .se {
+  color: #ae81ff;
+}
+.highlight .ss {
+  color: #ae81ff;
+}
+.highlight .sd {
+  color: #e6db74;
+}
+.highlight .s2 {
+  color: #e6db74;
+}
+.highlight .sb {
+  color: #e6db74;
+}
+.highlight .sh {
+  color: #e6db74;
+}
+.highlight .si {
+  color: #e6db74;
+}
+.highlight .sx {
+  color: #e6db74;
+}
+.highlight .s1 {
+  color: #e6db74;
+}
+.highlight .s {
+  color: #e6db74;
+}
+.highlight .na {
+  color: #a6e22e;
+}
+.highlight .nc {
+  color: #a6e22e;
+}
+.highlight .nd {
+  color: #a6e22e;
+}
+.highlight .ne {
+  color: #a6e22e;
+}
+.highlight .nf {
+  color: #a6e22e;
+}
+.highlight .vc {
+  color: #ffffff;
+}
+.highlight .nn {
+  color: #ffffff;
+}
+.highlight .nl {
+  color: #ffffff;
+}
+.highlight .ni {
+  color: #ffffff;
+}
+.highlight .bp {
+  color: #ffffff;
+}
+.highlight .vg {
+  color: #ffffff;
+}
+.highlight .vi {
+  color: #ffffff;
+}
+.highlight .nv {
+  color: #ffffff;
+}
+.highlight .w {
+  color: #ffffff;
+}
+.highlight {
+  color: #ffffff;
+}
+.highlight .n, .highlight .py, .highlight .nx {
+  color: #ffffff;
+}
+.highlight .ow {
+  color: #f92672;
+}
+.highlight .nt {
+  color: #f92672;
+}
+.highlight .k, .highlight .kv {
+  color: #f92672;
+}
+.highlight .kn {
+  color: #f92672;
+}
+.highlight .kp {
+  color: #f92672;
+}
+.highlight .o {
+  color: #f92672;
+}
+    </style>
+    <link href="stylesheets/screen.css" rel="stylesheet" media="screen" />
+    <link href="stylesheets/print.css" rel="stylesheet" media="print" />
+      <script src="javascripts/all.js"></script>
+  </head>
+
+  <body class="index" data-languages="[&quot;php&quot;]">
+    <a href="#" id="nav-button">
+      <span>
+        NAV
+        <img src="images/navbar.png" alt="Navbar" />
+      </span>
+    </a>
+    <div class="toc-wrapper">
+      <img src="images/logo.png" class="logo" alt="Logo" />
+        <div class="lang-selector">
+              <a href="#" data-language-name="php">php</a>
+        </div>
+        <div class="search">
+          <input type="text" class="search" id="input-search" placeholder="Search">
+        </div>
+        <ul class="search-results"></ul>
+      <div id="toc" class="toc-list-h1">
+          <li>
+            <a href="#supersql" class="toc-h1 toc-link" data-title="SuperSQL">SuperSQL</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#purpose" class="toc-h2 toc-link" data-title="SuperSQL">Purpose</a>
+                  </li>
+                  <li>
+                    <a href="#usage" class="toc-h2 toc-link" data-title="SuperSQL">Usage</a>
+                  </li>
+                  <li>
+                    <a href="#build" class="toc-h2 toc-link" data-title="SuperSQL">Build</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
+            <a href="#documentation" class="toc-h1 toc-link" data-title="Documentation">Documentation</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#conditionals" class="toc-h2 toc-link" data-title="Documentation">Conditionals</a>
+                  </li>
+                  <li>
+                    <a href="#multi-queries" class="toc-h2 toc-link" data-title="Documentation">Multi-queries</a>
+                  </li>
+                  <li>
+                    <a href="#multi-table-support" class="toc-h2 toc-link" data-title="Documentation">Multi-Table support</a>
+                  </li>
+                  <li>
+                    <a href="#simple" class="toc-h2 toc-link" data-title="Documentation">Simple</a>
+                  </li>
+                  <li>
+                    <a href="#cache" class="toc-h2 toc-link" data-title="Documentation">Cache</a>
+                  </li>
+                  <li>
+                    <a href="#select" class="toc-h2 toc-link" data-title="Documentation">SELECT</a>
+                  </li>
+                  <li>
+                    <a href="#insert" class="toc-h2 toc-link" data-title="Documentation">INSERT</a>
+                  </li>
+                  <li>
+                    <a href="#update" class="toc-h2 toc-link" data-title="Documentation">UPDATE</a>
+                  </li>
+                  <li>
+                    <a href="#delete" class="toc-h2 toc-link" data-title="Documentation">DELETE</a>
+                  </li>
+              </ul>
+          </li>
+      </div>
+    </div>
+    <div class="page-wrapper">
+      <div class="dark-box"></div>
+      <div class="content">
+        <h1 id='supersql'>SuperSQL</h1><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="c1">// MySql setup
+</span><span class="nv">$host</span> <span class="o">=</span> <span class="s2">"localhost"</span><span class="p">;</span>
+<span class="nv">$db</span> <span class="o">=</span> <span class="s2">"test"</span><span class="p">;</span>
+<span class="nv">$user</span> <span class="o">=</span> <span class="s2">"root"</span><span class="p">;</span>
+<span class="nv">$pass</span> <span class="o">=</span> <span class="s2">"1234"</span><span class="p">;</span>
+
+<span class="nv">$dsn</span> <span class="o">=</span> <span class="s2">"mysql:host=</span><span class="nv">$host</span><span class="s2">;port=3306;dbname=</span><span class="nv">$db</span><span class="s2">;charset=utf8"</span><span class="p">;</span>
+<span class="nv">$SuperSQL</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SuperSQL</span><span class="p">(</span><span class="nv">$dsn</span><span class="p">,</span><span class="nv">$user</span><span class="p">,</span><span class="nv">$pass</span><span class="p">);</span>
+<span class="cp">?&gt;</span>
+</code></pre>
+<p>SlickInject and Medoo on steroids - The most advanced and compact library available.</p>
+<h3 id='purpose'>Purpose</h3>
+<ol>
+<li>To provide a very fast and efficient way to edit sql databases</li>
+<li>To provide a easy method of access</li>
+</ol>
+<h3 id='usage'>Usage</h3><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="k">new</span> <span class="nx">SuperSQL</span><span class="p">(</span><span class="nv">$dsn</span><span class="p">,</span><span class="nv">$user</span><span class="p">,</span><span class="nv">$pass</span><span class="p">);</span>
+<span class="cp">?&gt;</span>
+</code></pre>
+<p>You may either</p>
+
+<ol>
+<li>Use the built file (<code>/dist/SuperSQL.php</code>)</li>
+<li>Use the library (include index.php)</li>
+</ol>
+<h3 id='build'>Build</h3>
+<p>To build this library, do </p>
+
+<p><code>node builder.js</code></p>
+
+<p>It will build to <code>/dist/SuperSQL.php</code></p>
+<h1 id='documentation'>Documentation</h1>
+<blockquote>
+<p>Conditionals (WHERE &amp; JOIN)</p>
+</blockquote>
+<pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$where</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+ <span class="s2">"arg1"</span> <span class="o">=&gt;</span> <span class="s2">"val1"</span><span class="p">,</span> <span class="c1">// AND arg1 = val1
+</span> <span class="s2">"[&gt;&gt;]arg2"</span> <span class="o">=&gt;</span> <span class="s2">"val2"</span><span class="p">,</span> <span class="c1">// AND arg2 &gt; val2
+</span> <span class="s2">"[&lt;&lt;]arg3"</span> <span class="o">=&gt;</span> <span class="s2">"val3"</span><span class="p">,</span> <span class="c1">// AND arg3 &lt; val3
+</span> <span class="s2">"[&gt;=]arg4"</span> <span class="o">=&gt;</span> <span class="s2">"val4"</span><span class="p">,</span> <span class="c1">// AND arg4 &gt;= val4
+</span> <span class="s2">"[&lt;=]arg5"</span> <span class="o">=&gt;</span> <span class="s2">"val5"</span><span class="p">,</span> <span class="c1">// AND arg5 &lt;= val5
+</span> <span class="s2">"[||]"</span> <span class="o">=&gt;</span> <span class="p">[</span> <span class="c1">// Bind ||.
+</span>     <span class="s2">"arg6"</span> <span class="o">=&gt;</span> <span class="s2">"val6"</span>
+ <span class="p">],</span>
+ <span class="s2">"[&amp;&amp;][&gt;&gt;]"</span> <span class="o">=&gt;</span> <span class="p">[</span> <span class="c1">// Bind &gt;.
+</span>     <span class="s2">"arg7"</span> <span class="o">=&gt;</span> <span class="s2">"val7"</span>
+ <span class="p">],</span>
+ <span class="s2">"arg8"</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s2">"val8a"</span><span class="p">,</span><span class="s2">"val8b"</span><span class="p">]</span>
+<span class="p">);</span>
+<span class="cp">?&gt;</span>
+</code></pre>
+<blockquote>
+<p>Multi-Querying</p>
+</blockquote>
+<pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="c1">// Way 1
+</span>
+<span class="k">array</span><span class="p">(</span>
+<span class="k">array</span><span class="p">(</span> <span class="c1">// NOTE: While the all the arrays dont have to be identical, the first one should have the most items
+</span><span class="s2">"arg1"</span><span class="o">=&gt;</span> <span class="s2">"val1"</span><span class="p">,</span>
+<span class="s2">"arg2"</span><span class="o">=&gt;</span> <span class="s2">"val2"</span>
+<span class="p">),</span>
+<span class="k">array</span><span class="p">(</span>
+<span class="s2">"arg2"</span><span class="o">=&gt;</span> <span class="s2">"val3"</span>
+<span class="p">}</span>
+<span class="p">);</span> <span class="c1">// -&gt; [["val1","val2"],["val1","val3"]] - Two queries
+</span>
+<span class="c1">// Way 2 (only works with the data argument in INSERT and UPDATE)
+</span>
+<span class="k">array</span><span class="p">(</span>
+<span class="s2">"arg1"</span> <span class="o">=&gt;</span> <span class="s2">"val1"</span><span class="p">,</span>
+<span class="s2">"arg2"</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">"val2"</span><span class="p">,</span><span class="s2">"val3"</span><span class="p">)</span>
+<span class="p">);</span> <span class="c1">// -&gt; [["val1","val2"],["val1","val3"]] - Two queries
+</span><span class="cp">?&gt;</span>
+</code></pre>
+<blockquote>
+<p>Multi-Table queries</p>
+</blockquote>
+<pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">SELECT</span><span class="p">([</span><span class="s2">"table1"</span><span class="p">,</span><span class="s2">"table2"</span><span class="p">],[],[]);</span>
+<span class="cp">?&gt;</span>
+</code></pre>
+<blockquote>
+<p>Simple queries</p>
+</blockquote>
+<pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">sSELECT</span><span class="p">(</span><span class="nv">$table</span><span class="p">,</span><span class="nv">$columns</span><span class="p">,</span><span class="nv">$where</span><span class="p">);</span>
+
+<span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">sINSERT</span><span class="p">(</span><span class="nv">$table</span><span class="p">,</span><span class="nv">$data</span><span class="p">);</span>
+
+<span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">sUPDATE</span><span class="p">(</span><span class="nv">$table</span><span class="p">,</span><span class="nv">$data</span><span class="p">,</span><span class="nv">$where</span><span class="p">);</span>
+
+<span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">sDELETE</span><span class="p">(</span><span class="nv">$table</span><span class="p">,</span><span class="nv">$where</span><span class="p">);</span>
+<span class="cp">?&gt;</span>
+</code></pre><h3 id='conditionals'>Conditionals</h3>
+<p>Conditional statements are extremly customisable. WHERE and JOIN clauses are conditional statements. </p>
+
+<aside class="notice">
+To make duplicate keys work for binds, you can add a name to the bind. Ex: `[&&]name`
+</aside>
+<h3 id='multi-queries'>Multi-queries</h3>
+<p>Multiqueries can be done too. This allows for highly efficient repetative queries. Note: Only the values of WHERE, JOIN, and INSERT work with this. VALUES, not KEYS.</p>
+<h3 id='multi-table-support'>Multi-Table support</h3>
+<p>If you want to query multiple tables at once, put the tables in as an array</p>
+<h3 id='simple'>Simple</h3>
+<p>If you are making simple queries, you may use simple functions to boost performance. Use simple functions by attatching an <code>s</code> in front of the function. The syntax is very similar to SlickInject.</p>
+<h3 id='cache'>Cache</h3>
+<p>Performance is boosted for a query if an identical query before it (with different values [EG where vals, join, insert]), is made right before. You can also clear the cache by doing: <code>$SuperSQL-&gt;clearCache()</code></p>
+<h2 id='select'>SELECT</h2><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">SELECT</span><span class="p">(</span><span class="s2">"horizon"</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[],</span> <span class="k">array</span><span class="p">(</span>
+    <span class="c1">// [&gt;&gt;] - Right join
+</span>    <span class="c1">// [&lt;&lt;] - Left join
+</span>    <span class="c1">// [&gt;&lt;] - Inner join (Default)
+</span>    <span class="c1">// [&lt;&gt;] - Full join
+</span>    <span class="s2">"[&gt;&lt;]meteors"</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">"horizon.object"</span> <span class="o">=&gt;</span> <span class="s2">"meteors.object"</span><span class="p">),</span> <span class="c1">// JOIN
+</span><span class="p">),</span><span class="mi">5</span><span class="p">);</span> <span class="c1">// only 5 rows
+</span><span class="cp">?&gt;</span>
+</code></pre>
+<p><strong>SuperSQL-&gt;SELECT($table, $columns, $where[,$join[, $limit);</strong></p>
+
+<ul>
+<li><code>(String)table</code> - Table name to query</li>
+<li><code>(Array)columns</code> - Array of columns to return. <code>[]</code> will query using the <code>*</code> selector. Also note, that you may use the <code>DISTINCT</code> keyword by putting it first in the array.</li>
+<li><code>(Array)where</code> - Array of conditions for WHERE (See above for documentation on WHERE)</li>
+<li><code>(Array)join</code> - Array of conditions for JOIN. Usage below</li>
+<li><code>{Int}limit</code> - Number of rows to retrieve. Usage below.</li>
+</ul>
+
+<aside class="notice">
+Note, you may also do `SuperSQL->SELECT($table, $columns, $where, $limit)`
+</aside>
+<h2 id='insert'>INSERT</h2><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">INSERT</span><span class="p">(</span><span class="s2">"table"</span><span class="p">,</span><span class="k">array</span><span class="p">(</span>
+<span class="s2">"hello"</span> <span class="o">=&gt;</span> <span class="s2">"world"</span><span class="p">,</span>
+<span class="s2">"SuperSQL"</span> <span class="o">=&gt;</span> <span class="s2">"rocks"</span>
+<span class="p">));</span>
+<span class="cp">?&gt;</span>
+</code></pre>
+<p><strong>SuperSQL-&gt;INSERT($table, $data);</strong></p>
+
+<ul>
+<li><code>(String)table</code> - Table to insert to</li>
+<li><code>(Array)data</code> - Data to insert</li>
+</ul>
+<h2 id='update'>UPDATE</h2><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">UPDATE</span><span class="p">(</span><span class="s2">"citizens"</span><span class="p">,</span><span class="k">array</span><span class="p">(</span>
+<span class="s2">"SuperSQL"</span> <span class="o">=&gt;</span> <span class="s2">"To the rescue!"</span>
+<span class="p">),</span><span class="k">array</span><span class="p">(</span>
+<span class="s2">"needs_help"</span> <span class="o">=&gt;</span> <span class="mi">1</span>
+<span class="p">));</span>
+<span class="cp">?&gt;</span>
+</code></pre>
+<p><strong>SuperSQL-&gt;UPDATE($table, $data, $where);</strong></p>
+
+<ul>
+<li><code>(String)table</code> - Table to insert to</li>
+<li><code>(Array)data</code> - Data to update</li>
+<li><code>(Array)where</code> - Conditional statements</li>
+</ul>
+<h2 id='delete'>DELETE</h2><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">DELETE</span><span class="p">(</span><span class="s2">"persons"</span><span class="p">,</span>
+<span class="s2">"is_villain"</span> <span class="o">=&gt;</span> <span class="mi">1</span>
+<span class="p">));</span>
+<span class="cp">?&gt;</span>
+</code></pre>
+<p><strong>SuperSQL-&gt;DELETE($table, $where);</strong></p>
+
+<ul>
+<li><code>(String)table</code> - Table to insert to</li>
+<li><code>(Array)where</code> - Conditional statements</li>
+</ul>
+
+      </div>
+      <div class="dark-box">
+          <div class="lang-selector">
+                <a href="#" data-language-name="php">php</a>
+          </div>
+      </div>
+    </div>
+  </body>
+</html>
