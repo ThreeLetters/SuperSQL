@@ -23,6 +23,10 @@ To build this library, do
 It will build to /dist/SuperSQL.php
 
 ## Documentation
+
+Full documentation is here: https://threeletters.github.io/SuperSQL/
+
+
 ```php
 // MySql setup
 $host = "localhost";
