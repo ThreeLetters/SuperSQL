@@ -27,127 +27,135 @@ SOFTWARE.
 */
 
 // BUILD BETWEEN
-class Helper {
-  public $s;
-  
- /**
-  * Constructs helper
-  *
-  * @param {SuperSQL} SuperSQL - SuperSQL object
-  */
-  function __construct($SuperSQL) {
-    $this->s = $SuperSQL;
-  }
+class Helper
+{
+    public $s;
     
- /**
-  * Connects to a database
-  *
-  * @param {String} host - Host
-  * @param {String} db - Database name
-  * @param {String} user - Username
-  * @param {String} pass - Password
-  * @param {DSN|String|Object} - options - DSN string, dbtype, or options array
-  *
-  * @returns {SuperSQL} SuperSQL - SuperSQL object
-  */ 
-  static function connect($host,$db,$user,$pass,$options = []) {
-      
-      $dbtype = "mysql";
-      $dsn = false;
-      
-      if (gettype($options) == "string") {
-          if (strpos($options,":") !== false) {
-          $dsn = $options;  
-          } else {
-          $dbtype = strtolower($options);
-          }
-      }
-      else if (isset($options["dbtype"])) $dbtype = strtolower($options["dbtype"]);
-     
-      if (!$dsn) {
-      $driver = "";
-      switch ($dbtype) {
-          case "pgsql":
-              $driver = "pgsql";
-              $data = array(
-                "dbname" => $db,
-                "host" => $host
-              );
-              
-              if (isset($options["port"])) $data["port"] = $options["port"];
-              break;
-          case "sybase":
-              $driver = "dblib";
-              $data = array(
-               "dbname" => $db,
-                "host" => $host
-              );
-              if (isset($options["port"])) $data["port"] = $options["port"];
-              break;
-          case "oracle":
-              $driver = "oci";
-              $data = array(
-                "dbname" => isset($host) ? "//" . $host . ":" . (isset($options["port"]) ? $options["port"] : "1521") . "/" . $db : $db  
-              )
-              break;
-          default:
-              $driver = "mysql";
-              $data = array(
-              "dbname" => $db
-              );
-              if (isset($options["socket"])) $data["unix_socket"] = $options["socket"];
-              else {
-                  $data["host"] = $host;
-                  if (isset($options["port"])) $data["port"] = $options["port"];
-                  
-              }
-              break;
-              
-      }
-          $dsn = $driver . ":";
-          
-		if (isset($options[ 'charset' ]))
-		{
-		$data[ 'charset' ] = $options[ 'charset' ];
-		}
-          $dsn = $driver . ":";
-          $b = 0;
-          foreach ($data as $key => $val) {
-              if ($b != 0) {
-                  $dsn .= ";";
-              }
-              $dsn .= $key . "=" . $val;
-              $b++;
-          }
-      }
-       return new SuperSQL($dsn,$user,$pass);
-  }
+    /**
+     * Constructs helper
+     *
+     * @param {SuperSQL} SuperSQL - SuperSQL object
+     */
+    function __construct($SuperSQL)
+    {
+        $this->s = $SuperSQL;
+    }
     
-  /**
-   * Gets the first row
-   *
-   * @param {String} table - Table to search
-   * @param {Array} columns - Columns to return
-   * @param {Array} where - where conditions
-   * @param {Array} join - join conditions
-   *
-   * @returns {Array|false} - Returns row or false if none
-   */
-   static function get($table,$columns, $where, $join = null) {
-       $d = $this->s->SELECT($table,$columns,$where,$join, 1)->getData();
-       return ($d && $d[0]) ? $d[0] : false;
-   }
+    /**
+     * Connects to a database
+     *
+     * @param {String} host - Host
+     * @param {String} db - Database name
+     * @param {String} user - Username
+     * @param {String} pass - Password
+     * @param {DSN|String|Object} - options - DSN string, dbtype, or options array
+     *
+     * @returns {SuperSQL} SuperSQL - SuperSQL object
+     */
+    static function connect($host, $db, $user, $pass, $options = array())
+    {
+        
+        $dbtype = "mysql";
+        $dsn    = false;
+        
+        if (gettype($options) == "string") {
+            if (strpos($options, ":") !== false) {
+                $dsn = $options;
+            } else {
+                $dbtype = strtolower($options);
+            }
+        } else if (isset($options["dbtype"]))
+            $dbtype = strtolower($options["dbtype"]);
+        
+        if (!$dsn) {
+            $driver = "";
+            switch ($dbtype) {
+                case "pgsql":
+                    $driver = "pgsql";
+                    $data   = array(
+                        "dbname" => $db,
+                        "host" => $host
+                    );
+                    
+                    if (isset($options["port"]))
+                        $data["port"] = $options["port"];
+                    break;
+                case "sybase":
+                    $driver = "dblib";
+                    $data   = array(
+                        "dbname" => $db,
+                        "host" => $host
+                    );
+                    if (isset($options["port"]))
+                        $data["port"] = $options["port"];
+                    break;
+                case "oracle":
+                    $driver = "oci";
+                    $data   = array(
+                        "dbname" => isset($host) ? "//" . $host . ":" . (isset($options["port"]) ? $options["port"] : "1521") . "/" . $db : $db
+                    );
+                    break;
+                default:
+                    $driver = "mysql";
+                    $data   = array(
+                        "dbname" => $db
+                    );
+                    if (isset($options["socket"]))
+                        $data["unix_socket"] = $options["socket"];
+                    else {
+                        $data["host"] = $host;
+                        if (isset($options["port"]))
+                            $data["port"] = $options["port"];
+                        
+                    }
+                    break;
+                    
+            }
+            $dsn = $driver . ":";
+            
+            if (isset($options['charset'])) {
+                $data['charset'] = $options['charset'];
+            }
+            $dsn = $driver . ":";
+            $b   = 0;
+            foreach ($data as $key => $val) {
+                if ($b != 0) {
+                    $dsn .= ";";
+                }
+                $dsn .= $key . "=" . $val;
+                $b++;
+            }
+        }
+        return new SuperSQL($dsn, $user, $pass);
+    }
     
-  /**
-   * Creates a table
-   *
-   * @param {String} table - Table name to create
-   * @param {Array} data - Columns to create
-   */
-    static function create($table,$data) {
+    /**
+     * Gets the first row
+     *
+     * @param {String} table - Table to search
+     * @param {Array} columns - Columns to return
+     * @param {Array} where - where conditions
+     * @param {Array} join - join conditions
+     *
+     * @returns {Array|false} - Returns row or false if none
+     */
+    static function get($table, $columns, $where, $join = null)
+    {
+        $d = $this->s->SELECT($table, $columns, $where, $join, 1)->getData();
+        return ($d && $d[0]) ? $d[0] : false;
+    }
+    
+    /**
+     * Creates a table
+     *
+     * @param {String} table - Table name to create
+     * @param {Array} data - Columns to create
+     */
+    static function create($table, $data)
+    {
         
         $sql = "CREATE TABLE `" . $table . "` (";
-        $i = 0;
+        $i   = 0;
         foreach ($data as $key => $val) {
             if ($i != 0) {
                 $sql .= ", ";
@@ -160,12 +168,13 @@ class Helper {
         return $s->query($sql);
     }
     
-  /**
-   * Deletes a table
-   *
-   * @param {String} table - Table name to delete
-   */
-    static function drop($table) {
+    /**
+     * Deletes a table
+     *
+     * @param {String} table - Table name to delete
+     */
+    static function drop($table)
+    {
         return $s->query("DROP TABLE `" . $table . "`");
     }
 }
