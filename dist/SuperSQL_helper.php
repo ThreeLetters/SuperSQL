@@ -1,9 +1,6 @@
 <?php
-namespace SuperSQL;
-
 /*
 MIT License
-
 Copyright (c) 2017 Andrew S
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,35 +23,23 @@ SOFTWARE.
 
 */
 
-// BUILD BETWEEN
+/*
+ Author: Andrews54757
+ License: MIT
+ Source: https://github.com/ThreeLetters/SQL-Library
+ Build: v2.0.0
+ Built on: 05/08/2017
+*/
+
+
 class Helper {
   public $s;
-  
- /**
-  * Constructs helper
-  *
-  * @param {SuperSQL} SuperSQL - SuperSQL object
-  */
   function __construct($SuperSQL) {
     $this->s = $SuperSQL;
   }
-    
- /**
-  * Connects to a database
-  *
-  * @param {String} host - Host
-  * @param {String} db - Database name
-  * @param {String} user - Username
-  * @param {String} pass - Password
-  * @param {DSN|String|Object} - options - DSN string, dbtype, or options array
-  *
-  * @returns {SuperSQL} SuperSQL - SuperSQL object
-  */ 
   static function connect($host,$db,$user,$pass,$options = []) {
-      
       $dbtype = "mysql";
       $dsn = false;
-      
       if (gettype($options) == "string") {
           if (strpos($options,":") !== false) {
           $dsn = $options;  
@@ -63,7 +48,6 @@ class Helper {
           }
       }
       else if (isset($options["dbtype"])) $dbtype = strtolower($options["dbtype"]);
-     
       if (!$dsn) {
       $driver = "";
       switch ($dbtype) {
@@ -73,7 +57,6 @@ class Helper {
                 "dbname" => $db,
                 "host" => $host
               );
-              
               if (isset($options["port"])) $data["port"] = $options["port"];
               break;
           case "sybase":
@@ -99,13 +82,10 @@ class Helper {
               else {
                   $data["host"] = $host;
                   if (isset($options["port"])) $data["port"] = $options["port"];
-                  
               }
               break;
-              
       }
           $dsn = $driver . ":";
-          
 		if (isset($options[ 'charset' ]))
 		{
 		$data[ 'charset' ] = $options[ 'charset' ];
@@ -122,30 +102,11 @@ class Helper {
       }
        return new SuperSQL($dsn,$user,$pass);
   }
-    
-  /**
-   * Gets the first row
-   *
-   * @param {String} table - Table to search
-   * @param {Array} columns - Columns to return
-   * @param {Array} where - where conditions
-   * @param {Array} join - join conditions
-   *
-   * @returns {Array|false} - Returns row or false if none
-   */
    static function get($table,$columns, $where, $join = null) {
        $d = $this->s->SELECT($table,$columns,$where,$join, 1)->getData();
        return ($d && $d[0]) ? $d[0] : false;
    }
-    
-  /**
-   * Creates a table
-   *
-   * @param {String} table - Table name to create
-   * @param {Array} data - Columns to create
-   */
     static function create($table,$data) {
-        
         $sql = "CREATE TABLE `" . $table . "` (";
         $i = 0;
         foreach ($data as $key => $val) {
@@ -156,19 +117,9 @@ class Helper {
             $i++;
         }
         $sql .= ")";
-        
         return $s->query($sql);
     }
-    
-  /**
-   * Deletes a table
-   *
-   * @param {String} table - Table name to delete
-   */
     static function drop($table) {
         return $s->query("DROP TABLE `" . $table . "`");
     }
 }
-// BUILD BETWEEN
-
-?>

@@ -20,16 +20,16 @@ function removeComments(str) {
     var out = [];
     var i = 0
 
-    function skip(char) {
+    function skip(match) {
 
         var backslash = false;
-        out.push(char);
+        out.push(match);
 
         for (++i; i < len; i++) {
             char = str[i];
             out.push(char);
             if (char === "\\") backslash = true;
-            else if (char === char && !backslash) {
+            else if (char === match && !backslash) {
                 break;
             } else if (backslash) {
                 backslash = false;
@@ -42,7 +42,7 @@ function removeComments(str) {
         if (char == "\"") {
             skip("\"");
         } else if (char == "'") {
-            skip("\"");
+            skip("'");
         } else if (char == "/") {
             i++
             if (str[i] == "/") {
@@ -87,6 +87,8 @@ var connector = fs.readFileSync(__dirname + "/lib/connector/index.php", "utf8");
 
 var main = fs.readFileSync(__dirname + "/index.php", "utf8");
 
+var helper = fs.readFileSync(__dirname + "/lib/helper/index.php", "utf8");
+
 var startstr = "// BUILD BETWEEN";
 
 
@@ -96,6 +98,7 @@ adv = removeComments(adv.split(startstr)[1]);
 connector = removeComments(connector.split(startstr)[1]);
 var index = main.split(startstr)[1];
 main = removeComments(index);
+helper = removeComments(helper.split(startstr)[1]);
 
 var out = `<?php\n\
 /*\n\
@@ -167,3 +170,4 @@ ${amain}\
 fs.writeFileSync(__dirname + "/dist/SuperSQL.php", out + complete);
 fs.writeFileSync(__dirname + "/dist/SuperSQL_simple.php", out + simpleOnly);
 fs.writeFileSync(__dirname + "/dist/SuperSQL_advanced.php", out + advancedOnly);
+fs.writeFileSync(__dirname + "/dist/SuperSQL_helper.php", out + helper);
