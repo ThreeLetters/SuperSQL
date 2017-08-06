@@ -35,24 +35,111 @@ class Helper {
   
   static function connect($host,$db,$user,$pass,$options = []) {
       
-      $dbtype = "";
-      if (gettype($options) == "string") $dbtype = strtolower($options);
-      else if (isset($options["dbtype"])) $dbtype = strtolower($options["dbtype"]);
-          
-      if (!$dbtype) $dbtype = "mysql";
+      $dbtype = "mysql";
+      $dsn = false;
       
+      if (gettype($options) == "string") {
+          if (strpos($options,":") !== false) {
+          $dsn = $options;  
+          } else {
+          $dbtype = strtolower($options);
+          }
+      }
+      else if (isset($options["dbtype"])) $dbtype = strtolower($options["dbtype"]);
+     
+      if (!$dsn) {
+      $driver = "";
       switch ($dbtype) {
-          case "mysql":
+          case "pgsql":
+              $driver = "pgsql";
               $data = array(
-              "driver" => "mysql",
-              "db"=>);
+                "dbname" => $db,
+                "host" => $host
+              );
+              
+              if (isset($options["port"])) $data["port"] = $options["port"];
+              break;
+          case "sybase":
+              $driver = "dblib";
+              $data = array(
+               "dbname" => $db,
+                "host" => $host
+              );
+              if (isset($options["port"])) $data["port"] = $options["port"];
+              break;
+          case "oracle":
+              $driver = "oci";
+              $data = array(
+                "dbname" => isset($host) ? "//" . $host . ":" . (isset($options["port"]) ? $options["port"] : "1521") . "/" . $db : $db  
+              )
+              break;
+          default:
+              $driver = "mysql";
+              $data = array(
+              "dbname" => $db
+              );
+              if (isset($options["socket"])) $data["unix_socket"] = $options["socket"];
+              else {
+                  $data["host"] = $host;
+                  if (isset($options["port"])) $data["port"] = $options["port"];
+                  
+              }
               break;
               
       }
-    
+          $dsn = $driver . ":";
+          
+		if (isset($options[ 'charset' ]))
+		{
+		$data[ 'charset' ] = $options[ 'charset' ];
+		}
+          $dsn = $driver . ":";
+          $b = 0;
+          foreach ($data as $key => $val) {
+              if ($b != 0) {
+                  $dsn .= ";";
+              }
+              $dsn .= $key . "=" . $val;
+              $b++;
+          }
+      }
+       return new SuperSQL($dsn,$user,$pass);
   }
-  
-  
+    
+   static function get($table,$columns,$where) {
+       return $this->s->SELECT($table,$columns,$where,1);
+   }
+    static function has($table,$where,$join = null) {
+        
+        $q = $this->s->SELECT($table,array(),$where,$join,1);
+        
+        if (count($q->getData()) == 0) {
+            return true;
+        } else {
+            return false;
+        }
+        
+    }
+    
+    static function create($table,$data) {
+        
+        $sql = "CREATE TABLE `" . $table . "` (";
+        $i = 0;
+        foreach ($data as $key => $val) {
+            if ($i != 0) {
+                $sql .= ", ";
+            }
+            $sql .= "`" . $key . "` " . $val;
+            $i++;
+        }
+        $sql .= ")";
+        
+        return $s->query($sql);
+    }
+    
+    static function drop($table) {
+        return $s->query("DROP TABLE `" . $table . "`");
+    }
 }
 
 
