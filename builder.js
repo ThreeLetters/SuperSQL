@@ -240,17 +240,44 @@ ${minify(adv)}\n\
 ${minify(amain)}\n\
 ?>`;
 
-fs.writeFileSync(__dirname + "/dist/SuperSQL.php", out + complete);
-fs.writeFileSync(__dirname + "/dist/SuperSQL_min.php", out + completeMin);
+var a = out + complete,
+    b = out + completeMin,
+    c = out + simpleOnly,
+    d = out + simpleOnlyMin,
+    e = out + advancedOnly,
+    f = out + advancedOnlyMin,
+    g = out + helper,
+    h = out + minify(helper) + "\n?>";
 
 
-fs.writeFileSync(__dirname + "/dist/SuperSQL_simple.php", out + simpleOnly);
-fs.writeFileSync(__dirname + "/dist/SuperSQL_simple_min.php", out + simpleOnlyMin);
+fs.writeFileSync(__dirname + "/dist/SuperSQL.php", a);
+fs.writeFileSync(__dirname + "/dist/SuperSQL_min.php", b);
 
 
-fs.writeFileSync(__dirname + "/dist/SuperSQL_advanced.php", out + advancedOnly);
-fs.writeFileSync(__dirname + "/dist/SuperSQL_advanced_min.php", out + advancedOnlyMin);
+fs.writeFileSync(__dirname + "/dist/SuperSQL_simple.php", c);
+fs.writeFileSync(__dirname + "/dist/SuperSQL_simple_min.php", d);
 
 
-fs.writeFileSync(__dirname + "/dist/SuperSQL_helper.php", out + helper);
-fs.writeFileSync(__dirname + "/dist/SuperSQL_helper_min.php", out + minify(helper) + "\n?>");
+fs.writeFileSync(__dirname + "/dist/SuperSQL_advanced.php", e);
+fs.writeFileSync(__dirname + "/dist/SuperSQL_advanced_min.php", f);
+
+
+fs.writeFileSync(__dirname + "/dist/SuperSQL_helper.php", g);
+fs.writeFileSync(__dirname + "/dist/SuperSQL_helper_min.php", h);
+
+
+console.log("Compiled files into dist. Stats:");
+
+console.log("OUTPUT");
+
+console.log(`SuperSQL: ~${a.length} Lines: ~${a.split("\n").length} - Minified: ~${b.length} Lines: ~${b.split("\n").length}`);
+console.log(`Simple: ~${c.length} Lines: ~${c.split("\n").length} - Minified: ~${d.length} Lines: ~${d.split("\n").length}`);
+console.log(`Advanced: ~${e.length} Lines: ~${e.split("\n").length} - Minified: ~${f.length} Lines: ~${f.split("\n").length}`);
+console.log(`Helper: ~${g.length} Lines: ~${g.split("\n").length} - Minified: ~${h.length} Lines: ~${h.split("\n").length}`);
+
+console.log("FILES");
+
+console.log(`Index ${index.length} Lines: ~${index.split("\n").length}`);
+console.log(`Connector ${connector.length} Lines: ~${connector.split("\n").length}`);
+console.log(`SimpleParser ${simple.length} Lines: ~${simple.split("\n").length}`);
+console.log(`AdvancedParser ${adv.length} Lines: ~${adv.split("\n").length}`);
