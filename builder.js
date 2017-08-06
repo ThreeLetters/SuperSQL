@@ -77,6 +77,55 @@ function removeComments(str) {
     return out.join('').replace(/\n\s*\n/g, "\n");
 }
 
+function minify(str) {
+    str = str.split("");
+    var len = str.length;
+    var out = [];
+    var i = 0;
+
+    function skip(match) {
+
+        var backslash = false;
+        out.push(match);
+
+        for (++i; i < len; i++) {
+            char = str[i];
+            out.push(char);
+            if (char === "\\") backslash = true;
+            else if (char === match && !backslash) {
+                break;
+            } else if (backslash) {
+                backslash = false;
+            }
+        }
+    }
+    for (; i < len; i++) {
+        var char = str[i];
+
+        if (char == "\"") {
+            skip("\"");
+        } else if (char == "'") {
+            skip("'");
+        } else if (char == "`") {
+            skip("`");
+        } else if (char == "\n") {
+            //    out.push(" ");
+        } else if (char == " ") {
+            out.push(" ");
+
+            for (; i < len; i++) {
+                if (str[i + 1] != " ") break;
+            }
+        } else {
+            out.push(char)
+        }
+
+    }
+
+    return out.join("");
+
+}
+
 var fs = require("fs");
 
 var simple = fs.readFileSync(__dirname + "/lib/parser/Simple.php", "utf8");
@@ -102,7 +151,7 @@ helper = removeComments(helper.split(startstr)[1]);
 
 var out = `<?php\n\
 /*\n\
-MIT License\
+MIT License\n\
 \n\
 Copyright (c) 2017 Andrew S\n\
 \n\
@@ -144,6 +193,16 @@ ${adv}\n\
 ${main}\
 ?>`;
 
+var completeMin = `// lib/connector/index.php\n\
+${minify(connector)}\n\
+// lib/parser/Simple.php\n\
+${minify(simple)}\n\
+// lib/parser/Advanced.php\n\
+${minify(adv)}\n\
+// index.php\n\
+${minify(main)}\
+?>`;
+
 var smain = index.split("// BUILD ADVANCED BETWEEN");
 smain = (smain[0] + smain[2]);
 smain = removeComments(smain);
@@ -153,6 +212,13 @@ ${connector}\n\
 ${simple}\n\
 // index.php\
 ${smain}\
+?>`;
+var simpleOnlyMin = `// lib/connector/index.php\n\
+${minify(connector)}\n\
+// lib/parser/Simple.php\n\
+${minify(simple)}\n\
+// index.php\n\
+${minify(smain)}\n\
 ?>`;
 
 var amain = index.split("// BUILD SIMPLE BETWEEN");
@@ -166,8 +232,25 @@ ${adv}\n\
 ${amain}\
 ?>`;
 
+var advancedOnlyMin = `// lib/connector/index.php\n\
+${minify(connector)}\n\
+// lib/parser/Advanced.php\n\
+${minify(adv)}\n\
+// index.php\
+${minify(amain)}\n\
+?>`;
 
 fs.writeFileSync(__dirname + "/dist/SuperSQL.php", out + complete);
+fs.writeFileSync(__dirname + "/dist/SuperSQL_min.php", out + completeMin);
+
+
 fs.writeFileSync(__dirname + "/dist/SuperSQL_simple.php", out + simpleOnly);
+fs.writeFileSync(__dirname + "/dist/SuperSQL_simple_min.php", out + simpleOnlyMin);
+
+
 fs.writeFileSync(__dirname + "/dist/SuperSQL_advanced.php", out + advancedOnly);
+fs.writeFileSync(__dirname + "/dist/SuperSQL_advanced_min.php", out + advancedOnlyMin);
+
+
 fs.writeFileSync(__dirname + "/dist/SuperSQL_helper.php", out + helper);
+fs.writeFileSync(__dirname + "/dist/SuperSQL_helper_min.php", out + minify(helper) + "\n?>");
