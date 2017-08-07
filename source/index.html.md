@@ -3,7 +3,11 @@ title: SuperSQL
 
 language_tabs:
   - php
-
+  
+toc_footers:
+ - <a href='https://github.com/ThreeLetters/SuperSQL/archive/master.zip'>Download</a>
+ - <a href='https://github.com/ThreeLetters/SuperSQL/'>Github</a>
+ 
 search: true
 ---
 
