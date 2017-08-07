@@ -133,12 +133,14 @@ $SuperSQL->sDELETE($table,$where);
 > Type Casting
 
 ```php
+<?php
 $SuperSQL->INSERT("sensitive_data",[ // NOTE: Also works with any other query. ALSO NOTE: Types are case-insensitive
    "nuclear_codes[int]" => 138148347734, // Integer (Use [int] or [integer]
    "in_state_of_emergency[bool]" => false, // Boolean (Use [bool] or [boolean]
    "secret_files[lob]" => $file // Large Objects/Resources (Use [lob] or [resource])
    "fake_data[null]" => null // Null values (use [null])
 ]);
+?>
 ```
 
 ### Conditionals
@@ -204,11 +206,11 @@ $SuperSQL->SELECT("horizon", [], [], array(
 
 **SuperSQL->SELECT($table, $columns, $where[,$join[, $limit);**
 
-* `(String)table` - Table name to query
+* `(String|Array)table` - Table(s) to query
 * `(Array)columns` - Array of columns to return. `[]` will query using the `*` selector.
 * `(Array)where` - Array of conditions for WHERE (See above for documentation on WHERE)
-* `(Array)join` - Array of conditions for JOIN. Usage below
-* `{Int}limit` - Number of rows to retrieve. Usage below.
+* `(Array|Null)join` - Array of conditions for JOIN. Usage below
+* `(Int)limit` - Number of rows to retrieve. Usage below.
 
 <aside class="notice">
 You may also put `DISTINCT`, in the top of the columns array to use the DISTINCT keyword. Other available keywords include: `INSERT INTO table` and `INTO table` (replace table with table name)
@@ -230,7 +232,7 @@ $SuperSQL->INSERT("table",array(
 
 **SuperSQL->INSERT($table, $data);**
 
-* `(String)table` - Table to insert to
+* `(String|Array)table` - Table(s) to insert to
 * `(Array)data` - Data to insert
 
 ## UPDATE
@@ -246,7 +248,7 @@ $SuperSQL->UPDATE("citizens",array(
 
 **SuperSQL->UPDATE($table, $data, $where);**
 
-* `(String)table` - Table to insert to
+* `(String|Array)table` - Table(s) to insert to
 * `(Array)data` - Data to update
 * `(Array)where` - Conditional statements
 
@@ -262,5 +264,158 @@ $SuperSQL->DELETE("persons",
 
 **SuperSQL->DELETE($table, $where);**
 
+* `(String|Array)table` - Table(s) to insert to
+* `(Array)where` - Conditional statements
+
+## Simple Documentation
+
+```php
+<?php
+// Gets data
+$SuperSQL->SELECT($table, $columns, $where);
+// Inserts/adds data to database
+$SuperSQL->sINSERT($table, $data);
+// Updates data in database
+$SuperSQL->sUPDATE($table, $data, $where);
+// Deletes data in database
+$SuperSQL->DELETE($table, $where);
+?>
+```
+
+> sSELECT
+
+```php
+<?php
+$SuperSQL->sSELECT("citizens",["name","age"],[ // SELECT `name`, `age` FROM `citizens` WHERE `in_trouble` = 1
+    "in_trouble" => 1
+]);
+?>
+```
+
+> sINSERT
+
+```php
+<?php
+$SuperSQL->sINSERT("message_board",array( // INSERT INTO `message_board` (`title`, `SuperSQL`) VALUES ('SuperSQL Saves The Day', 'SuperSQL rocks!')
+    "title" => "SuperSQL Saves The Day",
+    "message" => "SuperSQL rocks!"
+));
+?>
+```
+
+> sUPDATE
+
+```php
+<?php
+$SuperSQL->sUPDATE("developers",[ // UPDATE `developers` SET `is_happy` = 1, `reason` = 'Becaz SuperSQL is awesome!' WHERE `is_happy` = 0
+"is_happy" => 0,
+],[
+"is_happy" => 1,
+"reason" => "Becaz SuperSQL is awesome!"
+]);
+?>
+```
+
+> sDELETE
+
+```php
+<?php
+$SuperSQL->sDELETE("hackers",[ // DELETE FROM `hackers` WHERE `status` = 'Tried to SQL Inject attack a site' AND `encountered` = 'SuperSQL'
+    "status" => "Tried to SQL Inject attack a site",
+    "encountered" => "SuperSQL"
+]);
+?>
+```
+
+Simple API is for basic querying. It allows of lightning-fast, simple and easy querying. Unlike the advanced api, you cannot:
+
+* You cannot use other opererators besides `=` (Equal to)
+* No binds - Only `AND` is used
+* No multi-querying
+* No cache
+* No type casting
+
+### sSELECT
+**SuperSQL->SELECT($table, $columns, $where[, $append);**
+
+* `(String)table` - Table to query
+* `(Array)columns` - Columns to return. `[]` is `*`
+* `(Array)where` - Conditional statements
+* `(String)append` - Append to sql (Optional)
+
+### sINSERT
+**SuperSQL->sINSERT($table, $data);**
+
+* `(String)table` - Table to insert to
+* `(Array)data` - Data to insert
+
+### sUPDATE
+
+**SuperSQL->sUPDATE($table, $data, $where);**
+
+* `(String)table` - Table to insert to
+* `(Array)data` - Data to update
+* `(Array)where` - Conditional statements
+
+### sDELETE
+
+**SuperSQL->DELETE($table, $where);**
+
 * `(String)table` - Table to insert to
 * `(Array)where` - Conditional statements
+
+## Helper Functions
+SuperSQL provides some helper functions to allow for easier access.
+
+<aside class="notice">
+Documentation not complete for helper functions
+</aside>
+
+
+## Super Advanced
+
+> Logging
+
+```php
+<?php
+$SuperSQL->dev(); // Turn on logging
+
+... // do some queries
+
+echo json_encode($a->getLog()); // Get some data
+?>
+```
+
+### Logging
+You find something isnt working for your website. You either:
+
+1. Rage quit, break everything, scream "I #%@&$@! HATE SUPERSQL"
+2. Use the log function to figure out whats wrong - LIKE A CIVILISED PERSON
+
+To enable the logger, do `$SuperSQL->dev()`. Then make some queries.
+
+
+Afterwords, do `$SuperSQL->getLog()` to get the log.
+
+### Da log - What does it mean?
+
+```php
+<?php
+$logOut = [
+    [
+    "fromCache" // If this is there, it means it used the cache.
+    "SELECT * FROM `table` WHERE `test` = ?", // SQL base
+    "s", // String of arg types
+    [[24424,1]], // Array of initial values with types. In this case, the value is 24424 and the type is an INT (PDO::PARAM_INT)
+    [["0":234]], // Multi-query array
+    
+]
+?>
+```
+
+* fromCache - If there, it means it reused an old query for efficiency
+* SQL - SQL base. `?` are replaced with values
+* typeString - String of types, mysqli_bind_param style.
+* Values - Initial values with types. NOTE: This is bound onto the SQL base string
+* Insert - Multi-query array
+
