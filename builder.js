@@ -200,7 +200,7 @@ ${minify(simple)}\n\
 // lib/parser/Advanced.php\n\
 ${minify(adv)}\n\
 // index.php\n\
-${minify(main)}\
+${minify(main)}\n\
 ?>`;
 
 var smain = index.split("// BUILD ADVANCED BETWEEN");
