@@ -31,7 +31,7 @@ SlickInject and Medoo on steroids - The most advanced and compact library availa
 
 ### Main Features
 
-1. Very small - 22.2KB one file (Unminified, `dist/SuperSQL.php`)
+1. Very small - 24.2KB one file (Unminified, `dist/SuperSQL.php`. Minified version: 11.1KB)
 2. Simple and easy - Very easy to lean. We also provide a simple and advanced API
 3. Compatability - Supports major SQL databases
 4. Customisability - We offer multiple files for your needs
@@ -50,7 +50,7 @@ new SuperSQL($dsn,$user,$pass);
 
 You may either
 
-1. Use the built file (`/dist/SuperSQL.php`)
+1. Use the built file (`/dist/SuperSQL*.php`)
 2. Use the library (include index.php)
 
 ### Build
@@ -143,6 +143,16 @@ $SuperSQL->INSERT("sensitive_data",[ // NOTE: Also works with any other query. A
 ?>
 ```
 
+> SQL functions/Raw
+
+```php
+<?php
+$SuperSQL->INSERT("times",[
+    "#time" => "NOW()"
+]);
+?>
+```
+
 ### Conditionals
 
 Conditional statements are extremly customisable. WHERE and JOIN clauses are conditional statements. 
@@ -159,6 +169,9 @@ If you want to query multiple tables at once, put the tables in as an array
 
 ### Type Casting
 If you want to set the type of the input, you can set it by adding `[type] (replace type with type)`.
+
+### SQL Functions/raw
+If you want to use SQL functions such as `NOW()` or want use insert raw, unescaped data, add `#` at the beginning of the key
 
 ### Simple
 If you are making simple queries, you may use simple functions to boost performance. Use simple functions by attatching an `s` in front of the function. The syntax is very similar to SlickInject.
@@ -368,9 +381,83 @@ Simple API is for basic querying. It allows of lightning-fast, simple and easy q
 SuperSQL provides some helper functions to allow for easier access.
 
 <aside class="notice">
-Documentation not complete for helper functions
+If your using the built/compiled file, you must include `dist/SuperSQL_helper.php` too
 </aside>
 
+### SQLHelper::connect
+Connect easily with any database.
+
+**connect($host,$user,$pass,$options)**
+
+* `(String)host` - Host to connect to
+* `(String)user` - Username
+* `(String)pass` - Password
+* `(Array)options` - Options (Optional)
+
+**connect($host,$user,$pass,$dbtype)**
+
+* `(String)host` - Host to connect to
+* `(String)user` - Username
+* `(String)pass` - Password
+* `(String)dbtype` - Database type (`mysql`,`pgsql`,`sybase`,`oracle`)
+
+**connect($host,$user,$pass,$dsn)**
+
+* `(String)host` - Host to connect to
+* `(String)user` - Username
+* `(String)pass` - Password
+* `(String)dbtype` - DSN string
+
+
+### SQLHelper()
+Initialise the helper
+
+**new SQLHelper($SuperSQL)**
+
+* `(SuperSQL)SuperSQL` - SuperSQL object
+
+**new SQLHelper($host,$user,$pass,$options)**
+
+* `(String)host` - Host to connect to
+* `(String)user` - Username
+* `(String)pass` - Password
+* `(Array)options` - Options (Optional)
+
+**new SQLHelper($connect)**
+
+* `(Array)connect` - Array of connection data - Uses Helper::connect
+
+#### Change
+**$SQLHelper->change($id)**
+
+Changes the selected connection
+
+* `(Int)id` - Connection id
+
+#### getCon
+**$SQLHelper->getCon($all = false)**
+
+* `(Bool)all` - if true, will return all connections. If not, then will only return the selected one
+
+#### get
+**$SQLHelper->get($table,$columns,$where,$join)**
+
+Gets the first row
+
+#### create
+**$SQLHelper->create($table,$data)**
+
+Creates a table
+
+* `(String)table` - Table name to create
+* `(Array)data` - Array of keys and types
+
+#### drop
+**$SQLHelper->drop($table)**
+
+Removes a table
+
+* `(String)table` - Table name to delete
 
 ## Super Advanced
 

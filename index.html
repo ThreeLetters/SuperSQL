@@ -251,6 +251,9 @@
                     <a href="#type-casting" class="toc-h2 toc-link" data-title="Documentation">Type Casting</a>
                   </li>
                   <li>
+                    <a href="#sql-functions-raw" class="toc-h2 toc-link" data-title="Documentation">SQL Functions/raw</a>
+                  </li>
+                  <li>
                     <a href="#simple" class="toc-h2 toc-link" data-title="Documentation">Simple</a>
                   </li>
                   <li>
@@ -309,7 +312,7 @@
 </ol>
 <h3 id='main-features'>Main Features</h3>
 <ol>
-<li>Very small - 22.2KB one file (Unminified, <code>dist/SuperSQL.php</code>)</li>
+<li>Very small - 24.2KB one file (Unminified, <code>dist/SuperSQL.php</code>. Minified version: 11.1KB)</li>
 <li>Simple and easy - Very easy to lean. We also provide a simple and advanced API</li>
 <li>Compatability - Supports major SQL databases</li>
 <li>Customisability - We offer multiple files for your needs</li>
@@ -325,7 +328,7 @@
 <p>You may either</p>
 
 <ol>
-<li>Use the built file (<code>/dist/SuperSQL.php</code>)</li>
+<li>Use the built file (<code>/dist/SuperSQL*.php</code>)</li>
 <li>Use the library (include index.php)</li>
 </ol>
 <h3 id='build'>Build</h3>
@@ -410,6 +413,15 @@
 </span>   <span class="s2">"fake_data[null]"</span> <span class="o">=&gt;</span> <span class="kc">null</span> <span class="c1">// Null values (use [null])
 </span><span class="p">]);</span>
 <span class="cp">?&gt;</span>
+</code></pre>
+<blockquote>
+<p>SQL functions/Raw</p>
+</blockquote>
+<pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">INSERT</span><span class="p">(</span><span class="s2">"times"</span><span class="p">,[</span>
+    <span class="s2">"#time"</span> <span class="o">=&gt;</span> <span class="s2">"NOW()"</span>
+<span class="p">]);</span>
+<span class="cp">?&gt;</span>
 </code></pre><h3 id='conditionals'>Conditionals</h3>
 <p>Conditional statements are extremly customisable. WHERE and JOIN clauses are conditional statements. </p>
 
@@ -422,6 +434,8 @@ To make duplicate keys work for binds, you can add a name to the bind. Ex: `[&&]
 <p>If you want to query multiple tables at once, put the tables in as an array</p>
 <h3 id='type-casting'>Type Casting</h3>
 <p>If you want to set the type of the input, you can set it by adding <code>[type] (replace type with type)</code>.</p>
+<h3 id='sql-functions-raw'>SQL Functions/raw</h3>
+<p>If you want to use SQL functions such as <code>NOW()</code> or want use insert raw, unescaped data, add <code>#</code> at the beginning of the key</p>
 <h3 id='simple'>Simple</h3>
 <p>If you are making simple queries, you may use simple functions to boost performance. Use simple functions by attatching an <code>s</code> in front of the function. The syntax is very similar to SlickInject.</p>
 <h3 id='cache'>Cache</h3>
@@ -607,8 +621,95 @@ You may also do `SuperSQL->SELECT($table, $columns, $where, $limit)`
 <p>SuperSQL provides some helper functions to allow for easier access.</p>
 
 <aside class="notice">
-Documentation not complete for helper functions
+If your using the built/compiled file, you must include `dist/SuperSQL_helper.php` too
 </aside>
+<h3 id='sqlhelper-connect'>SQLHelper::connect</h3>
+<p>Connect easily with any database.</p>
+
+<p><strong>connect($host,$user,$pass,$options)</strong></p>
+
+<ul>
+<li><code>(String)host</code> - Host to connect to</li>
+<li><code>(String)user</code> - Username</li>
+<li><code>(String)pass</code> - Password</li>
+<li><code>(Array)options</code> - Options (Optional)</li>
+</ul>
+
+<p><strong>connect($host,$user,$pass,$dbtype)</strong></p>
+
+<ul>
+<li><code>(String)host</code> - Host to connect to</li>
+<li><code>(String)user</code> - Username</li>
+<li><code>(String)pass</code> - Password</li>
+<li><code>(String)dbtype</code> - Database type (<code>mysql</code>,<code>pgsql</code>,<code>sybase</code>,<code>oracle</code>)</li>
+</ul>
+
+<p><strong>connect($host,$user,$pass,$dsn)</strong></p>
+
+<ul>
+<li><code>(String)host</code> - Host to connect to</li>
+<li><code>(String)user</code> - Username</li>
+<li><code>(String)pass</code> - Password</li>
+<li><code>(String)dbtype</code> - DSN string</li>
+</ul>
+<h3 id='sqlhelper'>SQLHelper()</h3>
+<p>Initialise the helper</p>
+
+<p><strong>new SQLHelper($SuperSQL)</strong></p>
+
+<ul>
+<li><code>(SuperSQL)SuperSQL</code> - SuperSQL object</li>
+</ul>
+
+<p><strong>new SQLHelper($host,$user,$pass,$options)</strong></p>
+
+<ul>
+<li><code>(String)host</code> - Host to connect to</li>
+<li><code>(String)user</code> - Username</li>
+<li><code>(String)pass</code> - Password</li>
+<li><code>(Array)options</code> - Options (Optional)</li>
+</ul>
+
+<p><strong>new SQLHelper($connect)</strong></p>
+
+<ul>
+<li><code>(Array)connect</code> - Array of connection data - Uses Helper::connect</li>
+</ul>
+<h4 id='change'>Change</h4>
+<p><strong>$SQLHelper-&gt;change($id)</strong></p>
+
+<p>Changes the selected connection</p>
+
+<ul>
+<li><code>(Int)id</code> - Connection id</li>
+</ul>
+<h4 id='getcon'>getCon</h4>
+<p><strong>$SQLHelper-&gt;getCon($all = false)</strong></p>
+
+<ul>
+<li><code>(Bool)all</code> - if true, will return all connections. If not, then will only return the selected one</li>
+</ul>
+<h4 id='get'>get</h4>
+<p><strong>$SQLHelper-&gt;get($table,$columns,$where,$join)</strong></p>
+
+<p>Gets the first row</p>
+<h4 id='create'>create</h4>
+<p><strong>$SQLHelper-&gt;create($table,$data)</strong></p>
+
+<p>Creates a table</p>
+
+<ul>
+<li><code>(String)table</code> - Table name to create</li>
+<li><code>(Array)data</code> - Array of keys and types</li>
+</ul>
+<h4 id='drop'>drop</h4>
+<p><strong>$SQLHelper-&gt;drop($table)</strong></p>
+
+<p>Removes a table</p>
+
+<ul>
+<li><code>(String)table</code> - Table name to delete</li>
+</ul>
 <h2 id='super-advanced'>Super Advanced</h2>
 <blockquote>
 <p>Logging</p>
