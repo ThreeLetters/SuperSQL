@@ -60,7 +60,7 @@ $where = array(
 ```
 
 #### Multi-queries
-Multiqueries can be done too. This allows for highly efficient repetative queries. Note: Only the values of WHERE, JOIN, and INSERT work with this. VALUES, not KEYS.
+Multiqueries can be done too. This allows for highly efficient repetative queries. Note: Only the values of WHERE, and INSERT work with this. VALUES, not KEYS.
 
 ```php
 // Way 1
