@@ -28,7 +28,7 @@ SOFTWARE.
  Author: Andrews54757
  License: MIT
  Source: https://github.com/ThreeLetters/SQL-Library
- Build: v2.0.0
+ Build: v2.5.0
  Built on: 07/08/2017
 */
 
