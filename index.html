@@ -225,6 +225,9 @@
                     <a href="#purpose" class="toc-h2 toc-link" data-title="SuperSQL">Purpose</a>
                   </li>
                   <li>
+                    <a href="#main-features" class="toc-h2 toc-link" data-title="SuperSQL">Main Features</a>
+                  </li>
+                  <li>
                     <a href="#usage" class="toc-h2 toc-link" data-title="SuperSQL">Usage</a>
                   </li>
                   <li>
@@ -243,6 +246,9 @@
                   </li>
                   <li>
                     <a href="#multi-table-support" class="toc-h2 toc-link" data-title="Documentation">Multi-Table support</a>
+                  </li>
+                  <li>
+                    <a href="#type-casting" class="toc-h2 toc-link" data-title="Documentation">Type Casting</a>
                   </li>
                   <li>
                     <a href="#simple" class="toc-h2 toc-link" data-title="Documentation">Simple</a>
@@ -291,6 +297,17 @@
 <ol>
 <li>To provide a very fast and efficient way to edit sql databases</li>
 <li>To provide a easy method of access</li>
+</ol>
+<h3 id='main-features'>Main Features</h3>
+<ol>
+<li>Very small - 22.2KB one file (Unminified, <code>dist/SuperSQL.php</code>)</li>
+<li>Simple and easy - Very easy to lean. We also provide a simple and advanced API</li>
+<li>Compatability - Supports major SQL databases</li>
+<li>Customisability - We offer multiple files for your needs</li>
+<li>Efficiency - This module was built with speed in mind.</li>
+<li>Complexity - This module allows you to make all kinds of complex queries</li>
+<li>Security - This module prevents SQL injections.</li>
+<li>Availability - This module is FREE. Licensed under the MIT license.</li>
 </ol>
 <h3 id='usage'>Usage</h3><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="k">new</span> <span class="nx">SuperSQL</span><span class="p">(</span><span class="nv">$dsn</span><span class="p">,</span><span class="nv">$user</span><span class="p">,</span><span class="nv">$pass</span><span class="p">);</span>
@@ -372,6 +389,16 @@
 
 <span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">sDELETE</span><span class="p">(</span><span class="nv">$table</span><span class="p">,</span><span class="nv">$where</span><span class="p">);</span>
 <span class="cp">?&gt;</span>
+</code></pre>
+<blockquote>
+<p>Type Casting</p>
+</blockquote>
+<pre class="highlight php tab-php"><code>$SuperSQL-&gt;INSERT("sensitive_data",[ // NOTE: Also works with any other query. ALSO NOTE: Types are case-insensitive
+   "nuclear_codes[int]" =&gt; 138148347734, // Integer (Use [int] or [integer]
+   "in_state_of_emergency[bool]" =&gt; false, // Boolean (Use [bool] or [boolean]
+   "secret_files[lob]" =&gt; $file // Large Objects/Resources (Use [lob] or [resource])
+   "fake_data[null]" =&gt; null // Null values (use [null])
+]);
 </code></pre><h3 id='conditionals'>Conditionals</h3>
 <p>Conditional statements are extremly customisable. WHERE and JOIN clauses are conditional statements. </p>
 
@@ -379,9 +406,11 @@
 To make duplicate keys work for binds, you can add a name to the bind. Ex: `[&&]name`
 </aside>
 <h3 id='multi-queries'>Multi-queries</h3>
-<p>Multiqueries can be done too. This allows for highly efficient repetative queries. Note: Only the values of WHERE, JOIN, and INSERT work with this. VALUES, not KEYS.</p>
+<p>Multiqueries can be done too. This allows for highly efficient repetative queries. Note: Only the values of WHERE and INSERT work with this. VALUES, not KEYS.</p>
 <h3 id='multi-table-support'>Multi-Table support</h3>
 <p>If you want to query multiple tables at once, put the tables in as an array</p>
+<h3 id='type-casting'>Type Casting</h3>
+<p>If you want to set the type of the input, you can set it by adding <code>[type] (replace type with type)</code>.</p>
 <h3 id='simple'>Simple</h3>
 <p>If you are making simple queries, you may use simple functions to boost performance. Use simple functions by attatching an <code>s</code> in front of the function. The syntax is very similar to SlickInject.</p>
 <h3 id='cache'>Cache</h3>
@@ -402,7 +431,7 @@ To make duplicate keys work for binds, you can add a name to the bind. Ex: `[&&]
 <p>Reset ititerator.</p>
 
 <aside class="notice">
-Note: All rows are retrieved and stored at object initialisation. `Response->next()` or `Response->reset()` does not affect the database or connection
+All rows are retrieved and stored at object initialisation. `Response->next()` or `Response->reset()` does not affect the database or connection
 </aside>
 <h2 id='select'>SELECT</h2><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">SELECT</span><span class="p">(</span><span class="s2">"horizon"</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[],</span> <span class="k">array</span><span class="p">(</span>
@@ -418,14 +447,18 @@ Note: All rows are retrieved and stored at object initialisation. `Response->nex
 
 <ul>
 <li><code>(String)table</code> - Table name to query</li>
-<li><code>(Array)columns</code> - Array of columns to return. <code>[]</code> will query using the <code>*</code> selector. Also note, that you may use the <code>DISTINCT</code> keyword by putting it first in the array.</li>
+<li><code>(Array)columns</code> - Array of columns to return. <code>[]</code> will query using the <code>*</code> selector.</li>
 <li><code>(Array)where</code> - Array of conditions for WHERE (See above for documentation on WHERE)</li>
 <li><code>(Array)join</code> - Array of conditions for JOIN. Usage below</li>
 <li><code>{Int}limit</code> - Number of rows to retrieve. Usage below.</li>
 </ul>
 
 <aside class="notice">
-Note, you may also do `SuperSQL->SELECT($table, $columns, $where, $limit)`
+You may also put `DISTINCT`, in the top of the columns array to use the DISTINCT keyword. Other available keywords include: `INSERT INTO table` and `INTO table` (replace table with table name)
+</aside>
+
+<aside class="notice">
+You may also do `SuperSQL->SELECT($table, $columns, $where, $limit)`
 </aside>
 <h2 id='insert'>INSERT</h2><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">INSERT</span><span class="p">(</span><span class="s2">"table"</span><span class="p">,</span><span class="k">array</span><span class="p">(</span>

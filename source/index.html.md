@@ -29,6 +29,17 @@ SlickInject and Medoo on steroids - The most advanced and compact library availa
 1. To provide a very fast and efficient way to edit sql databases
 2. To provide a easy method of access
 
+### Main Features
+
+1. Very small - 22.2KB one file (Unminified, `dist/SuperSQL.php`)
+2. Simple and easy - Very easy to lean. We also provide a simple and advanced API
+3. Compatability - Supports major SQL databases
+4. Customisability - We offer multiple files for your needs
+5. Efficiency - This module was built with speed in mind.
+6. Complexity - This module allows you to make all kinds of complex queries
+7. Security - This module prevents SQL injections.
+8. Availability - This module is FREE. Licensed under the MIT license.
+
 ### Usage
 
 ```php
@@ -118,6 +129,18 @@ $SuperSQL->sUPDATE($table,$data,$where);
 $SuperSQL->sDELETE($table,$where);
 ?>
 ```
+
+> Type Casting
+
+```php
+$SuperSQL->INSERT("sensitive_data",[ // NOTE: Also works with any other query. ALSO NOTE: Types are case-insensitive
+   "nuclear_codes[int]" => 138148347734, // Integer (Use [int] or [integer]
+   "in_state_of_emergency[bool]" => false, // Boolean (Use [bool] or [boolean]
+   "secret_files[lob]" => $file // Large Objects/Resources (Use [lob] or [resource])
+   "fake_data[null]" => null // Null values (use [null])
+]);
+```
+
 ### Conditionals
 
 Conditional statements are extremly customisable. WHERE and JOIN clauses are conditional statements. 
@@ -127,10 +150,13 @@ To make duplicate keys work for binds, you can add a name to the bind. Ex: `[&&]
 </aside>
 
 ### Multi-queries
-Multiqueries can be done too. This allows for highly efficient repetative queries. Note: Only the values of WHERE, JOIN, and INSERT work with this. VALUES, not KEYS.
+Multiqueries can be done too. This allows for highly efficient repetative queries. Note: Only the values of WHERE and INSERT work with this. VALUES, not KEYS.
 
 ### Multi-Table support
 If you want to query multiple tables at once, put the tables in as an array
+
+### Type Casting
+If you want to set the type of the input, you can set it by adding `[type] (replace type with type)`.
 
 ### Simple
 If you are making simple queries, you may use simple functions to boost performance. Use simple functions by attatching an `s` in front of the function. The syntax is very similar to SlickInject.
@@ -160,7 +186,7 @@ Get next row
 Reset ititerator.
 
 <aside class="notice">
-Note: All rows are retrieved and stored at object initialisation. `Response->next()` or `Response->reset()` does not affect the database or connection
+All rows are retrieved and stored at object initialisation. `Response->next()` or `Response->reset()` does not affect the database or connection
 </aside>
 
 ## SELECT
@@ -179,13 +205,17 @@ $SuperSQL->SELECT("horizon", [], [], array(
 **SuperSQL->SELECT($table, $columns, $where[,$join[, $limit);**
 
 * `(String)table` - Table name to query
-* `(Array)columns` - Array of columns to return. `[]` will query using the `*` selector. Also note, that you may use the `DISTINCT` keyword by putting it first in the array.
+* `(Array)columns` - Array of columns to return. `[]` will query using the `*` selector.
 * `(Array)where` - Array of conditions for WHERE (See above for documentation on WHERE)
 * `(Array)join` - Array of conditions for JOIN. Usage below
 * `{Int}limit` - Number of rows to retrieve. Usage below.
 
 <aside class="notice">
-Note, you may also do `SuperSQL->SELECT($table, $columns, $where, $limit)`
+You may also put `DISTINCT`, in the top of the columns array to use the DISTINCT keyword. Other available keywords include: `INSERT INTO table` and `INTO table` (replace table with table name)
+</aside>
+
+<aside class="notice">
+You may also do `SuperSQL->SELECT($table, $columns, $where, $limit)`
 </aside>
 
 ## INSERT
