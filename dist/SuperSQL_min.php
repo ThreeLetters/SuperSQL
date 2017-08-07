@@ -29,7 +29,7 @@ SOFTWARE.
  License: MIT
  Source: https://github.com/ThreeLetters/SQL-Library
  Build: v2.0.0
- Built on: 06/08/2017
+ Built on: 07/08/2017
 */
 
 // lib/connector/index.php

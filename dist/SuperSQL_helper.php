@@ -29,16 +29,42 @@ SOFTWARE.
  License: MIT
  Source: https://github.com/ThreeLetters/SQL-Library
  Build: v2.0.0
- Built on: 06/08/2017
+ Built on: 07/08/2017
 */
 
 
-class Helper
+class SQLHelper
 {
     public $s;
-    function __construct($SuperSQL)
+    public $connections;
+    function __construct($dt,$db = null,$user = null,$pass = null,$options = array())
     {
-        $this->s = $SuperSQL;
+        $this->connections = array();
+        $type = gettype($dt);
+        if ($type == "array") {
+            if (gettype($dt[0]) == "array") {
+                foreach ($dt as $key => $v) {
+                $host = isset($v["host"]) ? $v["host"] : "";
+                $db = isset($v["db"]) ? $v["db"] : "";
+                $user = isset($v["user"]) ? $v["user"] : "";
+                $pass = isset($v["password"]) ? $v["password"] : "";
+                $opt = isset($v["options"]) ? $v["options"] : array();
+                $s = self::connect($host,$db,$user,$pass,$opt);
+                array_push($this->connections,$s);
+                }
+            } else {
+                 foreach ($dt as $key => $v) {
+                    array_push($this->connections,$v);
+                 }
+            }
+            $this->s = $this->connections[0];
+        } else if ($type == "string") {
+            $this->s = self::connect($dt,$db,$user,$pass,$options);
+            array_push($this->connections,$this->s);
+        } else {
+            array_push($this->connections,$dt);
+            $this->s = $dt;
+        }
     }
     static function connect($host, $db, $user, $pass, $options = array())
     {
@@ -109,12 +135,16 @@ class Helper
         }
         return new SuperSQL($dsn, $user, $pass);
     }
-    static function get($table, $columns, $where, $join = null)
+    function change($id) {
+            $this->s = $this->connections[$id];
+            return $this->s;
+    }
+    function get($table, $columns, $where, $join = null)
     {
         $d = $this->s->SELECT($table, $columns, $where, $join, 1)->getData();
         return ($d && $d[0]) ? $d[0] : false;
     }
-    static function create($table, $data)
+    function create($table, $data)
     {
         $sql = "CREATE TABLE `" . $table . "` (";
         $i   = 0;
@@ -126,10 +156,10 @@ class Helper
             $i++;
         }
         $sql .= ")";
-        return $s->query($sql);
+        return $this->s->query($sql);
     }
-    static function drop($table)
+    function drop($table)
     {
-        return $s->query("DROP TABLE `" . $table . "`");
+        return $this->s->query("DROP TABLE `" . $table . "`");
     }
 }

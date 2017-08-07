@@ -33,6 +33,7 @@ Source: https://github.com/ThreeLetters/SuperSQL
 include "lib/parser/Advanced.php";
 include "lib/parser/Simple.php";
 include "lib/connector/index.php";
+include "lib/helper/index.php";
 
 use SuperSQL\AdvancedParser as AdvancedParser;
 use SuperSQL\SimpleParser as SimpleParser;

@@ -1,6 +1,4 @@
 <?php
-namespace SuperSQL;
-
 /*
 MIT License
 
@@ -27,18 +25,47 @@ SOFTWARE.
 */
 
 // BUILD BETWEEN
-class Helper
+class SQLHelper
 {
     public $s;
+    public $connections;
     
     /**
      * Constructs helper
      *
      * @param {SuperSQL} SuperSQL - SuperSQL object
      */
-    function __construct($SuperSQL)
+    function __construct($dt,$db = null,$user = null,$pass = null,$options = array())
     {
-        $this->s = $SuperSQL;
+        $this->connections = array();
+        
+        $type = gettype($dt);
+        if ($type == "array") {
+            
+            if (gettype($dt[0]) == "array") {
+                foreach ($dt as $key => $v) {
+                    
+                $host = isset($v["host"]) ? $v["host"] : "";
+                $db = isset($v["db"]) ? $v["db"] : "";
+                $user = isset($v["user"]) ? $v["user"] : "";
+                $pass = isset($v["password"]) ? $v["password"] : "";
+                $opt = isset($v["options"]) ? $v["options"] : array();
+                $s = self::connect($host,$db,$user,$pass,$opt);
+                array_push($this->connections,$s);
+                }
+            } else {
+                 foreach ($dt as $key => $v) {
+                    array_push($this->connections,$v);
+                 }
+            }
+            $this->s = $this->connections[0];
+        } else if ($type == "string") {
+            $this->s = self::connect($dt,$db,$user,$pass,$options);
+            array_push($this->connections,$this->s);
+        } else {
+            array_push($this->connections,$dt);
+            $this->s = $dt;
+        }
     }
     
     /**
@@ -54,7 +81,7 @@ class Helper
      */
     static function connect($host, $db, $user, $pass, $options = array())
     {
-        
+
         $dbtype = "mysql";
         $dsn    = false;
         
@@ -129,6 +156,10 @@ class Helper
         return new SuperSQL($dsn, $user, $pass);
     }
     
+    function change($id) {
+            $this->s = $this->connections[$id];
+            return $this->s;
+    }
     /**
      * Gets the first row
      *
@@ -139,7 +170,7 @@ class Helper
      *
      * @returns {Array|false} - Returns row or false if none
      */
-    static function get($table, $columns, $where, $join = null)
+    function get($table, $columns, $where, $join = null)
     {
         $d = $this->s->SELECT($table, $columns, $where, $join, 1)->getData();
         return ($d && $d[0]) ? $d[0] : false;
@@ -151,7 +182,7 @@ class Helper
      * @param {String} table - Table name to create
      * @param {Array} data - Columns to create
      */
-    static function create($table, $data)
+    function create($table, $data)
     {
         
         $sql = "CREATE TABLE `" . $table . "` (";
@@ -165,7 +196,7 @@ class Helper
         }
         $sql .= ")";
         
-        return $s->query($sql);
+        return $this->s->query($sql);
     }
     
     /**
@@ -173,10 +204,11 @@ class Helper
      *
      * @param {String} table - Table name to delete
      */
-    static function drop($table)
+    function drop($table)
     {
-        return $s->query("DROP TABLE `" . $table . "`");
+        return $this->s->query("DROP TABLE `" . $table . "`");
     }
+    
 }
 // BUILD BETWEEN
 
