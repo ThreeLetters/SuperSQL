@@ -139,6 +139,13 @@ class SQLHelper
             $this->s = $this->connections[$id];
             return $this->s;
     }
+    function getCon($all = false) {
+        if ($all) {
+            return $this->connections;
+        } else {
+         return $this->s;
+        }
+    }
     function get($table, $columns, $where, $join = null)
     {
         $d = $this->s->SELECT($table, $columns, $where, $join, 1)->getData();

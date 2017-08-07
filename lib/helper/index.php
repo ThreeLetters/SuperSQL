@@ -160,6 +160,14 @@ class SQLHelper
             $this->s = $this->connections[$id];
             return $this->s;
     }
+    function getCon($all = false) {
+        if ($all) {
+            return $this->connections;
+        } else {
+         return $this->s;
+        }
+    }
+    
     /**
      * Gets the first row
      *
