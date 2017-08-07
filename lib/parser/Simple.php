@@ -46,7 +46,7 @@ class SimpleParser
                     $sql .= " AND ";
                 }
                 $sql .= "`" . $key . "` = ?";
-                array_push($insert[0], $value);
+                array_push($insert, $value);
                 $i++;
             }
         }
@@ -54,9 +54,7 @@ class SimpleParser
     public static function SELECT($table, $columns, $where, $append)
     {
         $sql    = "SELECT ";
-        $insert = array(
-            array()
-        );
+        $insert = array();
         $len    = count($columns);
         if ($len == 0) { // none
             $sql .= "*";
@@ -71,7 +69,7 @@ class SimpleParser
         
         $sql .= "FROM `" . $table . "`";
         
-        self::WHERE($where, $sql, $insert);
+        self::WHERE($where, $sql);
         
         $sql .= " " . $append;
         
@@ -84,9 +82,7 @@ class SimpleParser
     {
         $sql    = "INSERT INTO `" . $table . "` (";
         $add    = ") VALUES (";
-        $insert = array(
-            array()
-        );
+        $insert = array();
         
         $i = 0;
         
@@ -98,7 +94,7 @@ class SimpleParser
             }
             $sql .= "`" . $key . "`";
             $add .= "?";
-            array_push($insert[0], $value);
+            array_push($insert, $value);
             $i++;
         }
         
@@ -112,9 +108,7 @@ class SimpleParser
     public static function UPDATE($table, $data, $where)
     {
         $sql    = "UPDATE `" . $table . "` SET ";
-        $insert = array(
-            array()
-        );
+        $insert = array();
         
         $i = 0;
         foreach ($data as $key => $value) {
@@ -122,7 +116,7 @@ class SimpleParser
                 $sql .= ", ";
             }
             $sql .= "`" . $key . "` = ?";
-            array_push($insert[0], $value);
+            array_push($insert, $value);
             $i++;
         }
         
@@ -135,9 +129,7 @@ class SimpleParser
     public static function DELETE($table, $where)
     {
         $sql    = "DELETE FROM `" . $table . "`";
-        $insert = array(
-            array()
-        );
+        $insert = array();
         
         self::WHERE($where, $sql, $insert);
         return array(

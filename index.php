@@ -185,9 +185,9 @@ class SuperSQL
     /**
      * Query
      */
-    function query($query)
+    function query($query, $obj = null)
     {
-        return $this->connector->query($query);
+        return $this->connector->query($query, $obj);
     }
     /**
      * Closes the connection

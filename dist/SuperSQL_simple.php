@@ -84,13 +84,15 @@ class Connector
         $this->db  = new \PDO($dsn, $user, $pass);
         $this->log = array();
     }
-    function query($query)
+    function query($query,$obj = null)
     {
         $q = $this->db->prepare($query);
-        $e = $q->execute();
+        if ($obj) $e = $q->execute($obj);
+        else $e = $q->execute();
         if ($this->dev)
             array_push($this->log, array(
-                $query
+                $query,
+                $obj
             ));
         return new Response($q,$e);
     }
@@ -98,10 +100,10 @@ class Connector
     {
         if (isset($this->queries[$sql . "|" . $typeString])) { 
             $s = $this->queries[$sql . "|" . $typeString];
-            $q = $s[0];
-            $v = &$s[1];
-            foreach ($values as $key => $val) {
-                $v[$key][0] = $val;
+            $q = $s[1];
+            $v = &$s[0];
+            foreach ($values as $key => $vq) {
+                $v[$key][0] = $vq[0];
             }
             if ($this->dev)
                 array_push($this->log, array(
@@ -167,7 +169,7 @@ class SimpleParser
                     $sql .= " AND ";
                 }
                 $sql .= "`" . $key . "` = ?";
-                array_push($insert[0], $value);
+                array_push($insert, $value);
                 $i++;
             }
         }
@@ -175,9 +177,7 @@ class SimpleParser
     public static function SELECT($table, $columns, $where, $append)
     {
         $sql    = "SELECT ";
-        $insert = array(
-            array()
-        );
+        $insert = array();
         $len    = count($columns);
         if ($len == 0) { 
             $sql .= "*";
@@ -190,7 +190,7 @@ class SimpleParser
             }
         }
         $sql .= "FROM `" . $table . "`";
-        self::WHERE($where, $sql, $insert);
+        self::WHERE($where, $sql);
         $sql .= " " . $append;
         return array(
             $sql,
@@ -201,9 +201,7 @@ class SimpleParser
     {
         $sql    = "INSERT INTO `" . $table . "` (";
         $add    = ") VALUES (";
-        $insert = array(
-            array()
-        );
+        $insert = array();
         $i = 0;
         foreach ($data as $key => $value) {
             if ($i != 0) {
@@ -212,7 +210,7 @@ class SimpleParser
             }
             $sql .= "`" . $key . "`";
             $add .= "?";
-            array_push($insert[0], $value);
+            array_push($insert, $value);
             $i++;
         }
         $sql .= $add;
@@ -224,16 +222,14 @@ class SimpleParser
     public static function UPDATE($table, $data, $where)
     {
         $sql    = "UPDATE `" . $table . "` SET ";
-        $insert = array(
-            array()
-        );
+        $insert = array();
         $i = 0;
         foreach ($data as $key => $value) {
             if ($i != 0) {
                 $sql .= ", ";
             }
             $sql .= "`" . $key . "` = ?";
-            array_push($insert[0], $value);
+            array_push($insert, $value);
             $i++;
         }
         self::WHERE($where, $sql, $insert);
@@ -245,9 +241,7 @@ class SimpleParser
     public static function DELETE($table, $where)
     {
         $sql    = "DELETE FROM `" . $table . "`";
-        $insert = array(
-            array()
-        );
+        $insert = array();
         self::WHERE($where, $sql, $insert);
         return array(
             $sql,
@@ -284,9 +278,9 @@ class SuperSQL
         $d = SimpleParser::DELETE($table, $where);
         return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
     }
-    function query($query)
+    function query($query, $obj = null)
     {
-        return $this->connector->query($query);
+        return $this->connector->query($query, $obj);
     }
     function close()
     {

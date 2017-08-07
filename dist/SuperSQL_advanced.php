@@ -84,13 +84,15 @@ class Connector
         $this->db  = new \PDO($dsn, $user, $pass);
         $this->log = array();
     }
-    function query($query)
+    function query($query,$obj = null)
     {
         $q = $this->db->prepare($query);
-        $e = $q->execute();
+        if ($obj) $e = $q->execute($obj);
+        else $e = $q->execute();
         if ($this->dev)
             array_push($this->log, array(
-                $query
+                $query,
+                $obj
             ));
         return new Response($q,$e);
     }
@@ -98,10 +100,10 @@ class Connector
     {
         if (isset($this->queries[$sql . "|" . $typeString])) { 
             $s = $this->queries[$sql . "|" . $typeString];
-            $q = $s[0];
-            $v = &$s[1];
-            foreach ($values as $key => $val) {
-                $v[$key][0] = $val;
+            $q = $s[1];
+            $v = &$s[0];
+            foreach ($values as $key => $vq) {
+                $v[$key][0] = $vq[0];
             }
             if ($this->dev)
                 array_push($this->log, array(
@@ -593,9 +595,9 @@ class SuperSQL
         $d = AdvancedParser::DELETE($table, $where);
         return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
     }
-    function query($query)
+    function query($query, $obj = null)
     {
-        return $this->connector->query($query);
+        return $this->connector->query($query, $obj);
     }
     function close()
     {

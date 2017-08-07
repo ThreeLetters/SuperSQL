@@ -129,14 +129,16 @@ class Connector
      *
      * @returns {SQLResponse}
      */
-    function query($query)
+    function query($query,$obj = null)
     {
         $q = $this->db->prepare($query);
-        $e = $q->execute();
+        if ($obj) $e = $q->execute($obj);
+        else $e = $q->execute();
         
         if ($this->dev)
             array_push($this->log, array(
-                $query
+                $query,
+                $obj
             ));
         return new Response($q,$e);
     }
@@ -144,7 +146,9 @@ class Connector
     /**
      * Queries database efficiently
      * @param {String} sql - Base query
-     * @param {Array} insert - array of args
+     * @param {Array} values - array of values and types
+     * @param {Array} insert - Multi-query inserts
+     * @param {String} typeString - Type checking
      *
      * @returns {SQLResponse|SQLResponse[]}
      */
@@ -154,11 +158,10 @@ class Connector
         // return;
         if (isset($this->queries[$sql . "|" . $typeString])) { // Cache
             $s = $this->queries[$sql . "|" . $typeString];
-            $q = $s[0];
-            $v = &$s[1];
-            
-            foreach ($values as $key => $val) {
-                $v[$key][0] = $val;
+            $q = $s[1];
+            $v = &$s[0];
+            foreach ($values as $key => $vq) {
+                $v[$key][0] = $vq[0];
             }
             
             if ($this->dev)
