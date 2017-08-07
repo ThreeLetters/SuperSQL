@@ -114,7 +114,7 @@ function minify(str) {
             out.push(" ");
 
             for (; i < len; i++) {
-                if (str[i + 1] != " ") break;
+                if (str[i + 1] != " " && str[i + 1] != "\n") break;
             }
         } else {
             out.push(char)
