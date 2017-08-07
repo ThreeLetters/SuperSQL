@@ -401,14 +401,14 @@ Afterwords, do `$SuperSQL->getLog()` to get the log.
 
 ```php
 <?php
-$logOut = [
+$log = [
     [
     "fromCache" // If this is there, it means it used the cache.
     "SELECT * FROM `table` WHERE `test` = ?", // SQL base
     "s", // String of arg types
     [[24424,1]], // Array of initial values with types. In this case, the value is 24424 and the type is an INT (PDO::PARAM_INT)
-    [["0":234]], // Multi-query array
-    
+    [["0":234]] // Multi-query array
+    ]
 ]
 ?>
 ```

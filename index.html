@@ -632,14 +632,14 @@ Documentation not complete for helper functions
 
 <p>Afterwords, do <code>$SuperSQL-&gt;getLog()</code> to get the log.</p>
 <h3 id='da-log-what-does-it-mean'>Da log - What does it mean?</h3><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
-<span class="nv">$logOut</span> <span class="o">=</span> <span class="p">[</span>
+<span class="nv">$log</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">[</span>
     <span class="s2">"fromCache"</span> <span class="c1">// If this is there, it means it used the cache.
 </span>    <span class="s2">"SELECT * FROM `table` WHERE `test` = ?"</span><span class="p">,</span> <span class="c1">// SQL base
 </span>    <span class="s2">"s"</span><span class="p">,</span> <span class="c1">// String of arg types
 </span>    <span class="p">[[</span><span class="mi">24424</span><span class="p">,</span><span class="mi">1</span><span class="p">]],</span> <span class="c1">// Array of initial values with types. In this case, the value is 24424 and the type is an INT (PDO::PARAM_INT)
-</span>    <span class="p">[[</span><span class="s2">"0"</span><span class="o">:</span><span class="mi">234</span><span class="p">]],</span> <span class="c1">// Multi-query array
-</span>
+</span>    <span class="p">[[</span><span class="s2">"0"</span><span class="o">:</span><span class="mi">234</span><span class="p">]]</span> <span class="c1">// Multi-query array
+</span>    <span class="p">]</span>
 <span class="p">]</span>
 <span class="cp">?&gt;</span>
 </code></pre>
