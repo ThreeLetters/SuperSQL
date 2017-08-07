@@ -132,7 +132,7 @@ function minify(str) {
     }
 
     function includes2(char) {
-        var dt = ["=", "{", "(", "}", ")", "]", ">", "<", "!", "."];
+        var dt = ["=", "{", "(", "}", ")", "]", ">", "<", "!", ".", "$"];
 
         return dt.indexOf(char) != -1;
     }
