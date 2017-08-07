@@ -132,13 +132,13 @@ class Connector
     function query($query)
     {
         $q = $this->db->prepare($query);
-        $q->execute();
+        $e = $q->execute();
         
         if ($this->dev)
             array_push($this->log, array(
                 $query
             ));
-        return new Response($q);
+        return new Response($q,$e);
     }
     
     /**
@@ -148,35 +148,60 @@ class Connector
      *
      * @returns {SQLResponse|SQLResponse[]}
      */
-    function _query($sql, $insert)
+    function _query($sql, $values, $insert, $typeString)
     {
         // echo json_encode(array($sql,$insert));
         // return;
-        if (isset($this->queries[$sql])) { // Cache
-            $q = $this->queries[$sql];
+        if (isset($this->queries[$sql . "|" . $typeString])) { // Cache
+            $s = $this->queries[$sql . "|" . $typeString];
+            $q = $s[0];
+            $v = &$s[1];
+            
+            foreach ($values as $key => $val) {
+                $v[$key][0] = $val;
+            }
+            
             if ($this->dev)
                 array_push($this->log, array(
                     "fromcache",
                     $sql,
+                    $typeString,
+                    $values,
                     $insert
                 ));
         } else {
             $q                   = $this->db->prepare($sql);
-            $this->queries[$sql] = $q;
+             $v = $values;
+            foreach ($v as $key => &$va) {
+                $q->bindParam($key + 1, $va[0],$va[1]);
+            }
+           
+            
+            $this->queries[$sql . "|" . $typeString] = array(&$v,$q);
             if ($this->dev)
                 array_push($this->log, array(
                     $sql,
+                    $typeString,
+                    $values,
                     $insert
                 ));
         }
         
-        if (count($insert) == 1) { // Single query
-            $e = $q->execute($insert[0]);
+        if (count($insert) == 0) { // Single query
+            $e = $q->execute();
             return new Response($q, $e);
         } else { // Multi Query
             $responses = array();
+            
+            $e = $q->execute();
+            array_push($responses,new Response($q, $e));
+            
             foreach ($insert as $key => $value) {
-                $e = $q->execute($insert[0]);
+                foreach ($value as $k => $val) {
+                    $v[$k][0] = $val;
+                }
+                
+                $e = $q->execute();
                 array_push($responses, new Response($q, $e));
             }
             return $responses;

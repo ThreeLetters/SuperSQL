@@ -73,7 +73,7 @@ class SuperSQL
             $join  = null;
         }
         $d = AdvancedParser::SELECT($table, $columns, $where, $join, $limit);
-        return $this->connector->_query($d[0], $d[1]);
+        return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
     }
     
     /**
@@ -87,7 +87,7 @@ class SuperSQL
     function INSERT($table, $data)
     {
         $d = AdvancedParser::INSERT($table, $data);
-        return $this->connector->_query($d[0], $d[1]);
+        return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
     }
     
     /**
@@ -102,7 +102,7 @@ class SuperSQL
     function UPDATE($table, $data, $where)
     {
         $d = AdvancedParser::UPDATE($table, $data, $where);
-        return $this->connector->_query($d[0], $d[1]);
+        return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
     }
     
     /**
@@ -115,8 +115,8 @@ class SuperSQL
      */
     function DELETE($table, $where)
     {
-        $d = Parser::DELETE($table, $where);
-        return $this->connector->_query($d[0], $d[1]);
+        $d = AdvancedParser::DELETE($table, $where);
+        return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
     }
     // BUILD ADVANCED BETWEEN
     
@@ -134,7 +134,7 @@ class SuperSQL
     function sSELECT($table, $columns, $where, $append = "")
     {
         $d = SimpleParser::SELECT($table, $columns, $where, $append);
-        return $this->connector->_query($d[0], $d[1]);
+        return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
     }
     
     /**
@@ -148,7 +148,7 @@ class SuperSQL
     function sINSERT($table, $data)
     {
         $d = SimpleParser::INSERT($table, $data);
-        return $this->connector->_query($d[0], $d[1]);
+        return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
     }
     
     /**
@@ -163,7 +163,7 @@ class SuperSQL
     function sUPDATE($table, $data, $where)
     {
         $d = SimpleParser::UPDATE($table, $data, $where);
-        return $this->connector->_query($d[0], $d[1]);
+        return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
     }
     
     /**
@@ -177,7 +177,7 @@ class SuperSQL
     function sDELETE($table, $where)
     {
         $d = SimpleParser::DELETE($table, $where);
-        return $this->connector->_query($d[0], $d[1]);
+        return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
     }
     
     // BUILD SIMPLE BETWEEN

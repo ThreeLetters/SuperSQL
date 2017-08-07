@@ -29,7 +29,7 @@ SOFTWARE.
  License: MIT
  Source: https://github.com/ThreeLetters/SQL-Library
  Build: v2.0.0
- Built on: 05/08/2017
+ Built on: 06/08/2017
 */
 
 // lib/connector/index.php
@@ -87,39 +87,57 @@ class Connector
     function query($query)
     {
         $q = $this->db->prepare($query);
-        $q->execute();
+        $e = $q->execute();
         if ($this->dev)
             array_push($this->log, array(
                 $query
             ));
-        return new Response($q);
+        return new Response($q,$e);
     }
-    function _query($sql, $insert)
+    function _query($sql, $values, $insert, $typeString)
     {
-        if (isset($this->queries[$sql])) { 
-            $q = $this->queries[$sql];
+        if (isset($this->queries[$sql . "|" . $typeString])) { 
+            $s = $this->queries[$sql . "|" . $typeString];
+            $q = $s[0];
+            $v = &$s[1];
+            foreach ($values as $key => $val) {
+                $v[$key][0] = $val;
+            }
             if ($this->dev)
                 array_push($this->log, array(
                     "fromcache",
                     $sql,
+                    $typeString,
+                    $values,
                     $insert
                 ));
         } else {
             $q                   = $this->db->prepare($sql);
-            $this->queries[$sql] = $q;
+             $v = $values;
+            foreach ($v as $key => &$va) {
+                $q->bindParam($key + 1, $va[0],$va[1]);
+            }
+            $this->queries[$sql . "|" . $typeString] = array(&$v,$q);
             if ($this->dev)
                 array_push($this->log, array(
                     $sql,
+                    $typeString,
+                    $values,
                     $insert
                 ));
         }
-        if (count($insert) == 1) { 
-            $e = $q->execute($insert[0]);
+        if (count($insert) == 0) { 
+            $e = $q->execute();
             return new Response($q, $e);
         } else { 
             $responses = array();
+            $e = $q->execute();
+            array_push($responses,new Response($q, $e));
             foreach ($insert as $key => $value) {
-                $e = $q->execute($insert[0]);
+                foreach ($value as $k => $val) {
+                    $v[$k][0] = $val;
+                }
+                $e = $q->execute();
                 array_push($responses, new Response($q, $e));
             }
             return $responses;
@@ -249,22 +267,22 @@ class SuperSQL
     function sSELECT($table, $columns, $where, $append = "")
     {
         $d = SimpleParser::SELECT($table, $columns, $where, $append);
-        return $this->connector->_query($d[0], $d[1]);
+        return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
     }
     function sINSERT($table, $data)
     {
         $d = SimpleParser::INSERT($table, $data);
-        return $this->connector->_query($d[0], $d[1]);
+        return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
     }
     function sUPDATE($table, $data, $where)
     {
         $d = SimpleParser::UPDATE($table, $data, $where);
-        return $this->connector->_query($d[0], $d[1]);
+        return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
     }
     function sDELETE($table, $where)
     {
         $d = SimpleParser::DELETE($table, $where);
-        return $this->connector->_query($d[0], $d[1]);
+        return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
     }
     function query($query)
     {
