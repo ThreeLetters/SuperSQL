@@ -5,20 +5,6 @@ SlickInject and Medoo on steroids - The most advanced and compact library availa
 1. To provide a very fast and efficient way to edit sql databases
 2. To provide a easy method of access
 
-## Notes
-This library was built with speed and conciseness in mind. Only needed features are added. Otherwise, it becomes blown up and inefficient like medoo. All the other missing features can be emulated with php. For example:
-
-```php
-// Medoo - Using sql functions is a bad practice - its lazy
-$medoo->insert("test",[
-   "#time" => "NOW()"
-]);
-
-// SuperSQL - USE PHP FOR GOODNESS' SAKES! DONT BE LAZY
-$SuperSQL->insert("test",[
- "time" => date('Y-m-d H:i:s')
-]);
-```
 ## Usage
 You may either
 
