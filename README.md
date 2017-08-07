@@ -89,6 +89,18 @@ If you want to query multiple tables at once, put the tables in as an array
 $SuperSQL->SELECT(["table1","table2"],[],[]);
 ```
 
+#### Type Casting
+If you want to set the type of the input, you can set it by adding `[type] (replace type with type)`.
+
+```php
+$SuperSQL->INSERT("sensitive_data",[ // NOTE: Also works with any other query. ALSO NOTE: Types are case-insensitive
+   "nuclear_codes[int]" => 138148347734, // Integer (Use [int] or [integer]
+   "in_state_of_emergency[bool]" => false, // Boolean (Use [bool] or [boolean]
+   "secret_files[lob]" => $file // Large Objects/Resources (Use [lob] or [resource])
+   "fake_data[null]" => null // Null values (use [null])
+]);
+```
+
 #### Simple
 If you are making simple queries, you may use simple functions to boost performance. Use simple functions by attatching an `s` in front of the function. The syntax is very similar to SlickInject.
 
