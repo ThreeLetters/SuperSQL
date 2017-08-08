@@ -35,7 +35,7 @@ SlickInject and Medoo on steroids - The most advanced and compact library availa
 
 ### Main Features
 
-1. Very small - 24.2KB one file (Unminified, `dist/SuperSQL.php`. Minified version: 11.1KB)
+1. Very small - 24.2KB one file (Unminified, `dist/SuperSQL.php`. Minified version: 10.2KB)
 2. Simple and easy - Very easy to lean. We also provide a simple and advanced API
 3. Compatability - Supports major SQL databases
 4. Customisability - We offer multiple files for your needs
