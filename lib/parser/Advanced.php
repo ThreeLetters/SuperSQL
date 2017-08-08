@@ -159,7 +159,7 @@ class AdvParser
         if (gettype($table) == "array") {
             $sql = "";
             for ($i = 0; $i < count($table); $i++) {
-                $t = self::getType($table[i]);
+                $t = self::getType($table[$i]);
                 
                 if ($i != 0)
                     $sql .= ", ";

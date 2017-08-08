@@ -193,7 +193,7 @@ class SimParser
             array_push($insert, $value);
             $i++;
         }
-        $sql .= $add;
+        $sql .= $add . ")";
         return array(
             $sql,
             $insert

@@ -98,7 +98,7 @@ class SimParser
             $i++;
         }
         
-        $sql .= $add;
+        $sql .= $add . ")";
         
         return array(
             $sql,
