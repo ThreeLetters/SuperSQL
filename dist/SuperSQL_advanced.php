@@ -320,7 +320,7 @@ class AdvParser
                         $newOperator = " != ";
                         break;
                     default:
-                        if (!$useBind)
+                        if (!$useBind || $arg = "==")
                             $newOperator = " = "; 
                         break;
                 }
