@@ -246,6 +246,7 @@ class AdvParser
             $typeString .= "b";
         } else if ($var == "integer" || $var == "int") {
             $typeString .= "i";
+            $value = (int) $value;
         } else if ($var == "string" || $var == "str") {
             $type = \PDO::PARAM_STR;
             $typeString .= "s";
