@@ -8,7 +8,7 @@ SlickInject and Medoo on steroids - The most advanced and compact library availa
 ## Notes
 #### Missing features.
 * `ORDER BY` not supported as you can sort things with php too - However, a pr would be welcome
-* `LIMIT` - only LIMIT is supported, so some databases might not be able to handle this
+* `GROUP` - prs welcome
 * `[<>] and [><]` operators
 
 ## Usage
