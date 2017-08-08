@@ -578,8 +578,13 @@ class AdvParser
                 $sql .= self::conditions($where, $values, $index, $typeString);
             }
         }
-        if ($limit)
-            $sql .= " LIMIT " . $limit;
+        if ($limit) {
+            if (gettype($limit) == "integer") {
+                 $sql .= " LIMIT " . $limit; 
+            } else if (gettype($limit) == "string") {
+                 $sql .= " " . $limit; 
+            }
+        }
         return array(
             $sql,
             $values,
@@ -742,7 +747,7 @@ class SuperSQL
     }
     function SELECT($table, $columns = array(), $where = array(), $join = null, $limit = false)
     {
-        if (gettype($join) == "integer") {
+        if ((gettype($join) == "integer" || gettype($join) == "string") && !$limit) {
             $limit = $join;
             $join  = null;
         }

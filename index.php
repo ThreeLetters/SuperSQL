@@ -69,7 +69,7 @@ class SuperSQL
      */
     function SELECT($table, $columns = array(), $where = array(), $join = null, $limit = false)
     {
-        if (gettype($join) == "integer") {
+        if ((gettype($join) == "integer" || gettype($join) == "string") && !$limit) {
             $limit = $join;
             $join  = null;
         }

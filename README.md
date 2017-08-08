@@ -19,7 +19,6 @@ SlickInject and Medoo on steroids - The most advanced and lightweight library of
 
 ## Notes
 #### Missing features.
-* `ORDER BY` not supported as you can sort things with php too - However, a pr would be welcome
 * `GROUP` - prs welcome
 * `[<>] and [><]` shortcut operators
 * SourceMaps - Prs welcome (again)

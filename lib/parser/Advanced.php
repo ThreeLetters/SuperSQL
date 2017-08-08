@@ -479,8 +479,14 @@ class AdvParser
             }
         }
         
-        if ($limit)
-            $sql .= " LIMIT " . $limit;
+        if ($limit) {
+            if (gettype($limit) == "integer") {
+                 $sql .= " LIMIT " . $limit; 
+            } else if (gettype($limit) == "string") {
+                 $sql .= " " . $limit; 
+            }
+        }
+           
         
         return array(
             $sql,
