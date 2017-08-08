@@ -224,6 +224,14 @@ class AdvParser
             return "";
         
     }
+    
+    private static function rmComments($str) {
+        $i = strpos($str,"#");
+        if ($i !== false) {
+            $str = substr($str,0,$i);
+        }
+        return trim($str);
+    }
     /**
      * Constructs logical conditional statements
      *
@@ -293,7 +301,7 @@ class AdvParser
                         $sql .= "(" . $build($build, $val, $map, $index, $values, $newJoin, $newOperator, $parent . "/" . $key) . ")";
                     } else {
                         $type = self::getType($key);
-                        
+                        $c = self::rmComments($key);
                         if ($map !== false && !$raw) {
                             $map[$key . "*"]                 = $index;
                             $map[$key . "#" . $parent . "*"] = $index++;
@@ -301,7 +309,7 @@ class AdvParser
                         foreach ($value as $k => $v) {
                             if ($k != 0)
                                 $sql .= $newJoin;
-                            $sql .= "`" . $key . "`" . $newOperator;
+                            $sql .= "`" . $c . "`" . $newOperator;
                             $index++;
                             if ($raw) {
                                 $sql .= $v;
@@ -323,10 +331,11 @@ class AdvParser
                         $sql .= $val;
                     } else {
                         if ($values !== false) {
-                            $sql .= "`" . $key . "`" . $newOperator . "?";
-                            array_push($values, self::value(self::getType($key), $val, $typeString));
+                            $t = self::getType($key);
+                            $sql .= "`" . self::rmComments($key) . "`" . $newOperator . "?";
+                            array_push($values, self::value($t, $val, $typeString));
                         } else {
-                            $sql .= self::quote($key) . $newOperator;
+                            $sql .= self::quote(self::rmComments($key)) . $newOperator;
                             if (gettype($val) == "integer") {
                                 $sql .= $val;
                             } else {
@@ -505,7 +514,7 @@ class AdvParser
             }
             $type = self::getType($key);
             
-            $sql .= "`" . $key . "`";
+            $sql .= "`" . self::rmComments($key) . "`";
             if ($raw) {
                 $append .= $val;
             } else {
