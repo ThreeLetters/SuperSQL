@@ -131,7 +131,12 @@ class Connector
      */
     function query($query,$obj = null)
     {
-        $q = $this->db->prepare($query);
+        if (isset($this->queries[$query])) {
+            $q = $this->queries[$query];
+        } else {
+            $q = $this->db->prepare($query);
+            $this->queries[$query] = $q;
+        }
         if ($obj) $e = $q->execute($obj);
         else $e = $q->execute();
         
@@ -144,7 +149,7 @@ class Connector
     }
     
     /**
-     * Queries database efficiently
+     * Queries database Advanced
      * @param {String} sql - Base query
      * @param {Array} values - array of values and types
      * @param {Array} insert - Multi-query inserts
