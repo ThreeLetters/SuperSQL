@@ -5,6 +5,17 @@ SlickInject and Medoo on steroids - The most advanced and compact library availa
 1. To provide a very fast and efficient way to edit sql databases
 2. To provide a easy method of access
 
+### Main Features
+
+1. Very small - 24.2KB one file (Unminified, `dist/SuperSQL.php`. Minified version: 10.2KB)
+2. Simple and easy - Very easy to lean. We also provide a simple and advanced API
+3. Compatability - Supports major SQL databases
+4. Customisability - We offer multiple files for your needs
+5. Efficiency - This module was built with speed in mind.
+6. Complexity - This module allows you to make all kinds of complex queries
+7. Security - This module prevents SQL injections.
+8. Availability - This module is FREE. Licensed under the MIT license.
+
 ## Notes
 #### Missing features.
 * `ORDER BY` not supported as you can sort things with php too - However, a pr would be welcome
