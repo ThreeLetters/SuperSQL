@@ -95,9 +95,8 @@ class AdvParser
         {
             foreach ($val as $k => $v) {
                 if (gettype($v) == "array") {
-                    $a = substr($k, 0, 4);
                     stripArgs($k);
-                    if ($a != "[||]" && $a != "[&&]") {
+                    if (isset($v[0])) {
                         if (isset($indexes[$k . "#" . $par . "*"]))
                             $d = $indexes[$k . "#" . $par . "*"];
                         else
