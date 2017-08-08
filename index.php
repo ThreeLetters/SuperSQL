@@ -35,15 +35,15 @@ include "lib/parser/Simple.php";
 include "lib/connector/index.php";
 include "lib/helper/index.php";
 
-use SuperSQL\AdvancedParser as AdvancedParser;
-use SuperSQL\SimpleParser as SimpleParser;
+use SuperSQL\AdvParser as AdvParser;
+use SuperSQL\SimParser as SimParser;
 use SuperSQL\Connector as Connector;
 
 
 // BUILD BETWEEN
 class SuperSQL
 {
-    public $connector;
+    public $con;
     
     /**
      * Creates a connection
@@ -53,7 +53,7 @@ class SuperSQL
      */
     function __construct($dsn, $user, $pass)
     {
-        $this->connector = new Connector($dsn, $user, $pass);
+        $this->con = new Connector($dsn, $user, $pass);
     }
     // BUILD ADVANCED BETWEEN
     /**
@@ -73,8 +73,8 @@ class SuperSQL
             $limit = $join;
             $join  = null;
         }
-        $d = AdvancedParser::SELECT($table, $columns, $where, $join, $limit);
-        return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
+        $d = AdvParser::SELECT($table, $columns, $where, $join, $limit);
+        return $this->con->_query($d[0], $d[1], $d[2], $d[3]);
     }
     
     /**
@@ -87,8 +87,8 @@ class SuperSQL
      */
     function INSERT($table, $data)
     {
-        $d = AdvancedParser::INSERT($table, $data);
-        return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
+        $d = AdvParser::INSERT($table, $data);
+        return $this->con->_query($d[0], $d[1], $d[2], $d[3]);
     }
     
     /**
@@ -102,8 +102,8 @@ class SuperSQL
      */
     function UPDATE($table, $data, $where = array())
     {
-        $d = AdvancedParser::UPDATE($table, $data, $where);
-        return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
+        $d = AdvParser::UPDATE($table, $data, $where);
+        return $this->con->_query($d[0], $d[1], $d[2], $d[3]);
     }
     
     /**
@@ -116,8 +116,8 @@ class SuperSQL
      */
     function DELETE($table, $where = array())
     {
-        $d = AdvancedParser::DELETE($table, $where);
-        return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
+        $d = AdvParser::DELETE($table, $where);
+        return $this->con->_query($d[0], $d[1], $d[2], $d[3]);
     }
     // BUILD ADVANCED BETWEEN
     
@@ -134,8 +134,8 @@ class SuperSQL
      */
     function sSELECT($table, $columns = array(), $where = array(), $append = "")
     {
-        $d = SimpleParser::SELECT($table, $columns, $where, $append);
-        return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
+        $d = SimParser::SELECT($table, $columns, $where, $append);
+        return $this->con->_query($d[0], $d[1], $d[2], $d[3]);
     }
     
     /**
@@ -148,8 +148,8 @@ class SuperSQL
      */
     function sINSERT($table, $data)
     {
-        $d = SimpleParser::INSERT($table, $data);
-        return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
+        $d = SimParser::INSERT($table, $data);
+        return $this->con->_query($d[0], $d[1], $d[2], $d[3]);
     }
     
     /**
@@ -163,8 +163,8 @@ class SuperSQL
      */
     function sUPDATE($table, $data, $where = array())
     {
-        $d = SimpleParser::UPDATE($table, $data, $where);
-        return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
+        $d = SimParser::UPDATE($table, $data, $where);
+        return $this->con->_query($d[0], $d[1], $d[2], $d[3]);
     }
     
     /**
@@ -177,8 +177,8 @@ class SuperSQL
      */
     function sDELETE($table, $where = array())
     {
-        $d = SimpleParser::DELETE($table, $where);
-        return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
+        $d = SimParser::DELETE($table, $where);
+        return $this->con->_query($d[0], $d[1], $d[2], $d[3]);
     }
     
     // BUILD SIMPLE BETWEEN
@@ -188,14 +188,14 @@ class SuperSQL
      */
     function query($query, $obj = null)
     {
-        return $this->connector->query($query, $obj);
+        return $this->con->query($query, $obj);
     }
     /**
      * Closes the connection
      */
     function close()
     {
-        $this->connector->close();
+        $this->con->close();
     }
     
     /**
@@ -203,7 +203,7 @@ class SuperSQL
      */
     function dev()
     {
-        $this->connector->dev = true;
+        $this->con->dev = true;
     }
     
     /**
@@ -211,14 +211,28 @@ class SuperSQL
      */
     function getLog()
     {
-        return $this->connector->log;
+        return $this->con->log;
     }
     /**
      * Clear cache
      */
     function clearCache() 
     {
-        $this->connector->clearCache();
+        $this->con->clearCache();
+    }
+    
+    /**
+     * Transaction
+     */
+    function transact($func) {
+        $this->con->db->beginTransaction();
+        $r = $func($this);
+        if ($r === false)
+            $this->con->db->rollBack();
+         else 
+            $this->con->db->commit();
+        
+        return $r;
     }
     
 }

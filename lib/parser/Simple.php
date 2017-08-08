@@ -33,7 +33,7 @@ Source: https://github.com/ThreeLetters/SuperSQL
 */
 
 // BUILD BETWEEN
-class SimpleParser
+class SimParser
 {
     public static function WHERE($where, &$sql, &$insert)
     {

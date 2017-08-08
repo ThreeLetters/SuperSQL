@@ -132,7 +132,7 @@ class Connector
 }
 
 // lib/parser/Simple.php
-class SimpleParser
+class SimParser
 {
     public static function WHERE($where, &$sql, &$insert)
     {
@@ -228,50 +228,59 @@ class SimpleParser
 // index.php
 class SuperSQL
 {
-    public $connector;
+    public $con;
     function __construct($dsn, $user, $pass)
     {
-        $this->connector = new Connector($dsn, $user, $pass);
+        $this->con = new Connector($dsn, $user, $pass);
     }
     function sSELECT($table, $columns = array(), $where = array(), $append = "")
     {
-        $d = SimpleParser::SELECT($table, $columns, $where, $append);
-        return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
+        $d = SimParser::SELECT($table, $columns, $where, $append);
+        return $this->con->_query($d[0], $d[1], $d[2], $d[3]);
     }
     function sINSERT($table, $data)
     {
-        $d = SimpleParser::INSERT($table, $data);
-        return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
+        $d = SimParser::INSERT($table, $data);
+        return $this->con->_query($d[0], $d[1], $d[2], $d[3]);
     }
     function sUPDATE($table, $data, $where = array())
     {
-        $d = SimpleParser::UPDATE($table, $data, $where);
-        return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
+        $d = SimParser::UPDATE($table, $data, $where);
+        return $this->con->_query($d[0], $d[1], $d[2], $d[3]);
     }
     function sDELETE($table, $where = array())
     {
-        $d = SimpleParser::DELETE($table, $where);
-        return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
+        $d = SimParser::DELETE($table, $where);
+        return $this->con->_query($d[0], $d[1], $d[2], $d[3]);
     }
     function query($query, $obj = null)
     {
-        return $this->connector->query($query, $obj);
+        return $this->con->query($query, $obj);
     }
     function close()
     {
-        $this->connector->close();
+        $this->con->close();
     }
     function dev()
     {
-        $this->connector->dev = true;
+        $this->con->dev = true;
     }
     function getLog()
     {
-        return $this->connector->log;
+        return $this->con->log;
     }
     function clearCache() 
     {
-        $this->connector->clearCache();
+        $this->con->clearCache();
+    }
+    function transact($func) {
+        $this->con->db->beginTransaction();
+        $r = $func($this);
+        if ($r === false)
+            $this->con->db->rollBack();
+         else 
+            $this->con->db->commit();
+        return $r;
     }
 }
 ?>
