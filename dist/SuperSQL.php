@@ -636,9 +636,10 @@ class AdvancedParser
         $typeString = "";
         $i = 0;
         $b = 0;
-        if (isset($data[0])) {
-            $indexes = array();
-            foreach ($data[0] as $key => $val) {
+        $indexes = array();
+        $multi = isset($data[0]);
+        $dt = $multi ? $data[0] : $data;
+         foreach ($dt as $key => $val) {
                 if (substr($key,0,1) === "#") {
                     $raw = true;
                     $key = substr($key,1);
@@ -648,40 +649,39 @@ class AdvancedParser
                 if ($b != 0) {
                     $sql .= ", ";
                 }
-                $sql .= "`" . $key . "` = ";
                 if ($raw) {
-                    $sql .= $val;
+                    $sql .= "`" . $key . "` = " . $val;
                 } else {
+                 $arg = self::parseArg($key);
+                 $sql .= "`" . $key . "` = ";
+                    switch ($arg) {
+                        case "+=":
+                            $sql .= "`" . $key . "` + ?";
+                            break;
+                        case "-=":
+                             $sql .= "`" . $key . "` - ?";
+                            break;
+                        case "/=":
+                              $sql .= "`" . $key . "` / ?";
+                            break;
+                        case "*=":
+                              $sql .= "`" . $key . "` * ?";
+                            break;
+                        default:
+                              $sql .= "?";
+                            break;
+                }
                 $type = self::getType($key);
                 array_push($values,self::value($type,$val,$typeString));
+                if ($multi) {
                 $indexes[$key] = $i++;
-                $sql .= "?";
+               } else {
+                self::append($insert, $val, $i++);
+               }
                 }
                 $b++;
             }
-            self::append2($insert, $indexes, $data);
-        } else {
-            foreach ($data as $key => $val) {
-                if (substr($key,0,1) === "#") {
-                    $raw = true;
-                    $key = substr($key,1);
-                } else {
-                    $raw = false;
-                }
-                if ($i != 0) {
-                    $sql .= ", ";
-                }
-                $sql .= "`" . $key . "` = ";
-                if ($raw) {
-                    $sql .= $val;
-                } else {
-                $type = self::getType($key);
-                array_push($values,self::value($type,$val,$typeString));
-                 $sql .= "?";
-                self::append($insert, $val, $i++);
-                }
-            }
-        }
+           if ($multi) self::append2($insert, $indexes, $data);
         if (count($where) != 0) {
             $sql .= " WHERE ";
             $index = array();
