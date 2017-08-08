@@ -414,7 +414,7 @@ class AdvParser
                         $newOperator = " != ";
                         break;
                     default:
-                        if (!$useBind || $arg = "==")
+                        if (!$useBind || $arg == "==")
                             $newOperator = " = "; 
                         break;
                 }
