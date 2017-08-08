@@ -138,13 +138,13 @@ class SQLHelper
         }
     }
     private static function includes($val,$arr) {
-        foreach ($str as $v) {
-         if (strpos($a, $v) !== false) return true;
+        foreach ($arr as $v) {
+         if (strpos($val, $v) !== false) return true;
         }
         return false;
     }
-    private static function containsAdv($val) {
-        foreach ($str as $key => $val) {
+    private static function containsAdv($arr) {
+        foreach ($arr as $key => $val) {
            if (gettype($val) == "array") return true;
             if (self::includes($key,array("[","#"))) return true;
             if (self::includes($val,array("DISTINCT","INSERT INTO","INTO"))) return true;
