@@ -1,5 +1,6 @@
 # SuperSQL
-SlickInject and Medoo on steroids - The most advanced and compact library available.
+SlickInject and Medoo on steroids - The most advanced and lightweight library of its kind.
+
 ## Purpose
 
 1. To provide a very fast and efficient way to edit sql databases
@@ -54,12 +55,30 @@ Full documentation is here: https://threeletters.github.io/SuperSQL/
 
 ![screen shot 2017-08-06 at 10 12 04 pm](https://user-images.githubusercontent.com/13282284/29009780-4fb22120-7af4-11e7-8621-a65ce32f69c2.png)
 
+## FAQ
+
+**Whats the difference between this and Medoo?**
+
+Not much - they are basically the equivalant - However, SuperSQL is slightly more advanced.
+
+* Response class - SuperSQL has a response class to access crucial information, such as errors
+* Cache - SuperSQL caches queries to re-execute them later
+* Helper - SuperSQL comes with a helper class, with helper functions, while meedoo has it built right in.
+* Simple API - SuperSQL comes with a simple api for simple queries to increase performance. No need to go overkill for something as simple as `SELECT * FROM \`table\``
+* Smaller & lightweight - SuperSQL is smaller than medoo
+* Development - SuperSQL's code is well structured and it is commented - so you can understand it more
+* Medoo has source mapping - SuperSQL doesnt support it yet
+
+## Special thanks
+* @LegitSoulja - SlickInject
+* @catfan - Medoo
+
 ## License
 
 ```
 MIT License
 
-Copyright (c) 2017 Andrew S
+Copyright (c) 2017 Andrew S (Andrews54757_at_gmail.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
