@@ -35,7 +35,22 @@ Source: https://github.com/ThreeLetters/SuperSQL
 // BUILD BETWEEN
 class SimParser
 {
-    public static function WHERE($where, &$sql, &$insert)
+    public static function escape($value) {
+        
+        $var = strtolower(gettype($value));
+        
+        if ($var == "boolean") {
+            $value = $value ? "1" : "0";
+        } else if ($var == "string") {
+            $value = "'" . $value . "'";
+        } else if ($var == "double") {
+            $value = (int) $value;
+        } else if ($var == "null") {
+            $value = "0";
+        }
+        return $value;
+    }
+    public static function WHERE($where, &$sql)
     {
         if (count($where) != 0) {
             $sql .= " WHERE ";
@@ -45,8 +60,7 @@ class SimParser
                 if ($i != 0) {
                     $sql .= " AND ";
                 }
-                $sql .= "`" . $key . "` = ?";
-                array_push($insert, $value);
+                $sql .= "`" . $key . "` = " . $self::escape($value);
                 $i++;
             }
         }
@@ -54,7 +68,6 @@ class SimParser
     public static function SELECT($table, $columns, $where, $append)
     {
         $sql    = "SELECT ";
-        $insert = array();
         $len    = count($columns);
         if ($len == 0) { // none
             $sql .= "*";
@@ -73,16 +86,12 @@ class SimParser
         
         $sql .= " " . $append;
         
-        return array(
-            $sql,
-            $insert
-        );
+        return $sql;
     }
     public static function INSERT($table, $data)
     {
         $sql    = "INSERT INTO `" . $table . "` (";
         $add    = ") VALUES (";
-        $insert = array();
         
         $i = 0;
         
@@ -93,49 +102,34 @@ class SimParser
                 $add .= ", ";
             }
             $sql .= "`" . $key . "`";
-            $add .= "?";
-            array_push($insert, $value);
+            $add .= self::escape($value);
             $i++;
         }
         
         $sql .= $add;
         
-        return array(
-            $sql,
-            $insert
-        );
+        return $sql;
     }
     public static function UPDATE($table, $data, $where)
     {
         $sql    = "UPDATE `" . $table . "` SET ";
-        $insert = array();
-        
         $i = 0;
         foreach ($data as $key => $value) {
             if ($i != 0) {
                 $sql .= ", ";
             }
-            $sql .= "`" . $key . "` = ?";
-            array_push($insert, $value);
+            $sql .= "`" . $key . "` = " . self::escape($value);
             $i++;
         }
         
-        self::WHERE($where, $sql, $insert);
-        return array(
-            $sql,
-            $insert
-        );
+        self::WHERE($where, $sql);
+        return $sql;
     }
     public static function DELETE($table, $where)
     {
         $sql    = "DELETE FROM `" . $table . "`";
-        $insert = array();
-        
-        self::WHERE($where, $sql, $insert);
-        return array(
-            $sql,
-            $insert
-        );
+        self::WHERE($where, $sql);
+        return $sql;
     }
 }
 // BUILD BETWEEN

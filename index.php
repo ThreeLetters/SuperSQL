@@ -135,7 +135,7 @@ class SuperSQL
     function sSELECT($table, $columns = array(), $where = array(), $append = "")
     {
         $d = SimParser::SELECT($table, $columns, $where, $append);
-        return $this->con->_query($d[0], $d[1], $d[2], $d[3]);
+        return $this->con->query($d);
     }
     
     /**
@@ -149,7 +149,7 @@ class SuperSQL
     function sINSERT($table, $data)
     {
         $d = SimParser::INSERT($table, $data);
-        return $this->con->_query($d[0], $d[1], $d[2], $d[3]);
+        return $this->con->query($d);
     }
     
     /**
@@ -164,7 +164,7 @@ class SuperSQL
     function sUPDATE($table, $data, $where = array())
     {
         $d = SimParser::UPDATE($table, $data, $where);
-        return $this->con->_query($d[0], $d[1], $d[2], $d[3]);
+        return $this->con->query($d);
     }
     
     /**
@@ -178,7 +178,7 @@ class SuperSQL
     function sDELETE($table, $where = array())
     {
         $d = SimParser::DELETE($table, $where);
-        return $this->con->_query($d[0], $d[1], $d[2], $d[3]);
+        return $this->con->query($d);
     }
     
     // BUILD SIMPLE BETWEEN
