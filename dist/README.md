@@ -16,8 +16,8 @@
 ### Sizes
 
 ```
-SuperSQL: ~19880 Lines: ~674 - Minified: ~12684 Lines: ~42
-Simple: ~7461 Lines: ~290 - Minified: ~5442 Lines: ~41
-Advanced: ~16660 Lines: ~552 - Minified: ~10545 Lines: ~40
-Helper: ~4509 Lines: ~136 - Minified: ~3153 Lines: ~36
+SuperSQL: ~24788 Lines: ~795 - Minified: ~10396 Lines: ~18
+Simple: ~7365 Lines: ~286 - Minified: ~3770 Lines: ~16
+Advanced: ~21645 Lines: ~681 - Minified: ~8936 Lines: ~15
+Helper: ~4910 Lines: ~148 - Minified: ~2319 Lines: ~11
 ```
