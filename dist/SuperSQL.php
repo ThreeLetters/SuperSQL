@@ -302,8 +302,10 @@ class AdvancedParser
         if (gettype($table) == "array") {
              $sql = "";
             for ($i = 0; $i < count($table); $i++) {
+                $t = self::getType($table[i]);
                 if ($i != 0) $sql .= ", ";
                 $sql .= self::quote($table[$i]);
+                if ($t) $sql .= " AS " . self::quote($t);
             }
             return $sql;
         } else {
@@ -342,7 +344,7 @@ class AdvancedParser
         if ($start === false) {
             return "";
         }
-        $out = substr($str, $start + 1);
+        $out = substr($str, $start + 1, -1);
         $str = substr($str,0,$start);
          return $out;
         } else return "";
@@ -387,6 +389,9 @@ class AdvancedParser
                         break;
                     case "<=":
                         $newOperator = " <= ";
+                        break;
+                    case "!=":
+                        $newOperator = " != ";
                         break;
                     default:
                         if (!$useBind) $newOperator = " = "; 
@@ -476,10 +481,12 @@ class AdvancedParser
             }
             if ($len > $req) { 
                 for (; $i < $len; $i++) {
+                    $t = self::getType($columns[$i]);
                     if ($i > $req) {
                         $sql .= ", ";
                     }
                     $sql .= self::quote($columns[$i]);
+                    if ($t) $sql .= " AS `" . $t . "`";
                 }
             } else
                 $sql .= "*";
@@ -707,7 +714,7 @@ class SuperSQL
     {
         $this->connector = new Connector($dsn, $user, $pass);
     }
-    function SELECT($table, $columns, $where, $join = null, $limit = false)
+    function SELECT($table, $columns = array(), $where = array(), $join = null, $limit = false)
     {
         if (gettype($join) == "integer") {
             $limit = $join;
@@ -721,17 +728,17 @@ class SuperSQL
         $d = AdvancedParser::INSERT($table, $data);
         return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
     }
-    function UPDATE($table, $data, $where)
+    function UPDATE($table, $data, $where = array())
     {
         $d = AdvancedParser::UPDATE($table, $data, $where);
         return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
     }
-    function DELETE($table, $where)
+    function DELETE($table, $where = array())
     {
         $d = AdvancedParser::DELETE($table, $where);
         return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
     }
-    function sSELECT($table, $columns, $where, $append = "")
+    function sSELECT($table, $columns = array(), $where = array(), $append = "")
     {
         $d = SimpleParser::SELECT($table, $columns, $where, $append);
         return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
@@ -741,12 +748,12 @@ class SuperSQL
         $d = SimpleParser::INSERT($table, $data);
         return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
     }
-    function sUPDATE($table, $data, $where)
+    function sUPDATE($table, $data, $where = array())
     {
         $d = SimpleParser::UPDATE($table, $data, $where);
         return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
     }
-    function sDELETE($table, $where)
+    function sDELETE($table, $where = array())
     {
         $d = SimpleParser::DELETE($table, $where);
         return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);

@@ -150,8 +150,12 @@ class AdvancedParser
         if (gettype($table) == "array") {
              $sql = "";
             for ($i = 0; $i < count($table); $i++) {
+                $t = self::getType($table[i]);
+                
                 if ($i != 0) $sql .= ", ";
                 $sql .= self::quote($table[$i]);
+                
+                if ($t) $sql .= " AS " . self::quote($t);
             }
             return $sql;
         } else {
@@ -196,7 +200,7 @@ class AdvancedParser
         if ($start === false) {
             return "";
         }
-        $out = substr($str, $start + 1);
+        $out = substr($str, $start + 1, -1);
         $str = substr($str,0,$start);
          return $out;
         } else return "";
@@ -253,6 +257,9 @@ class AdvancedParser
                         break;
                     case "<=":
                         $newOperator = " <= ";
+                        break;
+                    case "!=":
+                        $newOperator = " != ";
                         break;
                     default:
                         if (!$useBind) $newOperator = " = "; // reset
@@ -365,11 +372,12 @@ class AdvancedParser
             if ($len > $req) { // has var
                 
                 for (; $i < $len; $i++) {
-                    
+                    $t = self::getType($columns[$i]);
                     if ($i > $req) {
                         $sql .= ", ";
                     }
                     $sql .= self::quote($columns[$i]);
+                    if ($t) $sql .= " AS `" . $t . "`";
                 }
                 
             } else

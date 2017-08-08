@@ -67,7 +67,7 @@ class SuperSQL
      *
      * @returns {SQLResponse|SQLResponse[]}
      */
-    function SELECT($table, $columns, $where, $join = null, $limit = false)
+    function SELECT($table, $columns = array(), $where = array(), $join = null, $limit = false)
     {
         if (gettype($join) == "integer") {
             $limit = $join;
@@ -100,7 +100,7 @@ class SuperSQL
      *
      * @returns {SQLResponse|SQLResponse[]}
      */
-    function UPDATE($table, $data, $where)
+    function UPDATE($table, $data, $where = array())
     {
         $d = AdvancedParser::UPDATE($table, $data, $where);
         return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
@@ -114,7 +114,7 @@ class SuperSQL
      *
      * @returns {SQLResponse|SQLResponse[]}
      */
-    function DELETE($table, $where)
+    function DELETE($table, $where = array())
     {
         $d = AdvancedParser::DELETE($table, $where);
         return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
@@ -132,7 +132,7 @@ class SuperSQL
      *
      * @returns {SQLResponse}
      */
-    function sSELECT($table, $columns, $where, $append = "")
+    function sSELECT($table, $columns = array(), $where = array(), $append = "")
     {
         $d = SimpleParser::SELECT($table, $columns, $where, $append);
         return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
@@ -161,7 +161,7 @@ class SuperSQL
      *
      * @returns {SQLResponse}
      */
-    function sUPDATE($table, $data, $where)
+    function sUPDATE($table, $data, $where = array())
     {
         $d = SimpleParser::UPDATE($table, $data, $where);
         return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
@@ -175,7 +175,7 @@ class SuperSQL
      *
      * @returns {SQLResponse}
      */
-    function sDELETE($table, $where)
+    function sDELETE($table, $where = array())
     {
         $d = SimpleParser::DELETE($table, $where);
         return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);

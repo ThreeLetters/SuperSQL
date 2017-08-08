@@ -233,7 +233,7 @@ class SuperSQL
     {
         $this->connector = new Connector($dsn, $user, $pass);
     }
-    function sSELECT($table, $columns, $where, $append = "")
+    function sSELECT($table, $columns = array(), $where = array(), $append = "")
     {
         $d = SimpleParser::SELECT($table, $columns, $where, $append);
         return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
@@ -243,12 +243,12 @@ class SuperSQL
         $d = SimpleParser::INSERT($table, $data);
         return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
     }
-    function sUPDATE($table, $data, $where)
+    function sUPDATE($table, $data, $where = array())
     {
         $d = SimpleParser::UPDATE($table, $data, $where);
         return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
     }
-    function sDELETE($table, $where)
+    function sDELETE($table, $where = array())
     {
         $d = SimpleParser::DELETE($table, $where);
         return $this->connector->_query($d[0], $d[1], $d[2], $d[3]);
