@@ -261,6 +261,7 @@ class AdvParser
                 $useBind     = !isset($val[0]);
                 $newJoin     = $join;
                 $newOperator = $operator;
+                
                 switch ($arg) {
                     case "||":
                         $arg     = $arg2;
@@ -288,13 +289,21 @@ class AdvParser
                     case "!=":
                         $newOperator = " != ";
                         break;
+                    case "~~":
+                        $newOperator = " LIKE ";
+                        break; 
+                    case "!~":
+                        $newOperator = " NOT LIKE ";
+                        break; 
                     default:
                         if (!$useBind || $arg == "==")
                             $newOperator = " = "; // reset
                         break;
                 }
+                
                 if ($num != 0)
                     $sql .= $join;
+                
                 
                 if ($valType == "array") {
                     if ($useBind) {
@@ -306,17 +315,18 @@ class AdvParser
                             $map[$key . "*"]                 = $index;
                             $map[$key . "#" . $parent . "*"] = $index++;
                         }
+                        
                         foreach ($value as $k => $v) {
                             if ($k != 0)
                                 $sql .= $newJoin;
-                            $sql .= "`" . $c . "`" . $newOperator;
                             $index++;
                             if ($raw) {
-                                $sql .= $v;
+                                $sql .= self::quote($c) . $newOperator . $v;
                             } else if ($values !== false) {
-                                $sql .= "?";
+                                $sql .= "`" . $c . "`" . $newOperator . "?";
                                 array_push($values, self::value($type, $v, $typeString));
                             } else {
+                                $sql .= self::quote($c) . $newOperator;
                                 if (gettype($v) == "integer") {
                                     $sql .= $v;
                                 } else {
@@ -326,9 +336,8 @@ class AdvParser
                         }
                     }
                 } else {
-                    
                     if ($raw) {
-                        $sql .= $val;
+                          $sql .= self::quote(self::rmComments($key)) . $newOperator . $val;
                     } else {
                         if ($values !== false) {
                             $t = self::getType($key);
