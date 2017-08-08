@@ -245,6 +245,9 @@
                     <a href="#multi-queries" class="toc-h2 toc-link" data-title="Documentation">Multi-queries</a>
                   </li>
                   <li>
+                    <a href="#key-collisions" class="toc-h2 toc-link" data-title="Documentation">Key-collisions</a>
+                  </li>
+                  <li>
                     <a href="#multi-table-support" class="toc-h2 toc-link" data-title="Documentation">Multi-Table support</a>
                   </li>
                   <li>
@@ -338,7 +341,7 @@
 <p>You may either</p>
 
 <ol>
-<li>Use the built files (<code>/dist/SuperSQL*.php</code>)</li>
+<li>Use the built file (<code>/dist/SuperSQL*.php</code>)</li>
 <li>Use the library (include index.php)</li>
 </ol>
 <h3 id='build'>Build</h3>
@@ -346,7 +349,7 @@
 
 <p><code>node builder.js</code></p>
 
-<p>It will build to <code>/dist/SuperSQL*.php</code></p>
+<p>It will build to <code>/dist/SuperSQL.php</code></p>
 <h1 id='documentation'>Documentation</h1>
 <blockquote>
 <p>Conditionals (WHERE &amp; JOIN)</p>
@@ -511,6 +514,12 @@ Binds dont have to be reproduced in the second or more arrays. You can put it in
 <aside class="notice">
 If there are key collisions with binds - no problem! You can reproduce the bind in the second or more arrays too.
 </aside>
+<h3 id='key-collisions'>Key-collisions</h3>
+<p>Since SuperSQL uses associative arrays, key collisions can occur. To solve this problem, add &quot;#id (replace id with something)&quot; to the key.</p>
+
+<aside class="notice">
+This is wrong: `[>>]somecolumn[int]#someid`, this is right: `[>>]somecolumn#someid[int]`
+</aside>
 <h3 id='multi-table-support'>Multi-Table support</h3>
 <p>If you want to query multiple tables at once, put the tables in as an array</p>
 <h3 id='type-casting'>Type Casting</h3>
@@ -535,7 +544,7 @@ Aliases go after the key, not before ex: `[alias]key` is WRONG, `key[alias]` is 
 <p>If you are making simple queries, you may use simple functions to boost performance. Use simple functions by attatching an <code>s</code> in front of the function. The syntax is very similar to SlickInject.</p>
 
 <aside class="success">
-Use simple API as much as you can! It is lightning fast!
+Use simple API as much as you can! It is lightning fast! Otherwise, use the helper functions - they will decide for you.
 </aside>
 <h3 id='cache'>Cache</h3>
 <p>Performance is boosted for a query if an identical query before it (with different values [EG where vals, join, insert]), is made right before. You can also clear the cache by doing: <code>$SuperSQL-&gt;clearCache()</code></p>
@@ -777,13 +786,24 @@ You can also use some special operators on the data argument. Example: `$SuperSQ
 <li><code>(Array)where</code> - Conditional statements</li>
 </ul>
 <h2 id='helper-functions'>Helper Functions</h2>
-<p>SuperSQL provides some helper functions to allow for easier access.</p>
+<p>SuperSQL provides some helper functions to allow for easier access. The helper functions allow you to:</p>
+
+<ul>
+<li>Connect easily</li>
+<li>Manage multiple database connections</li>
+<li>Do queries more efficiently</li>
+</ul>
 
 <aside class="notice">
 If your using the built/compiled file, you must include `dist/SuperSQL_helper.php` too
 </aside>
-<h3 id='sqlhelper-connect'>SQLHelper::connect</h3>
-<p>Connect easily with any database.</p>
+<h3 id='sqlhelper-connect'>SQLHelper::connect</h3><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$SuperSQL</span> <span class="o">=</span> <span class="nx">SQLHelper</span><span class="o">::</span><span class="na">connect</span><span class="p">(</span><span class="s2">"localhost"</span><span class="p">,</span><span class="s2">"root"</span><span class="p">,</span><span class="s2">"1234"</span><span class="p">);</span> <span class="c1">// mysql
+</span>
+<span class="nv">$SuperSQL</span> <span class="o">=</span> <span class="nx">SQLHelper</span><span class="o">::</span><span class="na">connect</span><span class="p">(</span><span class="s2">"localhost"</span><span class="p">,</span><span class="s2">"root"</span><span class="p">,</span><span class="s2">"1234"</span><span class="p">,</span> <span class="nv">$dbtype</span><span class="p">);</span> <span class="c1">// others
+</span><span class="cp">?&gt;</span>
+</code></pre>
+<p>Connect easily to any database.</p>
 
 <p><strong>connect($host,$user,$pass,$options)</strong></p>
 
@@ -811,7 +831,28 @@ If your using the built/compiled file, you must include `dist/SuperSQL_helper.ph
 <li><code>(String)pass</code> - Password</li>
 <li><code>(String)dbtype</code> - DSN string</li>
 </ul>
-<h3 id='sqlhelper'>SQLHelper()</h3>
+<h3 id='sqlhelper'>SQLHelper()</h3><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$Helper</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SQLHelper</span><span class="p">(</span><span class="s2">"localhost"</span><span class="p">,</span><span class="s2">"root"</span><span class="p">,</span><span class="s2">"1234"</span><span class="p">);</span> <span class="c1">// mysql
+</span>
+<span class="nv">$Helper</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SQLHelper</span><span class="p">(</span><span class="s2">"localhost"</span><span class="p">,</span><span class="s2">"root"</span><span class="p">,</span><span class="s2">"1234"</span><span class="p">,</span> <span class="nv">$dbtype</span><span class="p">);</span> <span class="c1">// others
+</span>
+<span class="nv">$Helper</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SQLHelper</span><span class="p">(</span><span class="nv">$array</span><span class="p">);</span> <span class="c1">// array of connections
+</span>
+<span class="nv">$Helper</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SQLHelper</span><span class="p">(</span><span class="k">array</span><span class="p">(</span> <span class="c1">// array of connection configs
+</span>    <span class="k">array</span><span class="p">(</span>
+    <span class="s2">"host"</span><span class="o">=&gt;</span><span class="s2">"localhost"</span><span class="p">,</span>
+    <span class="s2">"user"</span><span class="o">=&gt;</span><span class="s2">"root"</span><span class="p">,</span>
+    <span class="s2">"password"</span><span class="o">=&gt;</span> <span class="s2">"1234"</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+    <span class="s2">"host"</span><span class="o">=&gt;</span> <span class="s2">"192.168.1.2"</span><span class="p">,</span>
+    <span class="s2">"user"</span><span class="o">=&gt;</span><span class="s2">"root"</span><span class="p">,</span>
+    <span class="s2">"password"</span><span class="o">=&gt;</span> <span class="s2">"1234"</span><span class="p">,</span>
+    <span class="s2">"options"</span> <span class="o">=&gt;</span> <span class="s2">"pgsql"</span> <span class="c1">// dbtype
+</span>    <span class="p">),</span>
+<span class="p">));</span>
+<span class="cp">?&gt;</span>
+</code></pre>
 <p>Initialise the helper</p>
 
 <p><strong>new SQLHelper($SuperSQL)</strong></p>
@@ -834,7 +875,7 @@ If your using the built/compiled file, you must include `dist/SuperSQL_helper.ph
 <ul>
 <li><code>(Array)connect</code> - Array of connection data - Uses Helper::connect</li>
 </ul>
-<h4 id='change'>Change</h4>
+<h3 id='change'>Change</h3>
 <p><strong>$SQLHelper-&gt;change($id)</strong></p>
 
 <p>Changes the selected connection</p>
@@ -842,17 +883,46 @@ If your using the built/compiled file, you must include `dist/SuperSQL_helper.ph
 <ul>
 <li><code>(Int)id</code> - Connection id</li>
 </ul>
-<h4 id='getcon'>getCon</h4>
+<h3 id='getcon'>getCon</h3>
 <p><strong>$SQLHelper-&gt;getCon($all = false)</strong></p>
 
 <ul>
 <li><code>(Bool)all</code> - if true, will return all connections. If not, then will only return the selected one</li>
 </ul>
-<h4 id='get'>get</h4>
+<h3 id='select-2'>SELECT</h3>
+<p><strong>$SQLHelper-&gt;SELECT($table,$columns,$where,$join,$limit/$append)</strong></p>
+
+<p>The SELECT query. The api is the same as normal SELECT or sSELECT. The helper will choose the most efficient way. (It will choose simple or advanced api based on certain conditions)</p>
+<h3 id='insert-2'>INSERT</h3>
+<p><strong>$SQLHelper-&gt;INSERT($table,$data)</strong></p>
+
+<p>The INSERT query. The api is the same as normal INSERT or sINSERT. The helper will choose the most efficient way. (It will choose simple or advanced api based on certain conditions)</p>
+<h3 id='update-2'>UPDATE</h3>
+<p><strong>$SQLHelper-&gt;UPDATE($table,$data,$where)</strong></p>
+
+<p>The UPDATE query. The api is the same as normal UPDATE or sUPDATE. The helper will choose the most efficient way. (It will choose simple or advanced api based on certain conditions)</p>
+<h3 id='delete-2'>DELETE</h3>
+<p><strong>$SQLHelper-&gt;DELETE($table,$where)</strong></p>
+
+<p>The DELETE query. The api is the same as normal DELETE or sDELETE. The helper will choose the most efficient way. (It will choose simple or advanced api based on certain conditions)</p>
+<h3 id='replace'>REPLACE</h3><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$SQLHelper</span><span class="o">-&gt;</span><span class="na">REPLACE</span><span class="p">(</span><span class="s2">"luggage"</span><span class="p">,[</span>
+    <span class="s2">"items"</span><span class="o">=&gt;</span><span class="k">array</span><span class="p">(</span><span class="s2">"bomb"</span><span class="o">=&gt;</span><span class="s2">"pillow"</span><span class="p">,</span><span class="s2">"poison"</span><span class="o">=&gt;</span><span class="s2">"perfume"</span><span class="p">)</span>
+<span class="p">]);</span> <span class="c1">// UPDATE `luggage` SET `items` = REPLACE(REPLACE(`items`,'bomb','pillow'),'poison','perfume');
+</span><span class="cp">?&gt;</span>
+</code></pre>
+<p><strong>$SQLHelper-&gt;REPLACE($table,$data,$where)</strong></p>
+
+<ul>
+<li><code>(String|Array)table</code> - table(s) to replace in</li>
+<li><code>(Array)data</code> - columns to replace</li>
+<li><code>(Array)where</code> - conditional statements</li>
+</ul>
+<h3 id='get'>get</h3>
 <p><strong>$SQLHelper-&gt;get($table,$columns,$where,$join)</strong></p>
 
 <p>Gets the first row</p>
-<h4 id='create'>create</h4>
+<h3 id='create'>create</h3>
 <p><strong>$SQLHelper-&gt;create($table,$data)</strong></p>
 
 <p>Creates a table</p>
@@ -861,7 +931,7 @@ If your using the built/compiled file, you must include `dist/SuperSQL_helper.ph
 <li><code>(String)table</code> - Table name to create</li>
 <li><code>(Array)data</code> - Array of keys and types</li>
 </ul>
-<h4 id='drop'>drop</h4>
+<h3 id='drop'>drop</h3>
 <p><strong>$SQLHelper-&gt;drop($table)</strong></p>
 
 <p>Removes a table</p>

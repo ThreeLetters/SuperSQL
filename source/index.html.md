@@ -240,6 +240,13 @@ Binds dont have to be reproduced in the second or more arrays. You can put it in
 If there are key collisions with binds - no problem! You can reproduce the bind in the second or more arrays too.
 </aside>
 
+### Key-collisions
+Since SuperSQL uses associative arrays, key collisions can occur. To solve this problem, add "#id (replace id with something)" to the key.
+
+<aside class="notice">
+This is wrong: `[>>]somecolumn[int]#someid`, this is right: `[>>]somecolumn#someid[int]`
+</aside>
+
 ### Multi-Table support
 If you want to query multiple tables at once, put the tables in as an array
 
@@ -268,7 +275,7 @@ Aliases go after the key, not before ex: `[alias]key` is WRONG, `key[alias]` is 
 If you are making simple queries, you may use simple functions to boost performance. Use simple functions by attatching an `s` in front of the function. The syntax is very similar to SlickInject.
 
 <aside class="success">
-Use simple API as much as you can! It is lightning fast!
+Use simple API as much as you can! It is lightning fast! Otherwise, use the helper functions - they will decide for you.
 </aside>
 
 ### Cache
@@ -537,14 +544,27 @@ Simple API is for basic querying. It allows of lightning-fast, simple and easy q
 * `(Array)where` - Conditional statements
 
 ## Helper Functions
-SuperSQL provides some helper functions to allow for easier access.
+SuperSQL provides some helper functions to allow for easier access. The helper functions allow you to:
+
+* Connect easily
+* Manage multiple database connections
+* Do queries more efficiently
 
 <aside class="notice">
 If your using the built/compiled file, you must include `dist/SuperSQL_helper.php` too
 </aside>
 
 ### SQLHelper::connect
-Connect easily with any database.
+
+```php
+<?php
+$SuperSQL = SQLHelper::connect("localhost","root","1234"); // mysql
+
+$SuperSQL = SQLHelper::connect("localhost","root","1234", $dbtype); // others
+?>
+```
+
+Connect easily to any database.
 
 **connect($host,$user,$pass,$options)**
 
@@ -569,6 +589,31 @@ Connect easily with any database.
 
 
 ### SQLHelper()
+
+```php
+<?php
+$Helper = new SQLHelper("localhost","root","1234"); // mysql
+
+$Helper = new SQLHelper("localhost","root","1234", $dbtype); // others
+
+$Helper = new SQLHelper($array); // array of connections
+
+$Helper = new SQLHelper(array( // array of connection configs
+    array(
+    "host"=>"localhost",
+    "user"=>"root",
+    "password"=> "1234"
+    ),
+    array(
+    "host"=> "192.168.1.2",
+    "user"=>"root",
+    "password"=> "1234",
+    "options" => "pgsql" // dbtype
+    ),
+));
+?>
+```
+
 Initialise the helper
 
 **new SQLHelper($SuperSQL)**
@@ -586,24 +631,63 @@ Initialise the helper
 
 * `(Array)connect` - Array of connection data - Uses Helper::connect
 
-#### Change
+### Change
 **$SQLHelper->change($id)**
 
 Changes the selected connection
 
 * `(Int)id` - Connection id
 
-#### getCon
+### getCon
 **$SQLHelper->getCon($all = false)**
 
 * `(Bool)all` - if true, will return all connections. If not, then will only return the selected one
 
-#### get
+### SELECT
+**$SQLHelper->SELECT($table,$columns,$where,$join,$limit/$append)**
+
+The SELECT query. The api is the same as normal SELECT or sSELECT. The helper will choose the most efficient way. (It will choose simple or advanced api based on certain conditions)
+
+### INSERT
+
+**$SQLHelper->INSERT($table,$data)**
+
+The INSERT query. The api is the same as normal INSERT or sINSERT. The helper will choose the most efficient way. (It will choose simple or advanced api based on certain conditions)
+
+### UPDATE
+
+**$SQLHelper->UPDATE($table,$data,$where)**
+
+The UPDATE query. The api is the same as normal UPDATE or sUPDATE. The helper will choose the most efficient way. (It will choose simple or advanced api based on certain conditions)
+
+### DELETE
+
+**$SQLHelper->DELETE($table,$where)**
+
+The DELETE query. The api is the same as normal DELETE or sDELETE. The helper will choose the most efficient way. (It will choose simple or advanced api based on certain conditions)
+
+### REPLACE
+
+```php
+<?php
+$SQLHelper->REPLACE("luggage",[
+    "items"=>array("bomb"=>"pillow","poison"=>"perfume")
+]); // UPDATE `luggage` SET `items` = REPLACE(REPLACE(`items`,'bomb','pillow'),'poison','perfume');
+?>
+```
+
+**$SQLHelper->REPLACE($table,$data,$where)**
+
+* `(String|Array)table` - table(s) to replace in
+* `(Array)data` - columns to replace
+* `(Array)where` - conditional statements
+
+### get
 **$SQLHelper->get($table,$columns,$where,$join)**
 
 Gets the first row
 
-#### create
+### create
 **$SQLHelper->create($table,$data)**
 
 Creates a table
@@ -611,7 +695,7 @@ Creates a table
 * `(String)table` - Table name to create
 * `(Array)data` - Array of keys and types
 
-#### drop
+### drop
 **$SQLHelper->drop($table)**
 
 Removes a table
@@ -664,4 +748,3 @@ $log = [
 * typeString - String of types, mysqli_bind_param style.
 * Values - Initial values with types. NOTE: This is bound onto the SQL base string
 * Insert - Multi-query array
-
