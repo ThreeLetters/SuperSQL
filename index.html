@@ -317,7 +317,7 @@
 <span class="nv">$SuperSQL</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SuperSQL</span><span class="p">(</span><span class="nv">$dsn</span><span class="p">,</span><span class="nv">$user</span><span class="p">,</span><span class="nv">$pass</span><span class="p">);</span>
 <span class="cp">?&gt;</span>
 </code></pre>
-<p>SlickInject and Medoo on steroids - The most advanced and compact library available.</p>
+<p>SlickInject and Medoo on steroids - The most advanced and lightweight library of it&#39;s kind.</p>
 <h3 id='purpose'>Purpose</h3>
 <ol>
 <li>To provide a very fast and efficient way to edit sql databases</li>
@@ -619,14 +619,14 @@ All rows are retrieved and stored at object initialisation. `Response->next()` o
 </span><span class="p">),</span><span class="mi">5</span><span class="p">);</span> <span class="c1">// only 5 rows
 </span><span class="cp">?&gt;</span>
 </code></pre>
-<p><strong>SuperSQL-&gt;SELECT($table, $columns, $where[,$join[, $limit);</strong></p>
+<p><strong>SuperSQL-&gt;SELECT($table, $columns, $where[,$join[, $limit/$append);</strong></p>
 
 <ul>
 <li><code>(String|Array)table</code> - Table(s) to query</li>
 <li><code>(Array)columns</code> - Array of columns to return. <code>[]</code> will query using the <code>*</code> selector.</li>
 <li><code>(Array)where</code> - Array of conditions for WHERE (See above for documentation on WHERE)</li>
 <li><code>(Array|Null)join</code> - Array of conditions for JOIN. Usage below</li>
-<li><code>(Int)limit</code> - Number of rows to retrieve. Usage below.</li>
+<li><code>(Int|String)limit</code> - Number of rows to retrieve. if string, will be treated as an append - it will be appended to the sql query.</li>
 </ul>
 
 <aside class="notice">
@@ -635,6 +635,10 @@ You may also put `DISTINCT`, in the top of the columns array to use the DISTINCT
 
 <aside class="notice">
 You may also do `SuperSQL->SELECT($table, $columns, $where, $limit)`
+</aside>
+
+<aside class="notice">
+You can order tables by setting limit/append to "ORDER BY column"
 </aside>
 <h2 id='insert'>INSERT</h2><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">INSERT</span><span class="p">(</span><span class="s2">"table"</span><span class="p">,</span><span class="k">array</span><span class="p">(</span>

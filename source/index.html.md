@@ -26,7 +26,7 @@ $SuperSQL = new SuperSQL($dsn,$user,$pass);
 ?>
 ```
 
-SlickInject and Medoo on steroids - The most advanced and compact library available.
+SlickInject and Medoo on steroids - The most advanced and lightweight library of it's kind.
 
 ### Purpose
 
@@ -363,13 +363,13 @@ $SuperSQL->SELECT("horizon", [], [], array(
 ?>
 ```
 
-**SuperSQL->SELECT($table, $columns, $where[,$join[, $limit);**
+**SuperSQL->SELECT($table, $columns, $where[,$join[, $limit/$append);**
 
 * `(String|Array)table` - Table(s) to query
 * `(Array)columns` - Array of columns to return. `[]` will query using the `*` selector.
 * `(Array)where` - Array of conditions for WHERE (See above for documentation on WHERE)
 * `(Array|Null)join` - Array of conditions for JOIN. Usage below
-* `(Int)limit` - Number of rows to retrieve. Usage below.
+* `(Int|String)limit` - Number of rows to retrieve. if string, will be treated as an append - it will be appended to the sql query.
 
 <aside class="notice">
 You may also put `DISTINCT`, in the top of the columns array to use the DISTINCT keyword. Other available keywords include: `INSERT INTO table` and `INTO table` (replace table with table name)
@@ -377,6 +377,10 @@ You may also put `DISTINCT`, in the top of the columns array to use the DISTINCT
 
 <aside class="notice">
 You may also do `SuperSQL->SELECT($table, $columns, $where, $limit)`
+</aside>
+
+<aside class="notice">
+You can order tables by setting limit/append to "ORDER BY column"
 </aside>
 
 ## INSERT
