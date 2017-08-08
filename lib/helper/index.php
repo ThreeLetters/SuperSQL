@@ -156,6 +156,53 @@ class SQLHelper
         return new SuperSQL($dsn, $user, $pass);
     }
     
+    private static function rmComments($str) {
+        $i = strpos($str,"#");
+        if ($i !== false) {
+            $str = substr($str,0,$i);
+        }
+        return trim($str);
+    }
+    
+    private static function escape($value) {
+        $var = strtolower(gettype($value));
+        if ($var == "boolean") {
+            $value = $value ? "1" : "0";
+        } else if ($var == "string") {
+            $value = "'" . $value . "'";
+        } else if ($var == "double") {
+            $value = (int) $value;
+        } else if ($var == "null") {
+            $value = "0";
+        }
+        return $value;
+    }
+     private static function escape2($value) {
+        if (is_numeric($value)) {
+            return (int)$value;
+        } else {
+        return "'" . $value . "'";
+        }
+    }
+    private static function includes($val,$arr) {
+        foreach ($str as $v) {
+         if (strpos($a, $v) !== false) return true;
+        }
+        return false;
+    }
+    
+    private static function containsAdv($val) {
+        foreach ($str as $key => $val) {
+           if (gettype($val) == "array") return true;
+            
+            if (self::includes($key,array("[","#"))) return true;
+            
+            if (self::includes($val,array("DISTINCT","INSERT INTO","INTO"))) return true;
+        }
+        return false;
+    }
+    
+    
     function change($id) {
             $this->s = $this->connections[$id];
             return $this->s;
@@ -217,7 +264,51 @@ class SQLHelper
         return $this->s->query("DROP TABLE `" . $table . "`");
     }
     
+    function replace($table,$data,$where = array()) {
+        
+        $newData = array();
+        
+        foreach ($data as $key => $val) {
+            $str = "`" . self::rmComments($key) . "`";
+            
+            foreach ($val as $k => $v) {
+                $str = "REPLACE(" . $str . ", " . self::escape2($k) . ", " . self::escape($v) . ")";
+            }
+            
+            $newData["#" . $key] = $str;
+        }
+        return $this->s->UPDATE($table,$newData,$where);
+    }
+    
+    function select($table,$columns = array(),$where = array(),$join = null,$limit = false) {
+        if (gettype($table) == "array" || self::containsAdv($columns) || self::containsAdv($where) || $join) {
+            return $this->s->SELECT($table,$columns,$where,$join,$limit);
+        } else {
+            if (gettype($limit) == "integer") $limit = "LIMIT " . (int)$limit;
+            return $this->s->sSELECT($table,$columns,$where,$limit);
+        }
+    }
+    function insert($table,$data) {
+         if (gettype($table) == "array" || self::containsAdv($data)) {
+            return $this->s->INSERT($table,$data);
+         } else {
+            return $this->s->sINSERT($table,$data);
+         }      
+    }
+    function update($table,$data,$where = array()) {
+        if (gettype($table) == "array" || self::containsAdv($data) || self::containsAdv($where)) {
+            return $this->s->UPDATE($table,$data,$where);
+         } else {
+               return $this->s->sUPDATE($table,$data,$where);
+         } 
+    }
+    function delete($table,$where = array()) {
+         if (gettype($table) == "array" || self::containsAdv($where)) {
+            return $this->s->DELETE($table,$where);
+         } else {
+            return $this->s->sDELETE($table,$where);
+         } 
+    }
 }
 // BUILD BETWEEN
-
 ?>
