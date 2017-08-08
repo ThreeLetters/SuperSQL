@@ -123,7 +123,7 @@ class SQLHelper
             $value = $value ? "1" : "0";
         } else if ($var == "string") {
             $value = "'" . $value . "'";
-        } else if ($var == "double") {
+        } else if ($var == "double" || $var == "integer") {
             $value = (int) $value;
         } else if ($var == "null") {
             $value = "0";

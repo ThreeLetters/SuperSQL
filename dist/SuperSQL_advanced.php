@@ -249,6 +249,7 @@ class AdvParser
             $value = (int) $value;
         } else if ($var == "string" || $var == "str") {
             $type = \PDO::PARAM_STR;
+            $value = (string) $value;
             $typeString .= "s";
         } else if ($var == "double" || $var == "doub") {
             $value = (int) $value;
