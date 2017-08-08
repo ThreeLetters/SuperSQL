@@ -76,13 +76,14 @@ $where = array(
  "[<<]arg3" => "val3", // AND arg3 < val3
  "[>=]arg4" => "val4", // AND arg4 >= val4
  "[<=]arg5" => "val5", // AND arg5 <= val5
+ "[!=]arg6" => "val6", // AND arg6 != val6
  "[||]" => [ // Bind ||.
-     "arg6" => "val6"
- ],
- "[&&][>>]" => [ // Bind >.
      "arg7" => "val7"
  ],
- "arg8" => ["val8a","val8b"]
+ "[&&][>>]" => [ // Bind >.
+     "arg8" => "val8"
+ ],
+ "arg9" => ["val9a","val9b"]
 );
 ?>
 ```
@@ -109,6 +110,41 @@ array(
 "arg1" => "val1",
 "arg2" => array("val2","val3")
 ); // -> [["val1","val2"],["val1","val3"]] - Two queries
+
+
+// Binds
+array(
+    array(
+        "hello" => "world"
+        "[||]" => array(
+            "foo" => "bar",
+            "num" => 123
+        )
+    ),
+    array( // this also works
+    "hello" => "hi!",
+    "foo" => "lol"
+    )
+);
+
+array(
+    array( // Uh-oh - collision
+        "[>>]lol" => 3
+        "[||]bind1" => array(
+            "foo" => "bar",
+            "lol" =>  5
+        ),
+        "[>>]bind2" => array(
+            "lols" => 231
+        )
+    ),
+    array( // args will be preserved
+    "lol" => 2,
+    "bind1" => array(
+        "foo" => "lol"
+    )
+    )
+);
 ?>
 ```
 
@@ -157,16 +193,52 @@ $SuperSQL->INSERT("times",[
 ?>
 ```
 
+> Alias
+
+```php
+<?php
+$SuperSQL->SELECT("users",["user_id[id]"]);
+?>
+```
+
 ### Conditionals
 
 Conditional statements are extremly customisable. WHERE and JOIN clauses are conditional statements. 
+
+<aside class="success">
+Available operators: `==`, `>>`, `<<`, `>=`, `<=`, `!=`
+</aside>
+
+<aside class="success">
+Available joins: `&&`(AND), `||`(OR)
+</aside>
 
 <aside class="notice">
 To make duplicate keys work for binds, you can add a name to the bind. Ex: `[&&]name`
 </aside>
 
+<aside class="notice">
+You can also bind operators. Not just `&&`(AND) or `||`(OR). However, the join (&& or ||), must come first
+</aside>
+
 ### Multi-queries
 Multiqueries can be done too. This allows for highly efficient repetative queries. Note: Only the values of WHERE and INSERT work with this. VALUES, not KEYS.
+
+<aside class="success">
+The keys for the second or later multi-query arrays do not have to be  exact. For example, the first array might have `[>>]test[int]` as a key, but the second one can have just `test`. Anything within brakets  in the key will be discarded
+</aside>
+
+<aside class="success">
+The keys do not have to be in order - SuperSQL will do that for you.
+</aside>
+
+<aside class="success">
+Binds dont have to be reproduced in the second or more arrays. You can put it in global scope if you like.
+</aside>
+
+<aside class="notice">
+If there are key collisions with binds - no problem! You can reproduce the bind in the second or more arrays too.
+</aside>
 
 ### Multi-Table support
 If you want to query multiple tables at once, put the tables in as an array
@@ -174,11 +246,30 @@ If you want to query multiple tables at once, put the tables in as an array
 ### Type Casting
 If you want to set the type of the input, you can set it by adding `[type] (replace type with type)`.
 
+<aside class="success">
+Available types: `int`, `bool`, `lob`, `null`
+</aside>
+
 ### SQL Functions/raw
 If you want to use SQL functions such as `NOW()` or want use insert raw, unescaped data, add `#` at the beginning of the key
 
+<aside class="notice">
+Programming guide: Please try to avoid SQL functions. If you can, use php. (EX:, replace `NOW()` with `date('Y-m-d H:i:s')`)
+</aside>
+
+### Alias
+You can use an alias for columns and/or tables by adding `[aliasname]`.
+
+<aside class="notice">
+Aliases go after the key, not before ex: `[alias]key` is WRONG, `key[alias]` is RIGHT
+</aside>
+
 ### Simple
 If you are making simple queries, you may use simple functions to boost performance. Use simple functions by attatching an `s` in front of the function. The syntax is very similar to SlickInject.
+
+<aside class="success">
+Use simple API as much as you can! It is lightning fast!
+</aside>
 
 ### Cache
 Performance is boosted for a query if an identical query before it (with different values [EG where vals, join, insert]), is made right before. You can also clear the cache by doing: `$SuperSQL->clearCache()`
@@ -186,7 +277,48 @@ Performance is boosted for a query if an identical query before it (with differe
 ### Raw Queries
 Raw queries can be made using `$SuperSQL->query($query)`.
 
+<aside class="notice">
+Programming guide: If you can, use raw queries. For example, theres nothing sensitive in `SELECT * FROM `table`, just do that instead of `$SuperSQL->SELECT("table");`
+</aside>
+
 ## Responses
+
+> Error handling
+
+```php
+<?php
+$Response = $SuperSQL->select("test",[],[
+    "#a" => "WHERE SELECT INSERT LOL" // raw
+]); // SELECT * FROM `test` WHERE `a` = WHERE SELECT INSERT 
+
+echo json_encode($Response->getData()); // NULL
+
+echo json_encode($response->error()); // ["42000",1064,"You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'WHERE SELECT INSERT LOL' at line 1"]
+?>
+```
+
+> Iterator usage
+
+```php
+<?php
+$Response = $SuperSQL->select("test",[],[
+    "a" => "WHERE SELECT INSERT LOL"
+]); // SELECT * FROM `test` WHERE `a` = 'WHERE SELECT INSERT' 
+
+echo $response->error(); // FALSE
+
+while ($row = $response->next()) { // Use the iterator to iterate through rows easily
+
+.... // Do some stuff
+
+}
+
+$response->reset(); // Reset iterator so you can do the above code again
+?>
+```
+
+> Itit
+
 When you make a query, SuperSQL will return a SQLResponse object.
 
 ### Response->getData()
@@ -202,7 +334,7 @@ Get number of rows affected by the query
 Get next row
 
 ### Response->reset()
-Reset ititerator.
+Reset iterator.
 
 <aside class="notice">
 All rows are retrieved and stored at object initialisation. `Response->next()` or `Response->reset()` does not affect the database or connection
@@ -269,6 +401,10 @@ $SuperSQL->UPDATE("citizens",array(
 * `(Array)data` - Data to update
 * `(Array)where` - Conditional statements
 
+<aside class="notice">
+You can also use some special operators on the data argument. Example: `$SuperSQL->UPDATE("test", ["increment[+=]" => 1]);`. Available: `+=`, `-=`, `/=`, `*=`.
+</aside>
+
 ## DELETE
 
 ```php
@@ -283,6 +419,25 @@ $SuperSQL->DELETE("persons",
 
 * `(String|Array)table` - Table(s) to insert to
 * `(Array)where` - Conditional statements
+
+## Transactions
+
+```php
+<?php
+$SuperSQL->transact(function () {
+
+$SuperSQL->DELETE("citizens",[
+    "near_explosion" => 1
+]);
+
+return false; // SuperSQL to the rescue! He reversed time (the query)
+});
+?>
+```
+
+**SuperSQL->transact($call);**
+
+* `(Callable)call` - Transaction Function. Return false to rollback
 
 ## Simple Documentation
 

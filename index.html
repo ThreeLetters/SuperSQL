@@ -254,6 +254,9 @@
                     <a href="#sql-functions-raw" class="toc-h2 toc-link" data-title="Documentation">SQL Functions/raw</a>
                   </li>
                   <li>
+                    <a href="#alias" class="toc-h2 toc-link" data-title="Documentation">Alias</a>
+                  </li>
+                  <li>
                     <a href="#simple" class="toc-h2 toc-link" data-title="Documentation">Simple</a>
                   </li>
                   <li>
@@ -276,6 +279,9 @@
                   </li>
                   <li>
                     <a href="#delete" class="toc-h2 toc-link" data-title="Documentation">DELETE</a>
+                  </li>
+                  <li>
+                    <a href="#transactions" class="toc-h2 toc-link" data-title="Documentation">Transactions</a>
                   </li>
                   <li>
                     <a href="#simple-documentation" class="toc-h2 toc-link" data-title="Documentation">Simple Documentation</a>
@@ -352,13 +358,14 @@
 </span> <span class="s2">"[&lt;&lt;]arg3"</span> <span class="o">=&gt;</span> <span class="s2">"val3"</span><span class="p">,</span> <span class="c1">// AND arg3 &lt; val3
 </span> <span class="s2">"[&gt;=]arg4"</span> <span class="o">=&gt;</span> <span class="s2">"val4"</span><span class="p">,</span> <span class="c1">// AND arg4 &gt;= val4
 </span> <span class="s2">"[&lt;=]arg5"</span> <span class="o">=&gt;</span> <span class="s2">"val5"</span><span class="p">,</span> <span class="c1">// AND arg5 &lt;= val5
+</span> <span class="s2">"[!=]arg6"</span> <span class="o">=&gt;</span> <span class="s2">"val6"</span><span class="p">,</span> <span class="c1">// AND arg6 != val6
 </span> <span class="s2">"[||]"</span> <span class="o">=&gt;</span> <span class="p">[</span> <span class="c1">// Bind ||.
-</span>     <span class="s2">"arg6"</span> <span class="o">=&gt;</span> <span class="s2">"val6"</span>
- <span class="p">],</span>
- <span class="s2">"[&amp;&amp;][&gt;&gt;]"</span> <span class="o">=&gt;</span> <span class="p">[</span> <span class="c1">// Bind &gt;.
 </span>     <span class="s2">"arg7"</span> <span class="o">=&gt;</span> <span class="s2">"val7"</span>
  <span class="p">],</span>
- <span class="s2">"arg8"</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s2">"val8a"</span><span class="p">,</span><span class="s2">"val8b"</span><span class="p">]</span>
+ <span class="s2">"[&amp;&amp;][&gt;&gt;]"</span> <span class="o">=&gt;</span> <span class="p">[</span> <span class="c1">// Bind &gt;.
+</span>     <span class="s2">"arg8"</span> <span class="o">=&gt;</span> <span class="s2">"val8"</span>
+ <span class="p">],</span>
+ <span class="s2">"arg9"</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s2">"val9a"</span><span class="p">,</span><span class="s2">"val9b"</span><span class="p">]</span>
 <span class="p">);</span>
 <span class="cp">?&gt;</span>
 </code></pre>
@@ -384,7 +391,42 @@
 <span class="s2">"arg1"</span> <span class="o">=&gt;</span> <span class="s2">"val1"</span><span class="p">,</span>
 <span class="s2">"arg2"</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">"val2"</span><span class="p">,</span><span class="s2">"val3"</span><span class="p">)</span>
 <span class="p">);</span> <span class="c1">// -&gt; [["val1","val2"],["val1","val3"]] - Two queries
-</span><span class="cp">?&gt;</span>
+</span>
+
+<span class="c1">// Binds
+</span><span class="k">array</span><span class="p">(</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s2">"hello"</span> <span class="o">=&gt;</span> <span class="s2">"world"</span>
+        <span class="s2">"[||]"</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s2">"foo"</span> <span class="o">=&gt;</span> <span class="s2">"bar"</span><span class="p">,</span>
+            <span class="s2">"num"</span> <span class="o">=&gt;</span> <span class="mi">123</span>
+        <span class="p">)</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span> <span class="c1">// this also works
+</span>    <span class="s2">"hello"</span> <span class="o">=&gt;</span> <span class="s2">"hi!"</span><span class="p">,</span>
+    <span class="s2">"foo"</span> <span class="o">=&gt;</span> <span class="s2">"lol"</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="k">array</span><span class="p">(</span>
+    <span class="k">array</span><span class="p">(</span> <span class="c1">// Uh-oh - collision
+</span>        <span class="s2">"[&gt;&gt;]lol"</span> <span class="o">=&gt;</span> <span class="mi">3</span>
+        <span class="s2">"[||]bind1"</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s2">"foo"</span> <span class="o">=&gt;</span> <span class="s2">"bar"</span><span class="p">,</span>
+            <span class="s2">"lol"</span> <span class="o">=&gt;</span>  <span class="mi">5</span>
+        <span class="p">),</span>
+        <span class="s2">"[&gt;&gt;]bind2"</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s2">"lols"</span> <span class="o">=&gt;</span> <span class="mi">231</span>
+        <span class="p">)</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span> <span class="c1">// args will be preserved
+</span>    <span class="s2">"lol"</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s2">"bind1"</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s2">"foo"</span> <span class="o">=&gt;</span> <span class="s2">"lol"</span>
+    <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+<span class="cp">?&gt;</span>
 </code></pre>
 <blockquote>
 <p>Multi-Table queries</p>
@@ -426,27 +468,120 @@
     <span class="s2">"#time"</span> <span class="o">=&gt;</span> <span class="s2">"NOW()"</span>
 <span class="p">]);</span>
 <span class="cp">?&gt;</span>
+</code></pre>
+<blockquote>
+<p>Alias</p>
+</blockquote>
+<pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">SELECT</span><span class="p">(</span><span class="s2">"users"</span><span class="p">,[</span><span class="s2">"user_id[id]"</span><span class="p">]);</span>
+<span class="cp">?&gt;</span>
 </code></pre><h3 id='conditionals'>Conditionals</h3>
 <p>Conditional statements are extremly customisable. WHERE and JOIN clauses are conditional statements. </p>
+
+<aside class="success">
+Available operators: `==`, `>>`, `<<`, `>=`, `<=`, `!=`
+</aside>
+
+<aside class="success">
+Available joins: `&&`(AND), `||`(OR)
+</aside>
 
 <aside class="notice">
 To make duplicate keys work for binds, you can add a name to the bind. Ex: `[&&]name`
 </aside>
+
+<aside class="notice">
+You can also bind operators. Not just `&&`(AND) or `||`(OR). However, the join (&& or ||), must come first
+</aside>
 <h3 id='multi-queries'>Multi-queries</h3>
 <p>Multiqueries can be done too. This allows for highly efficient repetative queries. Note: Only the values of WHERE and INSERT work with this. VALUES, not KEYS.</p>
+
+<aside class="success">
+The keys for the second or later multi-query arrays do not have to be  exact. For example, the first array might have `[>>]test[int]` as a key, but the second one can have just `test`. Anything within brakets  in the key will be discarded
+</aside>
+
+<aside class="success">
+The keys do not have to be in order - SuperSQL will do that for you.
+</aside>
+
+<aside class="success">
+Binds dont have to be reproduced in the second or more arrays. You can put it in global scope if you like.
+</aside>
+
+<aside class="notice">
+If there are key collisions with binds - no problem! You can reproduce the bind in the second or more arrays too.
+</aside>
 <h3 id='multi-table-support'>Multi-Table support</h3>
 <p>If you want to query multiple tables at once, put the tables in as an array</p>
 <h3 id='type-casting'>Type Casting</h3>
 <p>If you want to set the type of the input, you can set it by adding <code>[type] (replace type with type)</code>.</p>
+
+<aside class="success">
+Available types: `int`, `bool`, `lob`, `null`
+</aside>
 <h3 id='sql-functions-raw'>SQL Functions/raw</h3>
 <p>If you want to use SQL functions such as <code>NOW()</code> or want use insert raw, unescaped data, add <code>#</code> at the beginning of the key</p>
+
+<aside class="notice">
+Programming guide: Please try to avoid SQL functions. If you can, use php. (EX:, replace `NOW()` with `date('Y-m-d H:i:s')`)
+</aside>
+<h3 id='alias'>Alias</h3>
+<p>You can use an alias for columns and/or tables by adding <code>[aliasname]</code>.</p>
+
+<aside class="notice">
+Aliases go after the key, not before ex: `[alias]key` is WRONG, `key[alias]` is RIGHT
+</aside>
 <h3 id='simple'>Simple</h3>
 <p>If you are making simple queries, you may use simple functions to boost performance. Use simple functions by attatching an <code>s</code> in front of the function. The syntax is very similar to SlickInject.</p>
+
+<aside class="success">
+Use simple API as much as you can! It is lightning fast!
+</aside>
 <h3 id='cache'>Cache</h3>
 <p>Performance is boosted for a query if an identical query before it (with different values [EG where vals, join, insert]), is made right before. You can also clear the cache by doing: <code>$SuperSQL-&gt;clearCache()</code></p>
 <h3 id='raw-queries'>Raw Queries</h3>
 <p>Raw queries can be made using <code>$SuperSQL-&gt;query($query)</code>.</p>
+
+<aside class="notice">
+Programming guide: If you can, use raw queries. For example, theres nothing sensitive in `SELECT * FROM `table`, just do that instead of `$SuperSQL->SELECT("table");`
+</aside>
 <h2 id='responses'>Responses</h2>
+<blockquote>
+<p>Error handling</p>
+</blockquote>
+<pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$Response</span> <span class="o">=</span> <span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">select</span><span class="p">(</span><span class="s2">"test"</span><span class="p">,[],[</span>
+    <span class="s2">"#a"</span> <span class="o">=&gt;</span> <span class="s2">"WHERE SELECT INSERT LOL"</span> <span class="c1">// raw
+</span><span class="p">]);</span> <span class="c1">// SELECT * FROM `test` WHERE `a` = WHERE SELECT INSERT 
+</span>
+<span class="k">echo</span> <span class="nb">json_encode</span><span class="p">(</span><span class="nv">$Response</span><span class="o">-&gt;</span><span class="na">getData</span><span class="p">());</span> <span class="c1">// NULL
+</span>
+<span class="k">echo</span> <span class="nb">json_encode</span><span class="p">(</span><span class="nv">$response</span><span class="o">-&gt;</span><span class="na">error</span><span class="p">());</span> <span class="c1">// ["42000",1064,"You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'WHERE SELECT INSERT LOL' at line 1"]
+</span><span class="cp">?&gt;</span>
+</code></pre>
+<blockquote>
+<p>Iterator usage</p>
+</blockquote>
+<pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$Response</span> <span class="o">=</span> <span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">select</span><span class="p">(</span><span class="s2">"test"</span><span class="p">,[],[</span>
+    <span class="s2">"a"</span> <span class="o">=&gt;</span> <span class="s2">"WHERE SELECT INSERT LOL"</span>
+<span class="p">]);</span> <span class="c1">// SELECT * FROM `test` WHERE `a` = 'WHERE SELECT INSERT' 
+</span>
+<span class="k">echo</span> <span class="nv">$response</span><span class="o">-&gt;</span><span class="na">error</span><span class="p">();</span> <span class="c1">// FALSE
+</span>
+<span class="k">while</span> <span class="p">(</span><span class="nv">$row</span> <span class="o">=</span> <span class="nv">$response</span><span class="o">-&gt;</span><span class="na">next</span><span class="p">())</span> <span class="p">{</span> <span class="c1">// Use the iterator to iterate through rows easily
+</span>
+<span class="o">....</span> <span class="c1">// Do some stuff
+</span>
+<span class="p">}</span>
+
+<span class="nv">$response</span><span class="o">-&gt;</span><span class="na">reset</span><span class="p">();</span> <span class="c1">// Reset iterator so you can do the above code again
+</span><span class="cp">?&gt;</span>
+</code></pre>
+<blockquote>
+<p>Itit</p>
+</blockquote>
+
 <p>When you make a query, SuperSQL will return a SQLResponse object.</p>
 <h3 id='response-gt-getdata'>Response-&gt;getData()</h3>
 <p>Get all rows</p>
@@ -457,7 +592,7 @@ To make duplicate keys work for binds, you can add a name to the bind. Ex: `[&&]
 <h3 id='response-gt-next'>Response-&gt;next()</h3>
 <p>Get next row</p>
 <h3 id='response-gt-reset'>Response-&gt;reset()</h3>
-<p>Reset ititerator.</p>
+<p>Reset iterator.</p>
 
 <aside class="notice">
 All rows are retrieved and stored at object initialisation. `Response->next()` or `Response->reset()` does not affect the database or connection
@@ -517,6 +652,10 @@ You may also do `SuperSQL->SELECT($table, $columns, $where, $limit)`
 <li><code>(Array)data</code> - Data to update</li>
 <li><code>(Array)where</code> - Conditional statements</li>
 </ul>
+
+<aside class="notice">
+You can also use some special operators on the data argument. Example: `$SuperSQL->UPDATE("test", ["increment[+=]" => 1]);`. Available: `+=`, `-=`, `/=`, `*=`.
+</aside>
 <h2 id='delete'>DELETE</h2><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">DELETE</span><span class="p">(</span><span class="s2">"persons"</span><span class="p">,</span>
 <span class="s2">"is_villain"</span> <span class="o">=&gt;</span> <span class="mi">1</span>
@@ -528,6 +667,22 @@ You may also do `SuperSQL->SELECT($table, $columns, $where, $limit)`
 <ul>
 <li><code>(String|Array)table</code> - Table(s) to insert to</li>
 <li><code>(Array)where</code> - Conditional statements</li>
+</ul>
+<h2 id='transactions'>Transactions</h2><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">transact</span><span class="p">(</span><span class="k">function</span> <span class="p">()</span> <span class="p">{</span>
+
+<span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">DELETE</span><span class="p">(</span><span class="s2">"citizens"</span><span class="p">,[</span>
+    <span class="s2">"near_explosion"</span> <span class="o">=&gt;</span> <span class="mi">1</span>
+<span class="p">]);</span>
+
+<span class="k">return</span> <span class="kc">false</span><span class="p">;</span> <span class="c1">// SuperSQL to the rescue! He reversed time (the query)
+</span><span class="p">});</span>
+<span class="cp">?&gt;</span>
+</code></pre>
+<p><strong>SuperSQL-&gt;transact($call);</strong></p>
+
+<ul>
+<li><code>(Callable)call</code> - Transaction Function. Return false to rollback</li>
 </ul>
 <h2 id='simple-documentation'>Simple Documentation</h2><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="c1">// Gets data
