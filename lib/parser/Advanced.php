@@ -404,10 +404,9 @@ class AdvParser
                         }
                     }
                 }
-                return $sql;
+                 $num++;
             }
-            $num++;
-            
+            return $sql;
         };
         
         return $build($build, $dt, $map, $index, $values, $typeString);
@@ -529,7 +528,6 @@ class AdvParser
         if (count($where) != 0) {
             $sql .= " WHERE ";
             $index = array();
-            
             if (isset($where[0])) {
                 $sql .= self::conditions($where[0], $values, $index, $typeString);
                 self::append2($insert, $index, $where, $values);

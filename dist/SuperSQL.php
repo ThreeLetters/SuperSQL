@@ -560,9 +560,9 @@ class AdvParser
                         }
                     }
                 }
-                return $sql;
+                 $num++;
             }
-            $num++;
+            return $sql;
         };
         return $build($build, $dt, $map, $index, $values, $typeString);
     }
