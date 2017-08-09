@@ -2,6 +2,11 @@
 
 include "../index.php";
 
+/*
+include "../dist/SuperSQL.php";
+include "../dist/SuperSQL_helper.php";
+*/
+
 if (isset($_GET["username"]) && isset($_GET["pass"])) {
     
     $SuperSQL = SQLHelper::connect("localhost","mysite","root","1234");
