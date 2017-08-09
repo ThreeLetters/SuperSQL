@@ -195,7 +195,7 @@ class SQLHelper
         foreach ($arr as $key => $val) {
            if (gettype($val) == "array") return true;
             
-            if (self::includes($key,array("[","#"))) return true;
+            if (self::includes($key,array("[","#")) || self::includes($val,array("["))) return true;
             
             if (self::includes($val,array("DISTINCT","INSERT INTO","INTO"))) return true;
         }
@@ -308,6 +308,12 @@ class SQLHelper
          } else {
             return $this->s->sDELETE($table,$where);
          } 
+    }
+    function query($a,$b=null) {
+        return $this->s->con->query($a,$b);
+    }
+    function transact($func) {
+        return $this->s->transact($func);
     }
 }
 // BUILD BETWEEN

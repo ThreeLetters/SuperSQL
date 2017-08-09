@@ -4,7 +4,7 @@
  License: MIT (https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE)
  Source: https://github.com/ThreeLetters/SQL-Library
  Build: v1.0.0
- Built on: 08/08/2017
+ Built on: 09/08/2017
 */
 
 // lib/connector/index.php
@@ -15,13 +15,39 @@ class Response
     public $ind;
     public $error;
     public $errorData;
-    function __construct($data, $error)
+    function __construct($data, $error, $outtypes)
     {
         $this->error = !$error;
         if (!$error) {
             $this->errorData = $data->errorInfo();
         } else {
-            $this->result   = $data->fetchAll();
+            $d = $data->fetchAll();
+            $this->result = $d;
+            if (count($outtypes) != 0) {
+                foreach ($d as $i => $row) {
+                    foreach ($outtypes as $col => $dt) {
+                        if (isset($row[$col])) {
+                            switch ($dt) {
+                                case "int":
+                                    $this->result[$i][$col] = (int)$row[$col];
+                                    break;
+                                case "string":
+                                    $this->result[$i][$col] = (string)$row[$col];
+                                    break;
+                                case "bool":
+                                    $this->result[$i][$col] = $row[$col] ? true : false;
+                                    break;
+                                case "json":
+                                    $this->result[$i][$col] = json_decode($row[$col]);
+                                    break;
+                                case "obj":
+                                    $this->result[$i][$col] = unserialize($row[$col]);
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
             $this->affected = $data->rowCount();
         }
         $this->ind = 0;
@@ -59,7 +85,7 @@ class Connector
         $this->db  = new \PDO($dsn, $user, $pass);
         $this->log = array();
     }
-    function query($query,$obj = null)
+    function query($query,$obj = null,$outtypes = array())
     {
         if (isset($this->queries[$query])) {
             $q = $this->queries[$query];
@@ -74,9 +100,9 @@ class Connector
                 $query,
                 $obj
             ));
-        return new Response($q,$e);
+        return new Response($q,$e,$outtypes);
     }
-    function _query($sql, $values, $insert, $typeString)
+    function _query($sql, $values, $insert, $typeString, $outtypes = array())
     {
         if (isset($this->queries[$sql . "|" . $typeString])) { 
             $s = $this->queries[$sql . "|" . $typeString];
@@ -110,17 +136,17 @@ class Connector
         }
         if (count($insert) == 0) { 
             $e = $q->execute();
-            return new Response($q, $e);
+            return new Response($q, $e, $outtypes);
         } else { 
             $responses = array();
             $e = $q->execute();
-            array_push($responses,new Response($q, $e));
+            array_push($responses,new Response($q, $e, $outtypes));
             foreach ($insert as $key => $value) {
                 foreach ($value as $k => $val) {
                     $v[$k][0] = $val;
                 }
                 $e = $q->execute();
-                array_push($responses, new Response($q, $e));
+                array_push($responses, new Response($q, $e, $outtypes));
             }
             return $responses;
         }

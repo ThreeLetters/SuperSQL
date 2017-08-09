@@ -74,7 +74,7 @@ class SuperSQL
             $join  = null;
         }
         $d = AdvParser::SELECT($table, $columns, $where, $join, $limit);
-        return $this->con->_query($d[0], $d[1], $d[2], $d[3]);
+        return $this->con->_query($d[0], $d[1], $d[2], $d[3], $d[4]);
     }
     
     /**

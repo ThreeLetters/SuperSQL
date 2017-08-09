@@ -4,7 +4,7 @@
  License: MIT (https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE)
  Source: https://github.com/ThreeLetters/SQL-Library
  Build: v1.0.0
- Built on: 08/08/2017
+ Built on: 09/08/2017
 */
 
 // lib/connector/index.php
@@ -15,13 +15,39 @@ class Response
     public $ind;
     public $error;
     public $errorData;
-    function __construct($data, $error)
+    function __construct($data, $error, $outtypes)
     {
         $this->error = !$error;
         if (!$error) {
             $this->errorData = $data->errorInfo();
         } else {
-            $this->result   = $data->fetchAll();
+            $d = $data->fetchAll();
+            $this->result = $d;
+            if (count($outtypes) != 0) {
+                foreach ($d as $i => $row) {
+                    foreach ($outtypes as $col => $dt) {
+                        if (isset($row[$col])) {
+                            switch ($dt) {
+                                case "int":
+                                    $this->result[$i][$col] = (int)$row[$col];
+                                    break;
+                                case "string":
+                                    $this->result[$i][$col] = (string)$row[$col];
+                                    break;
+                                case "bool":
+                                    $this->result[$i][$col] = $row[$col] ? true : false;
+                                    break;
+                                case "json":
+                                    $this->result[$i][$col] = json_decode($row[$col]);
+                                    break;
+                                case "obj":
+                                    $this->result[$i][$col] = unserialize($row[$col]);
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
             $this->affected = $data->rowCount();
         }
         $this->ind = 0;
@@ -59,7 +85,7 @@ class Connector
         $this->db  = new \PDO($dsn, $user, $pass);
         $this->log = array();
     }
-    function query($query,$obj = null)
+    function query($query,$obj = null,$outtypes = array())
     {
         if (isset($this->queries[$query])) {
             $q = $this->queries[$query];
@@ -74,9 +100,9 @@ class Connector
                 $query,
                 $obj
             ));
-        return new Response($q,$e);
+        return new Response($q,$e,$outtypes);
     }
-    function _query($sql, $values, $insert, $typeString)
+    function _query($sql, $values, $insert, $typeString, $outtypes = array())
     {
         if (isset($this->queries[$sql . "|" . $typeString])) { 
             $s = $this->queries[$sql . "|" . $typeString];
@@ -110,17 +136,17 @@ class Connector
         }
         if (count($insert) == 0) { 
             $e = $q->execute();
-            return new Response($q, $e);
+            return new Response($q, $e, $outtypes);
         } else { 
             $responses = array();
             $e = $q->execute();
-            array_push($responses,new Response($q, $e));
+            array_push($responses,new Response($q, $e, $outtypes));
             foreach ($insert as $key => $value) {
                 foreach ($value as $k => $val) {
                     $v[$k][0] = $val;
                 }
                 $e = $q->execute();
-                array_push($responses, new Response($q, $e));
+                array_push($responses, new Response($q, $e, $outtypes));
             }
             return $responses;
         }
@@ -149,9 +175,9 @@ class AdvParser
             return false;
         }
     }
-    private static function append(&$args, $val, $index)
+    private static function append(&$args, $val, $index, $values)
     {
-        if (gettype($val) == "array") {
+        if (gettype($val) == "array" && $values[$index][2] < 5) {
             $len = count($val);
             for ($k = 1; $k < $len; $k++) {
                 if (!isset($args[$k]))
@@ -160,7 +186,7 @@ class AdvParser
             }
         }
     }
-    private static function append2(&$insert, $indexes, $dt)
+    private static function append2(&$insert, $indexes, $dt, $values)
     {
         function stripArgs(&$key)
         {
@@ -171,30 +197,60 @@ class AdvParser
             $b = strrpos($key, "]", -1);
             if ($b !== false)
                 $key = substr($key, $b + 1);
+            if (substr($key, 0, 1) === "#") {
+                    $key = substr($key, 1);
+             }
         }
-        function recurse(&$holder, $val, $indexes, $par)
+        function escape($val, $dt)
+        {
+        if (!isset($dt[2])) return $val;
+        switch ($dt[2]) {
+            case 0: 
+                return $val ? "1" : "0";
+                break;
+            case 1: 
+                return (int)$val;
+                break;
+            case 2: 
+                return (string)$val;
+                break;
+            case 3: 
+                return $val;
+                break;
+            case 4: 
+                return null;
+                 break;
+            case 5: 
+                return json_encode($val);
+                break;
+            case 6: 
+                return serialize($val);
+                break;
+        }
+        }
+        function recurse(&$holder, $val, $indexes, $par, $values)
         {
             foreach ($val as $k => $v) {
-                if (gettype($v) == "array") {
-                    stripArgs($k);
+                stripArgs($k);
+                $k1 = $k . "#" . $par;
+                if (isset($indexes[$k1]))
+                    $d = $indexes[$k1];
+                else
+                    $d = $indexes[$k];
+                $isArr = gettype($v) == "array" && (!isset($values[$d][2]) || $values[$d][2] < 5);
+                if ($isArr) {
                     if (isset($v[0])) {
-                        if (isset($indexes[$k . "#" . $par . "*"]))
-                            $d = $indexes[$k . "#" . $par . "*"];
-                        else
-                            $d = $indexes[$k . "*"];
                         foreach ($v as $i => $j) {
-                            $holder[$d + $i] = $j;
+                            $a = $d + $i;
+                            if (isset($holder[$a])) echo "SUPERSQL WARN: Key collision: " . $k;
+                            $holder[$a] = escape($j,$values[$a]);
                         }
                     } else {
-                        recurse($holder, $v, $indexes, $par . "/" . $k);
+                        recurse($holder, $v, $indexes, $par . "/" . $k, $values);
                     }
                 } else {
-                    stripArgs($k);
-                    if (isset($indexes[$k . "#" . $par]))
-                        $d = $indexes[$k . "#" . $par];
-                    else
-                        $d = $indexes[$k];
-                    $holder[$d] = $v;
+                      if (isset($holder[$d])) echo "SUPERSQL WARN: Key collision: " . $k;
+                    $holder[$d] = escape($v,$values[$d]);
                 }
             }
         }
@@ -203,7 +259,7 @@ class AdvParser
             $val = $dt[$key];
             if (!isset($insert[$key]))
                 $insert[$key] = array();
-            recurse($insert[$key], $val, $indexes, "");
+            recurse($insert[$key], $val, $indexes, "", $values);
         }
     }
     private static function quote($str)
@@ -239,38 +295,53 @@ class AdvParser
         $var = strtolower($type);
         if (!$var)
             $var = strtolower(gettype($value));
-        $type = \PDO::PARAM_INT;
+        $type = \PDO::PARAM_STR;
+        $dtype = 2;
         if ($var == "boolean" || $var == "bool") {
             $type  = \PDO::PARAM_BOOL;
             $value = $value ? "1" : "0";
+            $dtype = 0;
             $typeString .= "b";
-        } else if ($var == "integer" || $var == "int") {
+        } else if ($var == "integer" || $var == "int" || $var == "double" || $var == "doub") {
             $typeString .= "i";
+            $dtype = 1;
             $value = (int) $value;
         } else if ($var == "string" || $var == "str") {
             $type = \PDO::PARAM_STR;
             $value = (string) $value;
+            $dtype = 2;
             $typeString .= "s";
-        } else if ($var == "double" || $var == "doub") {
-            $value = (int) $value;
-            $typeString .= "i";
         } else if ($var == "resource" || $var == "lob") {
             $type = \PDO::PARAM_LOB;
+            $dtype = 3;
             $typeString .= "l";
         } else if ($var == "null") {
+            $dtype = 4;
             $type  = \PDO::PARAM_NULL;
             $value = null;
             $typeString .= "n";
+        } else if ($var == "json") {
+            $dtype = 5;
+            $type = \PDO::PARAM_STR;
+            $value = json_encode($value);
+        } else if ($var == "obj") {
+              $dtype = 6;
+            $type = \PDO::PARAM_STR;
+            $value = serialize($value);
+        } else {
+            $value = (string)$value;
+            echo "SUPERSQL WARN: Invalid type " . $var . " Assumed STRING";
         }
         return array(
             $value,
-            $type
+            $type,
+            $dtype
         );
     }
     private static function getType(&$str)
-    {
+    {   
         if (substr($str, -1) == "]") {
-            $start = strpos($str, "[");
+            $start = strrpos($str, "[");
             if ($start === false) {
                 return "";
             }
@@ -306,6 +377,8 @@ class AdvParser
                 $useBind     = !isset($val[0]);
                 $newJoin     = $join;
                 $newOperator = $operator;
+                $type = $raw ? false : self::getType($key);
+                $column = self::quote(self::rmComments($key));
                 switch ($arg) {
                     case "||":
                         $arg     = $arg2;
@@ -345,27 +418,25 @@ class AdvParser
                 }
                 if ($num != 0)
                     $sql .= $join;
-                if ($valType == "array") {
+                if ($valType == "array" && $type != "json" && $type != "obj") {
                     if ($useBind) {
                         $sql .= "(" . $build($build, $val, $map, $index, $values, $newJoin, $newOperator, $parent . "/" . $key) . ")";
                     } else {
-                        $type = self::getType($key);
-                        $c = self::rmComments($key);
                         if ($map !== false && !$raw) {
-                            $map[$key . "*"]                 = $index;
-                            $map[$key . "#" . $parent . "*"] = $index++;
+                            $map[$key]                 = $index;
+                            $map[$key . "#" . $parent] = $index++;
                         }
                         foreach ($value as $k => $v) {
                             if ($k != 0)
                                 $sql .= $newJoin;
                             $index++;
+                            $sql .= $column . $newOperator;
                             if ($raw) {
-                                $sql .= self::quote($c) . $newOperator . $v;
+                                $sql .= $v;
                             } else if ($values !== false) {
-                                $sql .= "`" . $c . "`" . $newOperator . "?";
+                                $sql .= "?";
                                 array_push($values, self::value($type, $v, $typeString));
                             } else {
-                                $sql .= self::quote($c) . $newOperator;
                                 if (gettype($v) == "integer") {
                                     $sql .= $v;
                                 } else {
@@ -375,15 +446,14 @@ class AdvParser
                         }
                     }
                 } else {
+                    $sql .= $column . $newOperator;
                     if ($raw) {
-                          $sql .= self::quote(self::rmComments($key)) . $newOperator . $val;
+                          $sql .= $val;
                     } else {
                         if ($values !== false) {
-                            $t = self::getType($key);
-                            $sql .= "`" . self::rmComments($key) . "`" . $newOperator . "?";
-                            array_push($values, self::value($t, $val, $typeString));
+                            $sql .= "?";
+                            array_push($values, self::value($type, $val, $typeString));
                         } else {
-                            $sql .= self::quote(self::rmComments($key)) . $newOperator;
                             if (gettype($val) == "integer") {
                                 $sql .= $val;
                             } else {
@@ -408,6 +478,7 @@ class AdvParser
         $len = count($columns);
         $values = array();
         $insert = array();
+        $outTypes = array();
         if ($len == 0) { 
             $sql .= "*";
         } else { 
@@ -429,7 +500,21 @@ class AdvParser
             }
             if ($len > $req) { 
                 for (; $i < $len; $i++) {
-                    $t = self::getType($columns[$i]);
+                    $b = self::getType($columns[$i]);
+                    $t = $b ? self::getType($columns[$i]) : false;
+                    if (!$t && $b) {
+                        if (!($b == "int" || $b == "string" || $b == "json" || $b == "obj" || $b == "bool")) {
+                            $t = $b;
+                            $b = false;   
+                        }
+                    }
+                    if ($b) {
+                        if ($t) {
+                      $outTypes[$t] = $b;
+                        } else {
+                        $outTypes[$columns[$i]] = $b;
+                        }
+                    }
                     if ($i > $req) {
                         $sql .= ", ";
                     }
@@ -479,7 +564,7 @@ class AdvParser
             $index = array();
             if (isset($where[0])) {
                 $sql .= self::conditions($where[0], $values, $index, $typeString);
-                self::append2($insert, $index, $where);
+                self::append2($insert, $index, $where, $values);
             } else {
                 $sql .= self::conditions($where, $values, $index, $typeString);
             }
@@ -495,7 +580,8 @@ class AdvParser
             $sql,
             $values,
             $insert,
-            $typeString
+            $typeString,
+            $outTypes
         );
     }
     static function INSERT($table, $data)
@@ -531,13 +617,13 @@ class AdvParser
                 if ($multi) {
                     $indexes[$key] = $i++;
                 } else {
-                    self::append($insert, $val, $i++);
+                    self::append($insert, $val, $i++, $values);
                 }
             }
             $b++;
         }
         if ($multi)
-            self::append2($insert, $indexes, $data);
+            self::append2($insert, $indexes, $data, $values);
         $sql .= ") VALUES (" . $append . ")";
         return array(
             $sql,
@@ -594,19 +680,19 @@ class AdvParser
                 if ($multi) {
                     $indexes[$key] = $i++;
                 } else {
-                    self::append($insert, $val, $i++);
+                    self::append($insert, $val, $i++, $values);
                 }
             }
             $b++;
         }
         if ($multi)
-            self::append2($insert, $indexes, $data);
+            self::append2($insert, $indexes, $data, $values);
         if (count($where) != 0) {
             $sql .= " WHERE ";
             $index = array();
             if (isset($where[0])) {
                 $sql .= self::conditions($where[0], $values, $index, $typeString, $i);
-                self::append2($insert, $index, $where);
+                self::append2($insert, $index, $where, $values);
             } else {
                 $sql .= self::conditions($where, $values, $index, $typeString, $i);
             }
@@ -629,7 +715,7 @@ class AdvParser
             $index = array();
             if (isset($where[0])) {
                 $sql .= self::conditions($where[0], $values, $index, $typeString);
-                self::append2($insert, $index, $where);
+                self::append2($insert, $index, $where, $values);
             } else {
                 $sql .= self::conditions($where, $values, $index, $typeString);
             }
@@ -658,7 +744,7 @@ class SuperSQL
             $join  = null;
         }
         $d = AdvParser::SELECT($table, $columns, $where, $join, $limit);
-        return $this->con->_query($d[0], $d[1], $d[2], $d[3]);
+        return $this->con->_query($d[0], $d[1], $d[2], $d[3], $d[4]);
     }
     function INSERT($table, $data)
     {

@@ -4,7 +4,7 @@
  License: MIT (https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE)
  Source: https://github.com/ThreeLetters/SQL-Library
  Build: v1.0.0
- Built on: 08/08/2017
+ Built on: 09/08/2017
 */
 
 
@@ -146,7 +146,7 @@ class SQLHelper
     private static function containsAdv($arr) {
         foreach ($arr as $key => $val) {
            if (gettype($val) == "array") return true;
-            if (self::includes($key,array("[","#"))) return true;
+            if (self::includes($key,array("[","#")) || self::includes($val,array("["))) return true;
             if (self::includes($val,array("DISTINCT","INSERT INTO","INTO"))) return true;
         }
         return false;
@@ -224,5 +224,11 @@ class SQLHelper
          } else {
             return $this->s->sDELETE($table,$where);
          } 
+    }
+    function query($a,$b=null) {
+        return $this->s->con->query($a,$b);
+    }
+    function transact($func) {
+        return $this->s->transact($func);
     }
 }

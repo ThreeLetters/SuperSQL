@@ -43,19 +43,47 @@ class Response
     /**
      * Gets data from a query
      */
-    function __construct($data, $error)
+    function __construct($data, $error, $outtypes)
     {
-        
+  
         $this->error = !$error;
         if (!$error) {
             $this->errorData = $data->errorInfo();
         } else {
-            $this->result   = $data->fetchAll();
+            $d = $data->fetchAll();
+            $this->result = $d;
+            if (count($outtypes) != 0) {
+                foreach ($d as $i => $row) {
+                    foreach ($outtypes as $col => $dt) {
+                        if (isset($row[$col])) {
+                            switch ($dt) {
+                                case "int":
+                                    $this->result[$i][$col] = (int)$row[$col];
+                                    break;
+                                case "string":
+                                    $this->result[$i][$col] = (string)$row[$col];
+                                    break;
+                                case "bool":
+                                    $this->result[$i][$col] = $row[$col] ? true : false;
+                                    break;
+                                case "json":
+                                    $this->result[$i][$col] = json_decode($row[$col]);
+                                    break;
+                                case "obj":
+                                    $this->result[$i][$col] = unserialize($row[$col]);
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
             $this->affected = $data->rowCount();
         }
         $this->ind = 0;
         
         $data->closeCursor();
+        
+        
     }
     
     /**
@@ -129,7 +157,7 @@ class Connector
      *
      * @returns {SQLResponse}
      */
-    function query($query,$obj = null)
+    function query($query,$obj = null,$outtypes = array())
     {
         if (isset($this->queries[$query])) {
             $q = $this->queries[$query];
@@ -145,7 +173,7 @@ class Connector
                 $query,
                 $obj
             ));
-        return new Response($q,$e);
+        return new Response($q,$e,$outtypes);
     }
     
     /**
@@ -157,7 +185,7 @@ class Connector
      *
      * @returns {SQLResponse|SQLResponse[]}
      */
-    function _query($sql, $values, $insert, $typeString)
+    function _query($sql, $values, $insert, $typeString, $outtypes = array())
     {
         // echo json_encode(array($sql,$insert));
         // return;
@@ -197,12 +225,12 @@ class Connector
         
         if (count($insert) == 0) { // Single query
             $e = $q->execute();
-            return new Response($q, $e);
+            return new Response($q, $e, $outtypes);
         } else { // Multi Query
             $responses = array();
             
             $e = $q->execute();
-            array_push($responses,new Response($q, $e));
+            array_push($responses,new Response($q, $e, $outtypes));
             
             foreach ($insert as $key => $value) {
                 foreach ($value as $k => $val) {
@@ -210,7 +238,7 @@ class Connector
                 }
                 
                 $e = $q->execute();
-                array_push($responses, new Response($q, $e));
+                array_push($responses, new Response($q, $e, $outtypes));
             }
             return $responses;
         }
