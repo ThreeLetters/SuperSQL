@@ -529,7 +529,7 @@ This is wrong: `[>>]somecolumn[int]#someid`, this is right: `[>>]somecolumn#some
 <p>If you want to set the type of the input, you can set it by adding <code>[type] (replace type with type)</code>.</p>
 
 <aside class="success">
-Available types: `int`, `bool`, `lob`, `null`
+Available types: `int`, `bool`, `lob`, `null`, `json`, `obj`
 </aside>
 <h3 id='sql-functions-raw'>SQL Functions/raw</h3>
 <p>If you want to use SQL functions such as <code>NOW()</code> or want use insert raw, unescaped data, add <code>#</code> at the beginning of the key</p>
@@ -617,6 +617,14 @@ All rows are retrieved and stored at object initialisation. `Response->next()` o
 </span>    <span class="c1">// [&lt;&gt;] - Full join
 </span>    <span class="s2">"[&gt;&lt;]meteors"</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">"horizon.object"</span> <span class="o">=&gt;</span> <span class="s2">"meteors.object"</span><span class="p">),</span> <span class="c1">// JOIN
 </span><span class="p">),</span><span class="mi">5</span><span class="p">);</span> <span class="c1">// only 5 rows
+</span>
+<span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">SELECT</span><span class="p">(</span><span class="s2">"table"</span><span class="p">,</span> <span class="p">[</span>
+    <span class="s2">"DISTINCT"</span><span class="p">,</span> <span class="c1">// Distinct items only
+</span>    <span class="s2">"col1"</span><span class="p">,</span>
+    <span class="s2">"col2[alias][int]"</span><span class="p">,</span> <span class="c1">// alias and type-casting
+</span>    <span class="s2">"col3[alias2]"</span><span class="p">,</span> <span class="c1">// alias
+</span>    <span class="s2">"col4[json]"</span> <span class="c1">// type casting
+</span><span class="p">]);</span> <span class="c1">// SELECT DISTINCT `col1`, `col2` AS `alias`, `col3` AS `alias2`, `col4` FROM `table`
 </span><span class="cp">?&gt;</span>
 </code></pre>
 <p><strong>SuperSQL-&gt;SELECT($table, $columns, $where[,$join[, $limit/$append);</strong></p>
@@ -639,6 +647,10 @@ You may also do `SuperSQL->SELECT($table, $columns, $where, $limit)`
 
 <aside class="notice">
 You can order tables by setting limit/append to "ORDER BY column"
+</aside>
+
+<aside class="notice">
+You can also have SuperSQL cast the output. To do so, add `[type]` at the end of the column name. Available types: `json`, `obj`, `int`, `bool`, `string`
 </aside>
 <h2 id='insert'>INSERT</h2><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">INSERT</span><span class="p">(</span><span class="s2">"table"</span><span class="p">,</span><span class="k">array</span><span class="p">(</span>

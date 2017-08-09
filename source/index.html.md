@@ -257,7 +257,7 @@ If you want to query multiple tables at once, put the tables in as an array
 If you want to set the type of the input, you can set it by adding `[type] (replace type with type)`.
 
 <aside class="success">
-Available types: `int`, `bool`, `lob`, `null`
+Available types: `int`, `bool`, `lob`, `null`, `json`, `obj`
 </aside>
 
 ### SQL Functions/raw
@@ -360,6 +360,14 @@ $SuperSQL->SELECT("horizon", [], [], array(
     // [<>] - Full join
     "[><]meteors" => array("horizon.object" => "meteors.object"), // JOIN
 ),5); // only 5 rows
+
+$SuperSQL->SELECT("table", [
+    "DISTINCT", // Distinct items only
+    "col1",
+    "col2[alias][int]", // alias and type-casting
+    "col3[alias2]", // alias
+    "col4[json]" // type casting
+]); // SELECT DISTINCT `col1`, `col2` AS `alias`, `col3` AS `alias2`, `col4` FROM `table`
 ?>
 ```
 
@@ -381,6 +389,10 @@ You may also do `SuperSQL->SELECT($table, $columns, $where, $limit)`
 
 <aside class="notice">
 You can order tables by setting limit/append to "ORDER BY column"
+</aside>
+
+<aside class="notice">
+You can also have SuperSQL cast the output. To do so, add `[type]` at the end of the column name. Available types: `json`, `obj`, `int`, `bool`, `string`
 </aside>
 
 ## INSERT
