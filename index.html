@@ -812,47 +812,52 @@ If your using the built/compiled file, you must include `dist/SuperSQL_helper.ph
 </code></pre>
 <p>Connect easily to any database.</p>
 
-<p><strong>connect($host,$user,$pass,$options)</strong></p>
+<p><strong>connect($host,$db,$user,$pass,$options)</strong></p>
 
 <ul>
 <li><code>(String)host</code> - Host to connect to</li>
+<li><code>(String)db</code> - DB name</li>
 <li><code>(String)user</code> - Username</li>
 <li><code>(String)pass</code> - Password</li>
 <li><code>(Array)options</code> - Options (Optional)</li>
 </ul>
 
-<p><strong>connect($host,$user,$pass,$dbtype)</strong></p>
+<p><strong>connect($host,$db,$user,$pass,$dbtype)</strong></p>
 
 <ul>
 <li><code>(String)host</code> - Host to connect to</li>
+<li><code>(String)db</code> - DB name</li>
 <li><code>(String)user</code> - Username</li>
 <li><code>(String)pass</code> - Password</li>
 <li><code>(String)dbtype</code> - Database type (<code>mysql</code>,<code>pgsql</code>,<code>sybase</code>,<code>oracle</code>)</li>
 </ul>
 
-<p><strong>connect($host,$user,$pass,$dsn)</strong></p>
+<p><strong>connect($host,$db,$user,$pass,$dsn)</strong></p>
 
 <ul>
 <li><code>(String)host</code> - Host to connect to</li>
+<li><code>(String)db</code> - DB name</li>
 <li><code>(String)user</code> - Username</li>
 <li><code>(String)pass</code> - Password</li>
 <li><code>(String)dbtype</code> - DSN string</li>
 </ul>
 <h3 id='sqlhelper'>SQLHelper()</h3><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
-<span class="nv">$Helper</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SQLHelper</span><span class="p">(</span><span class="s2">"localhost"</span><span class="p">,</span><span class="s2">"root"</span><span class="p">,</span><span class="s2">"1234"</span><span class="p">);</span> <span class="c1">// mysql
+<span class="nv">$Helper</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SQLHelper</span><span class="p">(</span><span class="s2">"localhost"</span><span class="p">,</span><span class="s2">"test"</span><span class="p">,</span><span class="s2">"root"</span><span class="p">,</span><span class="s2">"1234"</span><span class="p">);</span> <span class="c1">// mysql
 </span>
-<span class="nv">$Helper</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SQLHelper</span><span class="p">(</span><span class="s2">"localhost"</span><span class="p">,</span><span class="s2">"root"</span><span class="p">,</span><span class="s2">"1234"</span><span class="p">,</span> <span class="nv">$dbtype</span><span class="p">);</span> <span class="c1">// others
+<span class="nv">$Helper</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SQLHelper</span><span class="p">(</span><span class="s2">"localhost"</span><span class="p">,</span><span class="s2">"test"</span><span class="p">,</span><span class="s2">"root"</span><span class="p">,</span><span class="s2">"1234"</span><span class="p">,</span> <span class="nv">$dbtype</span><span class="p">);</span> <span class="c1">// others
 </span>
 <span class="nv">$Helper</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SQLHelper</span><span class="p">(</span><span class="nv">$array</span><span class="p">);</span> <span class="c1">// array of connections
 </span>
 <span class="nv">$Helper</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SQLHelper</span><span class="p">(</span><span class="k">array</span><span class="p">(</span> <span class="c1">// array of connection configs
 </span>    <span class="k">array</span><span class="p">(</span>
     <span class="s2">"host"</span><span class="o">=&gt;</span><span class="s2">"localhost"</span><span class="p">,</span>
+    <span class="s2">"db"</span><span class="o">=&gt;</span><span class="s2">"test"</span><span class="p">,</span>
     <span class="s2">"user"</span><span class="o">=&gt;</span><span class="s2">"root"</span><span class="p">,</span>
     <span class="s2">"password"</span><span class="o">=&gt;</span> <span class="s2">"1234"</span>
     <span class="p">),</span>
     <span class="k">array</span><span class="p">(</span>
     <span class="s2">"host"</span><span class="o">=&gt;</span> <span class="s2">"192.168.1.2"</span><span class="p">,</span>
+    <span class="s2">"db"</span><span class="o">=&gt;</span><span class="s2">"test2"</span><span class="p">,</span>
     <span class="s2">"user"</span><span class="o">=&gt;</span><span class="s2">"root"</span><span class="p">,</span>
     <span class="s2">"password"</span><span class="o">=&gt;</span> <span class="s2">"1234"</span><span class="p">,</span>
     <span class="s2">"options"</span> <span class="o">=&gt;</span> <span class="s2">"pgsql"</span> <span class="c1">// dbtype
@@ -868,10 +873,11 @@ If your using the built/compiled file, you must include `dist/SuperSQL_helper.ph
 <li><code>(SuperSQL)SuperSQL</code> - SuperSQL object</li>
 </ul>
 
-<p><strong>new SQLHelper($host,$user,$pass,$options)</strong></p>
+<p><strong>new SQLHelper($host,$db,$user,$pass,$options)</strong></p>
 
 <ul>
 <li><code>(String)host</code> - Host to connect to</li>
+<li><code>(String)db</code> - DB name</li>
 <li><code>(String)user</code> - Username</li>
 <li><code>(String)pass</code> - Password</li>
 <li><code>(Array)options</code> - Options (Optional)</li>

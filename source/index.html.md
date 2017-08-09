@@ -573,23 +573,26 @@ $SuperSQL = SQLHelper::connect("localhost","root","1234", $dbtype); // others
 
 Connect easily to any database.
 
-**connect($host,$user,$pass,$options)**
+**connect($host,$db,$user,$pass,$options)**
 
 * `(String)host` - Host to connect to
+* `(String)db` - DB name
 * `(String)user` - Username
 * `(String)pass` - Password
 * `(Array)options` - Options (Optional)
 
-**connect($host,$user,$pass,$dbtype)**
+**connect($host,$db,$user,$pass,$dbtype)**
 
 * `(String)host` - Host to connect to
+* `(String)db` - DB name
 * `(String)user` - Username
 * `(String)pass` - Password
 * `(String)dbtype` - Database type (`mysql`,`pgsql`,`sybase`,`oracle`)
 
-**connect($host,$user,$pass,$dsn)**
+**connect($host,$db,$user,$pass,$dsn)**
 
 * `(String)host` - Host to connect to
+* `(String)db` - DB name
 * `(String)user` - Username
 * `(String)pass` - Password
 * `(String)dbtype` - DSN string
@@ -599,20 +602,22 @@ Connect easily to any database.
 
 ```php
 <?php
-$Helper = new SQLHelper("localhost","root","1234"); // mysql
+$Helper = new SQLHelper("localhost","test","root","1234"); // mysql
 
-$Helper = new SQLHelper("localhost","root","1234", $dbtype); // others
+$Helper = new SQLHelper("localhost","test","root","1234", $dbtype); // others
 
 $Helper = new SQLHelper($array); // array of connections
 
 $Helper = new SQLHelper(array( // array of connection configs
     array(
     "host"=>"localhost",
+    "db"=>"test",
     "user"=>"root",
     "password"=> "1234"
     ),
     array(
     "host"=> "192.168.1.2",
+    "db"=>"test2",
     "user"=>"root",
     "password"=> "1234",
     "options" => "pgsql" // dbtype
@@ -627,9 +632,10 @@ Initialise the helper
 
 * `(SuperSQL)SuperSQL` - SuperSQL object
 
-**new SQLHelper($host,$user,$pass,$options)**
+**new SQLHelper($host,$db,$user,$pass,$options)**
 
 * `(String)host` - Host to connect to
+* `(String)db` - DB name
 * `(String)user` - Username
 * `(String)pass` - Password
 * `(Array)options` - Options (Optional)
