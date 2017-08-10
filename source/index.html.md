@@ -11,7 +11,7 @@ toc_footers:
 search: true
 ---
 
-# SuperSQL
+# SuperSQL - Overview
 
 ```php
 <?php
@@ -64,7 +64,71 @@ To build this library, do
 
 It will build to `/dist/SuperSQL.php`
 
-# Documentation
+# Basics
+These are the basic functionalities of SuperSQL. 
+
+<aside class="notice">
+Most of the features listed here are for ADVANCED API. Except for Simple (Simple API), Cache (Its global), and Responses
+</aside>
+
+## Responses
+
+> Error handling
+
+```php
+<?php
+$Response = $SuperSQL->select("test",[],[
+    "#a" => "WHERE SELECT INSERT LOL" // raw
+]); // SELECT * FROM `test` WHERE `a` = WHERE SELECT INSERT 
+
+echo json_encode($Response->getData()); // NULL
+
+echo json_encode($response->error()); // ["42000",1064,"You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'WHERE SELECT INSERT LOL' at line 1"]
+?>
+```
+
+> Iterator usage
+
+```php
+<?php
+$Response = $SuperSQL->select("test",[],[
+    "a" => "WHERE SELECT INSERT LOL"
+]); // SELECT * FROM `test` WHERE `a` = 'WHERE SELECT INSERT' 
+
+echo $response->error(); // FALSE
+
+while ($row = $response->next()) { // Use the iterator to iterate through rows easily
+
+.... // Do some stuff
+
+}
+
+$response->reset(); // Reset iterator so you can do the above code again
+?>
+```
+
+When you make a query, SuperSQL will return a SQLResponse object.
+
+### Response->getData()
+Get all rows
+
+### Response->error() 
+Returns error object if there is one. False otherwise
+
+### Response->getAffected()
+Get number of rows affected by the query
+
+### Response->next()
+Get next row
+
+### Response->reset()
+Reset iterator.
+
+<aside class="notice">
+All rows are retrieved and stored at object initialisation. `Response->next()` or `Response->reset()` does not affect the database or connection
+</aside>
+
+## Conditionals
 
 > Conditionals (WHERE & JOIN)
 
@@ -90,6 +154,26 @@ $where = array(
 );
 ?>
 ```
+
+Conditional statements are extremly customisable. WHERE and JOIN clauses are conditional statements. 
+
+<aside class="success">
+Available operators: `==`, `>>`, `<<`, `>=`, `<=`, `!=`, `~~`, `!~`
+</aside>
+
+<aside class="success">
+Available joins: `&&`(AND), `||`(OR)
+</aside>
+
+<aside class="notice">
+To make duplicate keys work for binds, you can add a name to the bind. Ex: `[&&]name`
+</aside>
+
+<aside class="notice">
+You can also bind operators. Not just `&&`(AND) or `||`(OR). However, the join (&& or ||), must come first
+</aside>
+
+## Multi-queries
 
 > Multi-Querying
 
@@ -151,80 +235,6 @@ array(
 ?>
 ```
 
-> Multi-Table queries
-
-```php
-<?php
-$SuperSQL->SELECT(["table1","table2"],[],[]);
-?>
-```
-
-> Simple queries
-
-```php
-<?php
-$SuperSQL->sSELECT($table,$columns,$where);
-
-$SuperSQL->sINSERT($table,$data);
-
-$SuperSQL->sUPDATE($table,$data,$where);
-
-$SuperSQL->sDELETE($table,$where);
-?>
-```
-
-> Type Casting
-
-```php
-<?php
-$SuperSQL->INSERT("sensitive_data",[ // NOTE: Also works with any other query. ALSO NOTE: Types are case-insensitive
-   "nuclear_codes[int]" => 138148347734, // Integer (Use [int] or [integer]
-   "in_state_of_emergency[bool]" => false, // Boolean (Use [bool] or [boolean]
-   "secret_files[lob]" => $file // Large Objects/Resources (Use [lob] or [resource])
-   "fake_data[null]" => null // Null values (use [null])
-]);
-?>
-```
-
-> SQL functions/Raw
-
-```php
-<?php
-$SuperSQL->INSERT("times",[
-    "#time" => "NOW()"
-]);
-?>
-```
-
-> Alias
-
-```php
-<?php
-$SuperSQL->SELECT("users",["user_id[id]"]);
-?>
-```
-
-### Conditionals
-
-Conditional statements are extremly customisable. WHERE and JOIN clauses are conditional statements. 
-
-<aside class="success">
-Available operators: `==`, `>>`, `<<`, `>=`, `<=`, `!=`, `~~`, `!~`
-</aside>
-
-<aside class="success">
-Available joins: `&&`(AND), `||`(OR)
-</aside>
-
-<aside class="notice">
-To make duplicate keys work for binds, you can add a name to the bind. Ex: `[&&]name`
-</aside>
-
-<aside class="notice">
-You can also bind operators. Not just `&&`(AND) or `||`(OR). However, the join (&& or ||), must come first
-</aside>
-
-### Multi-queries
 Multiqueries can be done too. This allows for highly efficient repetative queries. Note: Only the values of WHERE and INSERT work with this. VALUES, not KEYS.
 
 <aside class="success">
@@ -243,111 +253,143 @@ Binds dont have to be reproduced in the second or more arrays. You can put it in
 If there are key collisions with binds - no problem! You can reproduce the bind in the second or more arrays too.
 </aside>
 
-### Key-collisions
+## Key-collisions
+
 Since SuperSQL uses associative arrays, key collisions can occur. To solve this problem, add "#id (replace id with something)" to the key.
 
 <aside class="notice">
 This is wrong: `[>>]somecolumn[int]#someid`, this is right: `[>>]somecolumn#someid[int]`
 </aside>
 
-### Multi-Table support
+## Multi-Table support
+
+> Multi-Table queries
+
+```php
+<?php
+$SuperSQL->SELECT(["table1","table2"],[],[]);
+?>
+```
+
 If you want to query multiple tables at once, put the tables in as an array
 
-### Type Casting
+## Type Casting
+
+> Type Casting
+
+```php
+<?php
+$SuperSQL->INSERT("sensitive_data",[ // NOTE: Also works with any other query. ALSO NOTE: Types are case-insensitive
+   "nuclear_codes[int]" => 138148347734, // Integer (Use [int] or [integer]
+   "in_state_of_emergency[bool]" => false, // Boolean (Use [bool] or [boolean]
+   "secret_files[lob]" => $file // Large Objects/Resources (Use [lob] or [resource])
+   "fake_data[null]" => null // Null values (use [null])
+]);
+?>
+```
+
 If you want to set the type of the input, you can set it by adding `[type] (replace type with type)`.
 
 <aside class="success">
 Available types: `int`, `bool`, `lob`, `null`, `json`, `obj`
 </aside>
 
-### SQL Functions/raw
+## SQL Functions/raw
+
+> SQL functions/Raw
+
+```php
+<?php
+$SuperSQL->INSERT("times",[
+    "#time" => "NOW()"
+]);
+?>
+```
+
 If you want to use SQL functions such as `NOW()` or want use insert raw, unescaped data, add `#` at the beginning of the key
 
 <aside class="notice">
 Programming guide: Please try to avoid SQL functions. If you can, use php. (EX:, replace `NOW()` with `date('Y-m-d H:i:s')`)
 </aside>
 
-### Alias
+## Alias
+
+> Alias
+
+```php
+<?php
+$SuperSQL->SELECT("users",["user_id[id]"]);
+?>
+```
+
 You can use an alias for columns and/or tables by adding `[aliasname]`.
 
 <aside class="notice">
 Aliases go after the key, not before ex: `[alias]key` is WRONG, `key[alias]` is RIGHT
 </aside>
 
-### Simple
+## Simple
+
+> Simple queries
+
+```php
+<?php
+$SuperSQL->sSELECT($table,$columns,$where);
+
+$SuperSQL->sINSERT($table,$data);
+
+$SuperSQL->sUPDATE($table,$data,$where);
+
+$SuperSQL->sDELETE($table,$where);
+?>
+```
+
 If you are making simple queries, you may use simple functions to boost performance. Use simple functions by attatching an `s` in front of the function. The syntax is very similar to SlickInject.
 
 <aside class="success">
 Use simple API as much as you can! It is lightning fast! Otherwise, use the helper functions - they will decide for you.
 </aside>
 
-### Cache
+## Cache
 Performance is boosted for a query if an identical query before it (with different values [EG where vals, join, insert]), is made right before. You can also clear the cache by doing: `$SuperSQL->clearCache()`
 
-### Raw Queries
-Raw queries can be made using `$SuperSQL->query($query)`.
+## Custom Queries
+
+Custom queries can be made using `$SuperSQL->query($query)`.
 
 <aside class="notice">
 Programming guide: If you can, use raw queries. For example, theres nothing sensitive in `SELECT * FROM `table`, just do that instead of `$SuperSQL->SELECT("table");`
 </aside>
 
-## Responses
 
-> Error handling
+# Advanced Functions
 
-```php
+```
 <?php
-$Response = $SuperSQL->select("test",[],[
-    "#a" => "WHERE SELECT INSERT LOL" // raw
-]); // SELECT * FROM `test` WHERE `a` = WHERE SELECT INSERT 
+$SuperSQL->SELECT($table, $columns, $where[,$join[, $limit/$append);
 
-echo json_encode($Response->getData()); // NULL
+$SuperSQL->INSERT($table, $data);
 
-echo json_encode($response->error()); // ["42000",1064,"You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'WHERE SELECT INSERT LOL' at line 1"]
+$SuperSQL->UPDATE($table, $data, $where);
+
+SuperSQL->DELETE($table, $where);
+
+SuperSQL->REPLACE($table, $data, $where);
 ?>
 ```
 
-> Iterator usage
+Advanced functions are for doing advanced queries. Advanced query features include:
 
-```php
-<?php
-$Response = $SuperSQL->select("test",[],[
-    "a" => "WHERE SELECT INSERT LOL"
-]); // SELECT * FROM `test` WHERE `a` = 'WHERE SELECT INSERT' 
-
-echo $response->error(); // FALSE
-
-while ($row = $response->next()) { // Use the iterator to iterate through rows easily
-
-.... // Do some stuff
-
-}
-
-$response->reset(); // Reset iterator so you can do the above code again
-?>
-```
-
-> Itit
-
-When you make a query, SuperSQL will return a SQLResponse object.
-
-### Response->getData()
-Get all rows
-
-### Response->error() 
-Returns error object if there is one. False otherwise
-
-### Response->getAffected()
-Get number of rows affected by the query
-
-### Response->next()
-Get next row
-
-### Response->reset()
-Reset iterator.
+* Multi-query
+* Multi-table querying
+* Type Casting
+* Aliasing
+* Use of operators other than `=`
+* Use of "OR"
+* Joins
 
 <aside class="notice">
-All rows are retrieved and stored at object initialisation. `Response->next()` or `Response->reset()` does not affect the database or connection
+If your only going to use advanced API, you can just include `dist/SuperSQL_advanced.php` to get SuperSQL with advanced api only.
 </aside>
 
 ## SELECT
@@ -446,26 +488,8 @@ $SuperSQL->DELETE("persons",
 * `(String|Array)table` - Table(s) to insert to
 * `(Array)where` - Conditional statements
 
-## Transactions
 
-```php
-<?php
-$SuperSQL->transact(function () {
-
-$SuperSQL->DELETE("citizens",[
-    "near_explosion" => 1
-]);
-
-return false; // SuperSQL to the rescue! He reversed time (the query)
-});
-?>
-```
-
-**SuperSQL->transact($call);**
-
-* `(Callable)call` - Transaction Function. Return false to rollback
-
-## Simple Documentation
+# Simple Functions
 
 ```php
 <?php
@@ -480,8 +504,21 @@ $SuperSQL->DELETE($table, $where);
 ?>
 ```
 
-> sSELECT
+Simple API is for basic querying. It allows of lightning-fast, simple and easy querying. Unlike the advanced api, you cannot:
 
+* You cannot use other opererators besides `=` (Equal to)
+* No binds - Only `AND` is used
+* No multi-querying
+* No cache
+* No type casting
+
+<aside class="notice">
+If your only going to use simple API, you can just include `dist/SuperSQL_simple.php` to get SuperSQL with simple api only.
+</aside>
+
+## sSELECT
+
+> sSELECT
 ```php
 <?php
 $SuperSQL->sSELECT("citizens",["name","age"],[ // SELECT `name`, `age` FROM `citizens` WHERE `in_trouble` = 1
@@ -490,8 +527,16 @@ $SuperSQL->sSELECT("citizens",["name","age"],[ // SELECT `name`, `age` FROM `cit
 ?>
 ```
 
-> sINSERT
+**SuperSQL->SELECT($table, $columns, $where[, $append);**
 
+* `(String)table` - Table to query
+* `(Array)columns` - Columns to return. `[]` is `*`
+* `(Array)where` - Conditional statements
+* `(String)append` - Append to sql (Optional)
+
+## sINSERT
+
+> sINSERT
 ```php
 <?php
 $SuperSQL->sINSERT("message_board",array( // INSERT INTO `message_board` (`title`, `SuperSQL`) VALUES ('SuperSQL Saves The Day', 'SuperSQL rocks!')
@@ -501,8 +546,14 @@ $SuperSQL->sINSERT("message_board",array( // INSERT INTO `message_board` (`title
 ?>
 ```
 
-> sUPDATE
+**SuperSQL->sINSERT($table, $data);**
 
+* `(String)table` - Table to insert to
+* `(Array)data` - Data to insert
+
+## sUPDATE
+
+> sUPDATE
 ```php
 <?php
 $SuperSQL->sUPDATE("developers",[ // UPDATE `developers` SET `is_happy` = 1, `reason` = 'Becaz SuperSQL is awesome!' WHERE `is_happy` = 0
@@ -514,8 +565,15 @@ $SuperSQL->sUPDATE("developers",[ // UPDATE `developers` SET `is_happy` = 1, `re
 ?>
 ```
 
-> sDELETE
+**SuperSQL->sUPDATE($table, $data, $where);**
 
+* `(String)table` - Table to insert to
+* `(Array)data` - Data to update
+* `(Array)where` - Conditional statements
+
+## sDELETE
+
+> sDELETE
 ```php
 <?php
 $SuperSQL->sDELETE("hackers",[ // DELETE FROM `hackers` WHERE `status` = 'Tried to SQL Inject attack a site' AND `encountered` = 'SuperSQL'
@@ -525,44 +583,12 @@ $SuperSQL->sDELETE("hackers",[ // DELETE FROM `hackers` WHERE `status` = 'Tried 
 ?>
 ```
 
-Simple API is for basic querying. It allows of lightning-fast, simple and easy querying. Unlike the advanced api, you cannot:
-
-* You cannot use other opererators besides `=` (Equal to)
-* No binds - Only `AND` is used
-* No multi-querying
-* No cache
-* No type casting
-
-### sSELECT
-**SuperSQL->SELECT($table, $columns, $where[, $append);**
-
-* `(String)table` - Table to query
-* `(Array)columns` - Columns to return. `[]` is `*`
-* `(Array)where` - Conditional statements
-* `(String)append` - Append to sql (Optional)
-
-### sINSERT
-**SuperSQL->sINSERT($table, $data);**
-
-* `(String)table` - Table to insert to
-* `(Array)data` - Data to insert
-
-### sUPDATE
-
-**SuperSQL->sUPDATE($table, $data, $where);**
-
-* `(String)table` - Table to insert to
-* `(Array)data` - Data to update
-* `(Array)where` - Conditional statements
-
-### sDELETE
-
 **SuperSQL->DELETE($table, $where);**
 
 * `(String)table` - Table to insert to
 * `(Array)where` - Conditional statements
 
-## Helper Functions
+# Helper Functions
 SuperSQL provides some helper functions to allow for easier access. The helper functions allow you to:
 
 * Connect easily
@@ -573,7 +599,7 @@ SuperSQL provides some helper functions to allow for easier access. The helper f
 If your using the built/compiled file, you must include `dist/SuperSQL_helper.php` too
 </aside>
 
-### SQLHelper::connect
+## SQLHelper::connect
 
 ```php
 <?php
@@ -610,7 +636,7 @@ Connect easily to any database.
 * `(String)dbtype` - DSN string
 
 
-### SQLHelper()
+## new SQLHelper()
 
 ```php
 <?php
@@ -663,35 +689,35 @@ Changes the selected connection
 
 * `(Int)id` - Connection id
 
-### getCon
+## getCon
 **$SQLHelper->getCon($all = false)**
 
 * `(Bool)all` - if true, will return all connections. If not, then will only return the selected one
 
-### SELECT
+## SELECT
 **$SQLHelper->SELECT($table,$columns,$where,$join,$limit/$append)**
 
 The SELECT query. The api is the same as normal SELECT or sSELECT. The helper will choose the most efficient way. (It will choose simple or advanced api based on certain conditions)
 
-### INSERT
+## INSERT
 
 **$SQLHelper->INSERT($table,$data)**
 
 The INSERT query. The api is the same as normal INSERT or sINSERT. The helper will choose the most efficient way. (It will choose simple or advanced api based on certain conditions)
 
-### UPDATE
+## UPDATE
 
 **$SQLHelper->UPDATE($table,$data,$where)**
 
 The UPDATE query. The api is the same as normal UPDATE or sUPDATE. The helper will choose the most efficient way. (It will choose simple or advanced api based on certain conditions)
 
-### DELETE
+## DELETE
 
 **$SQLHelper->DELETE($table,$where)**
 
 The DELETE query. The api is the same as normal DELETE or sDELETE. The helper will choose the most efficient way. (It will choose simple or advanced api based on certain conditions)
 
-### REPLACE
+## REPLACE
 
 ```php
 <?php
@@ -707,12 +733,12 @@ $SQLHelper->REPLACE("luggage",[
 * `(Array)data` - columns to replace
 * `(Array)where` - conditional statements
 
-### get
+## get
 **$SQLHelper->get($table,$columns,$where,$join)**
 
 Gets the first row
 
-### count
+## count
 ```php
 <?php
 echo $SQLHelper->count("table",array( // returns row count (int)
@@ -723,7 +749,7 @@ echo $SQLHelper->count("table",array( // returns row count (int)
 
 Get num of rows
 
-### max
+## max
 ```php
 <?php
 echo $SQLHelper->max("table","column"); // Returns biggest value for column
@@ -732,7 +758,7 @@ echo $SQLHelper->max("table","column"); // Returns biggest value for column
 
 Get the maximum value of a column
 
-### min
+## min
 ```php
 <?php
 echo $SQLHelper->min("table","column"); // Returns smallest value for column
@@ -741,7 +767,7 @@ echo $SQLHelper->min("table","column"); // Returns smallest value for column
 
 Get the minimum value of a column
 
-### avg
+## avg
 
 ```php
 <?php
@@ -751,7 +777,7 @@ echo $SQLHelper->avg("table","column"); // Returns average value for column
 
 Get the average value of a column
 
-### sum
+## sum
 
 ```php
 <?php
@@ -761,7 +787,7 @@ echo $SQLHelper->min("table","column"); // Returns sum of values in the column
 
 Get the sum of values in a column
 
-### create
+## create
 **$SQLHelper->create($table,$data)**
 
 Creates a table
@@ -769,14 +795,35 @@ Creates a table
 * `(String)table` - Table name to create
 * `(Array)data` - Array of keys and types
 
-### drop
+## drop
 **$SQLHelper->drop($table)**
 
 Removes a table
 
 * `(String)table` - Table name to delete
 
-## Super Advanced
+# Super Advanced
+
+## Transactions
+
+```php
+<?php
+$SuperSQL->transact(function () {
+
+$SuperSQL->DELETE("citizens",[
+    "near_explosion" => 1
+]);
+
+return false; // SuperSQL to the rescue! He reversed time (the query)
+});
+?>
+```
+
+**SuperSQL->transact($call);**
+
+* `(Callable)call` - Transaction Function. Return false to rollback
+
+## Logging
 
 > Logging
 
@@ -790,7 +837,6 @@ echo json_encode($a->getLog()); // Get some data
 ?>
 ```
 
-### Logging
 You find something isnt working for your website. You either:
 
 1. Rage quit, break everything, scream "I #%@&$@! HATE SUPERSQL"
