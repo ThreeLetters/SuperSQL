@@ -762,17 +762,16 @@
                             Programming guide: If you can, use raw queries. For example, theres nothing sensitive in `SELECT * FROM `table`, just do that instead of `$SuperSQL->SELECT("table");`
                         </aside>
                         <h1 id='advanced-functions'>Advanced Functions</h1>
-                        <pre class="highlight plaintext"><code>&lt;?php
-$SuperSQL-&gt;SELECT($table, $columns, $where[,$join[, $limit/$append);
+                        <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">SELECT</span><span class="p">(</span><span class="nv">$table</span><span class="p">,</span> <span class="nv">$columns</span><span class="p">,</span> <span class="nv">$where</span><span class="p">[,</span><span class="nv">$join</span><span class="p">[,</span> <span class="nv">$limit</span><span class="o">/</span><span class="nv">$append</span><span class="p">);</span>
 
-$SuperSQL-&gt;INSERT($table, $data);
+<span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">INSERT</span><span class="p">(</span><span class="nv">$table</span><span class="p">,</span> <span class="nv">$data</span><span class="p">);</span>
 
-$SuperSQL-&gt;UPDATE($table, $data, $where);
+<span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">UPDATE</span><span class="p">(</span><span class="nv">$table</span><span class="p">,</span> <span class="nv">$data</span><span class="p">,</span> <span class="nv">$where</span><span class="p">);</span>
 
-SuperSQL-&gt;DELETE($table, $where);
+<span class="nx">SuperSQL</span><span class="o">-&gt;</span><span class="na">DELETE</span><span class="p">(</span><span class="nv">$table</span><span class="p">,</span> <span class="nv">$where</span><span class="p">);</span>
 
-SuperSQL-&gt;REPLACE($table, $data, $where);
-?&gt;
+<span class="cp">?&gt;</span>
 </code></pre>
                         <p>Advanced functions are for doing advanced queries. Advanced query features include:</p>
 
