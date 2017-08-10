@@ -344,7 +344,7 @@ var advancedOnlyMin = `// lib/connector/index.php\n\
 ${minify(connector)}\n\
 // lib/parser/Advanced.php\n\
 ${minify(adv)}\n\
-// index.php\
+// index.php\n\
 ${minify(amain)}\n\
 ?>`;
 
