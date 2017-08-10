@@ -95,7 +95,7 @@ function removeComments(str) {
                 }
             }
         } else {
-            out.push(char)
+            out.push(char);
         }
 
     }
@@ -103,9 +103,18 @@ function removeComments(str) {
 }
 
 // Minifier -> https://github.com/ThreeLetters/PHP-Minify-js
-function minify(str) {
-    str = str.replace(/\n/g, "").split("");
-    //str = str.split("");
+function minify(str,options) {
+    if (!options) options = {};
+    str = removeComments(str);
+    var varReplace = options.varReplace === undefined ? true : options.varReplace;
+    var extreme = options.extremeMinify === undefined ? true : options.extremeMinify;
+    var removeLine = options.removeLine === undefined ? true : options.removeLine;
+    
+    if (removeLine) {
+        str = str.replace(/\n/g, "").replace(/\t/g,"").split("");
+    } else {
+       str = str.split("");
+    }
     var len = str.length;
     var out = [];
     var i = 0;
@@ -156,13 +165,14 @@ function minify(str) {
 
     function includes(char) {
 
-        var dt = [";", "{", "}", ",", "(", ")", "[", "]", "=", ">", "<", ".", "+", "-", "/", "*", "&", "|"];
+        var dt = [";", "{", "}", ",", "(", ")", "[", "]", "=", ">", "<", "."];
+        if (extreme) dt.push("&","|","+","-","*","/");
         return dt.indexOf(char) != -1;
     }
 
     function includes2(char) {
-        var dt = ["=", "{", "(", "}", ")", "]", ">", "<", "!", ".", "$", "&", "|", "+", "-", "/", "*"];
-
+        var dt = ["=", "{", "(", "}", ")", "]", ">", "<", "!", "."];
+        if (extreme) dt.push("$","&","|","+","-","*","/");
         return dt.indexOf(char) != -1;
     }
 
@@ -181,7 +191,7 @@ function minify(str) {
             skip("'");
         } else if (char == "`") {
             skip("`");
-        } else if (char == "$") {
+        } else if (varReplace && char == "$") {
 
             var v = "";
             for (; i < len; i++) {
@@ -189,11 +199,9 @@ function minify(str) {
                 if (!includes3(str[i + 1])) break;
                 v += str[i + 1];
             }
-
-
             if (varMap[v]) {
                 out.push(varMap[v]);
-            } else {
+            } else if (v != "this") {
                 var found = false;
                 for (var j = i; j < len; j++) {
                     if (str[j + 1] == "=" || str[j + 1] == "," || str[j + 1] == ")") {
@@ -205,7 +213,7 @@ function minify(str) {
                 }
                 if (found) {
                     for (var j = i - v.length - 1; j > 0; j--) {
-                        if (str[j] == "c" || str[j] == "e" || str[j] == "l") {
+                        if (str[j] == "c" || str[j] == "e" || str[j] == "l" || str[j] == "d") {
                             found = false;
                             break;
                         } else if (str[j] != " ") {
@@ -220,6 +228,8 @@ function minify(str) {
                 } else {
                     out.push("$" + v);
                 }
+            } else {
+                out.push("$" + v);
             }
             //console.log(v);
 
