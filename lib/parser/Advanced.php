@@ -42,7 +42,7 @@ class AdvParser
      *
      * @returns {String|Boolean}
      */
-    private static function getArg(&$str)
+    static function getArg(&$str)
     {
         if (substr($str, 0, 1) == "[" && substr($str, 3, 1) == "]") {
             $out = substr($str, 1, 2);
@@ -59,7 +59,7 @@ class AdvParser
      * @param {&Array} args - Arguments to append to
      * @param {String|Int|Boolean|Array} val - Value(s) to append
      */
-    private static function append(&$args, $val, $index, $values)
+    static function append(&$args, $val, $index, $values)
     {
         if (gettype($val) == "array" && $values[$index][2] < 5) {
             $len = count($val);
@@ -79,7 +79,7 @@ class AdvParser
      * @param {Array} dt - Values to append
      */
     
-    private static function append2(&$insert, $indexes, $dt, $values)
+    static function append2(&$insert, $indexes, $dt, $values)
     {
         function stripArgs(&$key)
         {
@@ -169,7 +169,7 @@ class AdvParser
      *
      * @returns {String}
      */
-    private static function quote($str)
+    static function quote($str)
     {
         $str = explode(".", $str);
         $out = "";
@@ -188,7 +188,7 @@ class AdvParser
      *
      * @returns {String}
      */
-    private static function table($table)
+    static function table($table)
     {
         if (gettype($table) == "array") {
             $sql = "";
@@ -208,7 +208,7 @@ class AdvParser
         }
     }
     
-    private static function value($type, $value, &$typeString)
+    static function value($type, $value, &$typeString)
     {
         $var = strtolower($type);
         if (!$var)
@@ -258,7 +258,7 @@ class AdvParser
         );
     }
     
-    private static function getType(&$str)
+    static function getType(&$str)
     {   
         if (substr($str, -1) == "]") {
             $start = strrpos($str, "[");
@@ -274,7 +274,7 @@ class AdvParser
         
     }
     
-    private static function rmComments($str) {
+    static function rmComments($str) {
         $i = strpos($str,"#");
         if ($i !== false) {
             $str = substr($str,0,$i);
@@ -289,7 +289,7 @@ class AdvParser
      *
      * @returns {String}
      */
-    private static function conditions($dt, &$values = false, &$map = false, &$typeString = "", &$index = 0)
+    static function conditions($dt, &$values = false, &$map = false, &$typeString = "", &$index = 0)
     {
         $build = function(&$build, $dt, &$map, &$index, &$values, &$typeString, $join = " AND ", $operator = " = ", $parent = "")
         {
@@ -412,6 +412,45 @@ class AdvParser
         return $build($build, $dt, $map, $index, $values, $typeString);
     }
     
+    static function JOIN($join, &$sql) {
+        foreach ($join as $key => $val) {
+                if (substr($key, 0, 1) === "#") {
+                    $raw = true;
+                    $key = substr($key, 1);
+                } else {
+                    $raw = false;
+                }
+                
+                $arg = self::getArg($key);
+                switch ($arg) {
+                    case "<<":
+                        
+                        $sql .= " RIGHT JOIN ";
+                        break;
+                    case ">>":
+                        
+                        $sql .= " LEFT JOIN ";
+                        break;
+                    case "<>":
+                        
+                        $sql .= " FULL JOIN ";
+                        break;
+                    default: // inner join
+                        
+                        $sql .= " JOIN ";
+                        break;
+                }
+                
+                $sql .= self::quote($key) . " ON ";
+                
+                if ($raw) {
+                    $sql .= "val";
+                } else {
+                    $sql .= self::conditions($val);
+                }
+            }
+    }
+    
     /**
      * Constructs SQL commands (SELECT)
      *
@@ -487,42 +526,7 @@ class AdvParser
         $sql .= " FROM " . self::table($table);
         
         if ($join) {
-            foreach ($join as $key => $val) {
-                if (substr($key, 0, 1) === "#") {
-                    $raw = true;
-                    $key = substr($key, 1);
-                } else {
-                    $raw = false;
-                }
-                
-                $arg = self::getArg($key);
-                switch ($arg) {
-                    case "<<":
-                        
-                        $sql .= " RIGHT JOIN ";
-                        break;
-                    case ">>":
-                        
-                        $sql .= " LEFT JOIN ";
-                        break;
-                    case "<>":
-                        
-                        $sql .= " FULL JOIN ";
-                        break;
-                    default: // inner join
-                        
-                        $sql .= " JOIN ";
-                        break;
-                }
-                
-                $sql .= self::quote($key) . " ON ";
-                
-                if ($raw) {
-                    $sql .= "val";
-                } else {
-                    $sql .= self::conditions($val);
-                }
-            }
+            self::JOIN($join,$sql);
         }
         $typeString = "";
         if (count($where) != 0) {

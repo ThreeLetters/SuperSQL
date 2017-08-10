@@ -3,7 +3,7 @@
  Author: Andrews54757
  License: MIT (https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE)
  Source: https://github.com/ThreeLetters/SQL-Library
- Build: v1.0.0
+ Build: v1.0.1
  Built on: 09/08/2017
 */
 
@@ -224,6 +224,42 @@ class SQLHelper
          } else {
             return $this->s->sDELETE($table,$where);
          } 
+    }
+    function sqBase($sql, $where, $join) {
+        $values = array();
+        if ($join) {
+            AdvParser::JOIN($join,$sql);
+        }
+        $typeString = "";
+        if (count($where) != 0) {
+            $sql .= " WHERE ";
+            $sql .= AdvParser::conditions($where, $values);
+        }
+       $res = $this->_query($sql,$values)[0];
+       return $res->fetchColumn();
+    }
+    function count($table, $where = array(), $join = array()) {
+       return $this->sqBase("SELECT COUNT(*) FROM `" . $table . "`",$where,$join);
+    }
+    function avg() {
+       return $this->sqBase("SELECT AVG(`" . $column ."`) FROM `" . $table . "`",$where,$join);
+    }
+    function max($table, $column, $where = array(), $join = array()) {
+        return $this->sqBase("SELECT MAX(`" . $column ."`) FROM `" . $table . "`",$where,$join);
+    }
+    function min($table, $column, $where = array(), $join = array()) {
+        return $this->sqBase("SELECT MIN(`" . $column ."`) FROM `" . $table . "`",$where,$join);
+    }
+    function sum($table, $column, $where = array(), $join = array()) {
+        return $this->sqBase("SELECT SUM(`" . $column ."`) FROM `" . $table . "`",$where,$join);
+    }
+    function _query($sql, $obj) {
+        $q = $this->s->con->db->prepare($sql);
+        foreach ($obj as $key => &$va) {
+                $q->bindParam($key + 1, $va[0],$va[1]);
+        }
+        $e = $q->execute();
+        return array($q,$e);
     }
     function query($a,$b=null) {
         return $this->s->con->query($a,$b);
