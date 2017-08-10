@@ -35,7 +35,7 @@ SlickInject and Medoo on steroids - The most advanced and lightweight library of
 
 ### Main Features
 
-1. Very small - 24.2KB one file (Unminified, `dist/SuperSQL.php`. Minified version: 10.2KB)
+1. Very small - 28.5KB one file (Unminified, `dist/SuperSQL.php`. Minified version: 11.8KB)
 2. Simple and easy - Very easy to lean. We also provide a simple and advanced API
 3. Compatability - Supports major SQL databases
 4. Customisability - We offer multiple files for your needs
@@ -85,8 +85,8 @@ $where = array(
  ],
  "arg9" => ["val9a","val9b"],
  
- "[~~]arg10" => "%arg10%",
- "[!~]arg11" => "%arg11%"
+ "arg10[~~]" => "%arg10%",
+ "arg11[!~]" => "%arg11%"
 );
 ?>
 ```
@@ -711,6 +711,55 @@ $SQLHelper->REPLACE("luggage",[
 **$SQLHelper->get($table,$columns,$where,$join)**
 
 Gets the first row
+
+### count
+```php
+<?php
+echo $SQLHelper->count("table",array( // returns row count (int)
+"condition" => 1
+);
+```
+**$SQLHelper->count($table,$where,$join)**
+
+Get num of rows
+
+### max
+```php
+<?php
+echo $SQLHelper->max("table","column"); // Returns biggest value for column
+```
+**$SQLHelper->max($table,$column,$where,$join)**
+
+Get the maximum value of a column
+
+### min
+```php
+<?php
+echo $SQLHelper->min("table","column"); // Returns smallest value for column
+```
+**$SQLHelper->min($table,$column,$where,$join)**
+
+Get the minimum value of a column
+
+### avg
+
+```php
+<?php
+echo $SQLHelper->avg("table","column"); // Returns average value for column
+```
+**$SQLHelper->avg($table,$column,$where,$join)**
+
+Get the average value of a column
+
+### sum
+
+```php
+<?php
+echo $SQLHelper->min("table","column"); // Returns sum of values in the column
+```
+**$SQLHelper->sum($table,$column,$where,$join)**
+
+Get the sum of values in a column
 
 ### create
 **$SQLHelper->create($table,$data)**

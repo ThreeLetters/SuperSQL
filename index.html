@@ -325,7 +325,7 @@
 </ol>
 <h3 id='main-features'>Main Features</h3>
 <ol>
-<li>Very small - 24.2KB one file (Unminified, <code>dist/SuperSQL.php</code>. Minified version: 10.2KB)</li>
+<li>Very small - 28.5KB one file (Unminified, <code>dist/SuperSQL.php</code>. Minified version: 11.8KB)</li>
 <li>Simple and easy - Very easy to lean. We also provide a simple and advanced API</li>
 <li>Compatability - Supports major SQL databases</li>
 <li>Customisability - We offer multiple files for your needs</li>
@@ -370,8 +370,8 @@
  <span class="p">],</span>
  <span class="s2">"arg9"</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s2">"val9a"</span><span class="p">,</span><span class="s2">"val9b"</span><span class="p">],</span>
 
- <span class="s2">"[~~]arg10"</span> <span class="o">=&gt;</span> <span class="s2">"%arg10%"</span><span class="p">,</span>
- <span class="s2">"[!~]arg11"</span> <span class="o">=&gt;</span> <span class="s2">"%arg11%"</span>
+ <span class="s2">"arg10[~~]"</span> <span class="o">=&gt;</span> <span class="s2">"%arg10%"</span><span class="p">,</span>
+ <span class="s2">"arg11[!~]"</span> <span class="o">=&gt;</span> <span class="s2">"%arg11%"</span>
 <span class="p">);</span>
 <span class="cp">?&gt;</span>
 </code></pre>
@@ -947,6 +947,38 @@ If your using the built/compiled file, you must include `dist/SuperSQL_helper.ph
 <p><strong>$SQLHelper-&gt;get($table,$columns,$where,$join)</strong></p>
 
 <p>Gets the first row</p>
+<h3 id='count'>count</h3><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="k">echo</span> <span class="nv">$SQLHelper</span><span class="o">-&gt;</span><span class="na">count</span><span class="p">(</span><span class="s2">"table"</span><span class="p">,</span><span class="k">array</span><span class="p">(</span> <span class="c1">// returns row count (int)
+</span><span class="s2">"condition"</span> <span class="o">=&gt;</span> <span class="mi">1</span>
+<span class="p">);</span>
+</code></pre>
+<p><strong>$SQLHelper-&gt;count($table,$where,$join)</strong></p>
+
+<p>Get num of rows</p>
+<h3 id='max'>max</h3><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="k">echo</span> <span class="nv">$SQLHelper</span><span class="o">-&gt;</span><span class="na">max</span><span class="p">(</span><span class="s2">"table"</span><span class="p">,</span><span class="s2">"column"</span><span class="p">);</span> <span class="c1">// Returns biggest value for column
+</span></code></pre>
+<p><strong>$SQLHelper-&gt;max($table,$column,$where,$join)</strong></p>
+
+<p>Get the maximum value of a column</p>
+<h3 id='min'>min</h3><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="k">echo</span> <span class="nv">$SQLHelper</span><span class="o">-&gt;</span><span class="na">min</span><span class="p">(</span><span class="s2">"table"</span><span class="p">,</span><span class="s2">"column"</span><span class="p">);</span> <span class="c1">// Returns smallest value for column
+</span></code></pre>
+<p><strong>$SQLHelper-&gt;min($table,$column,$where,$join)</strong></p>
+
+<p>Get the minimum value of a column</p>
+<h3 id='avg'>avg</h3><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="k">echo</span> <span class="nv">$SQLHelper</span><span class="o">-&gt;</span><span class="na">avg</span><span class="p">(</span><span class="s2">"table"</span><span class="p">,</span><span class="s2">"column"</span><span class="p">);</span> <span class="c1">// Returns average value for column
+</span></code></pre>
+<p><strong>$SQLHelper-&gt;avg($table,$column,$where,$join)</strong></p>
+
+<p>Get the average value of a column</p>
+<h3 id='sum'>sum</h3><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="k">echo</span> <span class="nv">$SQLHelper</span><span class="o">-&gt;</span><span class="na">min</span><span class="p">(</span><span class="s2">"table"</span><span class="p">,</span><span class="s2">"column"</span><span class="p">);</span> <span class="c1">// Returns sum of values in the column
+</span></code></pre>
+<p><strong>$SQLHelper-&gt;sum($table,$column,$where,$join)</strong></p>
+
+<p>Get the sum of values in a column</p>
 <h3 id='create'>create</h3>
 <p><strong>$SQLHelper-&gt;create($table,$data)</strong></p>
 
