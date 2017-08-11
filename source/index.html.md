@@ -35,7 +35,7 @@ SlickInject and Medoo on steroids - The most advanced and lightweight library of
 
 ### Main Features
 
-1. Very small - 28.5KB one file (Unminified, `dist/SuperSQL.php`. Minified version: 11.8KB)
+1. Very small - 28.5KB one file (Unminified, `dist/SuperSQL.php`. Minified version: 12KB)
 2. Simple and easy - Very easy to lean. We also provide a simple and advanced API
 3. Compatability - Supports major SQL databases
 4. Customisability - We offer multiple files for your needs
@@ -68,7 +68,7 @@ It will build to `/dist/SuperSQL.php`
 These are the basic functionalities of SuperSQL. 
 
 <aside class="notice">
-Most of the features listed here are for ADVANCED API. Except for Simple (Simple API), Cache (Its global), and Responses
+Most of the features listed here are for ADVANCED API. Except for Simple (Simple API) and Responses
 </aside>
 
 ## Responses
@@ -109,8 +109,8 @@ $response->reset(); // Reset iterator so you can do the above code again
 
 When you make a query, SuperSQL will return a SQLResponse object.
 
-### Response->getData()
-Get all rows
+### Response->getData($dontFetch = false)
+Get all rows. If dontfetch is true, then it will only return the results that have already been fetched
 
 ### Response->error() 
 Returns error object if there is one. False otherwise
@@ -125,7 +125,7 @@ Get next row
 Reset iterator.
 
 <aside class="notice">
-All rows are retrieved and stored at object initialisation. `Response->next()` or `Response->reset()` does not affect the database or connection
+Using Response->next is recommended as it is more efficient - It will fetch the row from db when it gets there, rather than fetching all at start
 </aside>
 
 ## Conditionals
@@ -350,9 +350,6 @@ If you are making simple queries, you may use simple functions to boost performa
 Use simple API as much as you can! It is lightning fast! Otherwise, use the helper functions - they will decide for you.
 </aside>
 
-## Cache
-Performance is boosted for a query if an identical query before it (with different values [EG where vals, join, insert]), is made right before. You can also clear the cache by doing: `$SuperSQL->clearCache()`
-
 ## Custom Queries
 
 Custom queries can be made using `$SuperSQL->query($query)`.
@@ -364,7 +361,7 @@ Programming guide: If you can, use raw queries. For example, theres nothing sens
 
 # Advanced Functions
 
-```
+```php
 <?php
 $SuperSQL->SELECT($table, $columns, $where[,$join[, $limit/$append);
 
@@ -374,7 +371,6 @@ $SuperSQL->UPDATE($table, $data, $where);
 
 SuperSQL->DELETE($table, $where);
 
-SuperSQL->REPLACE($table, $data, $where);
 ?>
 ```
 
@@ -509,7 +505,6 @@ Simple API is for basic querying. It allows of lightning-fast, simple and easy q
 * You cannot use other opererators besides `=` (Equal to)
 * No binds - Only `AND` is used
 * No multi-querying
-* No cache
 * No type casting
 
 <aside class="notice">
@@ -682,7 +677,7 @@ Initialise the helper
 
 * `(Array)connect` - Array of connection data - Uses Helper::connect
 
-### Change
+## Change
 **$SQLHelper->change($id)**
 
 Changes the selected connection
@@ -853,9 +848,7 @@ Afterwords, do `$SuperSQL->getLog()` to get the log.
 <?php
 $log = [
     [
-    "fromCache" // If this is there, it means it used the cache.
     "SELECT * FROM `table` WHERE `test` = ?", // SQL base
-    "s", // String of arg types
     [[24424,1]], // Array of initial values with types. In this case, the value is 24424 and the type is an INT (PDO::PARAM_INT)
     [["0":234]] // Multi-query array
     ]
@@ -863,8 +856,15 @@ $log = [
 ?>
 ```
 
-* fromCache - If there, it means it reused an old query for efficiency
 * SQL - SQL base. `?` are replaced with values
-* typeString - String of types, mysqli_bind_param style.
 * Values - Initial values with types. NOTE: This is bound onto the SQL base string
 * Insert - Multi-query array
+
+## modeLock
+```php
+<?php
+$SuperSQL->modeLock(true);
+?>
+```
+
+Modelock locks the fetch mode. By default, fetching is dynamic for performance. However, if you want to have it fetch all rows at the start, then set to true.
