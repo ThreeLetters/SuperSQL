@@ -74,7 +74,13 @@ class Response
             $this->result = array();
         }
     }
-    
+    function close() {
+            $this->complete = true;
+        if ($this->stmt) {
+            $this->stmt->closeCursor();
+            $this->stmt = null;
+        }
+    }
     function fetchNextRow() {
        $row = $this->stmt->fetch();
         if ($row) {

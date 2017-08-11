@@ -4,7 +4,7 @@
  License: MIT (https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE)
  Source: https://github.com/ThreeLetters/SQL-Library
  Build: v1.0.2
- Built on: 10/08/2017
+ Built on: 11/08/2017
 */
 
 // lib/connector/index.php
@@ -43,6 +43,13 @@ class Response
         } else if ($mode === 1) { 
             $this->stmt = $data;
             $this->result = array();
+        }
+    }
+    function close() {
+            $this->complete = true;
+        if ($this->stmt) {
+            $this->stmt->closeCursor();
+            $this->stmt = null;
         }
     }
     function fetchNextRow() {

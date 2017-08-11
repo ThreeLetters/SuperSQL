@@ -190,13 +190,22 @@ class SQLHelper
         return false;
     }
     
-    private static function containsAdv($arr) {
-        foreach ($arr as $key => $val) {
+    private static function containsAdv($arr,$col = false) {
+        if ($col) {
+        foreach ($arr as $key => &$val) {
            if (is_array($val)) return true;
             
-            if (self::includes($key,array('[','#')) || self::includes($val,array('['))) return true;
+            if (self::includes($val,array('['))) return true;
             
             if (self::includes($val,array('DISTINCT','INSERT INTO','INTO'))) return true;
+        }
+        } else {
+        foreach ($arr as $key => &$val) {
+           if (is_array($val)) return true;
+            
+            if (self::includes($key,array('[','#'))) return true;
+               
+        }
         }
         return false;
     }
@@ -280,7 +289,7 @@ class SQLHelper
     }
     
     function select($table,$columns = array(),$where = array(),$join = null,$limit = false) {
-        if (is_array($table) || self::containsAdv($columns) || self::containsAdv($where) || $join) {
+        if (is_array($table) || self::containsAdv($columns, true) || self::containsAdv($where) || $join) {
             return $this->s->SELECT($table,$columns,$where,$join,$limit);
         } else {
             if (is_int($limit)) $limit = 'LIMIT ' . (int)$limit;

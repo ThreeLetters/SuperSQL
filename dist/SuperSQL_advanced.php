@@ -4,7 +4,7 @@
  License: MIT (https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE)
  Source: https://github.com/ThreeLetters/SQL-Library
  Build: v1.0.2
- Built on: 10/08/2017
+ Built on: 11/08/2017
 */
 
 // lib/connector/index.php
@@ -43,6 +43,13 @@ class Response
         } else if ($mode === 1) { 
             $this->stmt = $data;
             $this->result = array();
+        }
+    }
+    function close() {
+            $this->complete = true;
+        if ($this->stmt) {
+            $this->stmt->closeCursor();
+            $this->stmt = null;
         }
     }
     function fetchNextRow() {
@@ -182,7 +189,7 @@ class AdvParser
 {
     static function getArg(&$str)
     {
-        if (substr($str, 0, 1) === '[' && substr($str, 3, 1) === ']') {
+        if ($str[0] === '[' && substr($str, 3, 1) === ']') {
             $out = substr($str, 1, 2);
             $str = substr($str, 4);
             return $out;
@@ -212,7 +219,7 @@ class AdvParser
             $b = strrpos($key, ']', -1);
             if ($b !== false)
                 $key = substr($key, $b + 1);
-            if (substr($key, 0, 1) === '#') {
+            if ($key[0] === '#') {
                     $key = substr($key, 1);
              }
         }
@@ -313,23 +320,21 @@ class AdvParser
     }
     static function value($type, $value)
     {
-        $var = strtolower($type);
-        if (!$var)
-            $var = strtolower(gettype($value));
+        $var = $type ? $type : gettype($value);
         $type = \PDO::PARAM_STR;
         $dtype = 2;
         if ($var === 'integer' || $var === 'int' || $var === 'double' || $var === 'doub') {
+            $type = \PDO::PARAM_INT;
             $dtype = 1;
             $value = (int) $value;
         } else if ($var === 'string' || $var === 'str') {
-            $type = \PDO::PARAM_STR;
             $value = (string) $value;
             $dtype = 2;
         } else if ($var === 'boolean' || $var === 'bool') {
             $type  = \PDO::PARAM_BOOL;
             $value = $value ? '1' : '0';
             $dtype = 0;
-        } else if ($var === 'null') {
+        } else if ($var === 'null' || $var === 'NULL') {
             $dtype = 4;
             $type  = \PDO::PARAM_NULL;
             $value = null;
@@ -338,11 +343,9 @@ class AdvParser
             $dtype = 3;
         } else if ($var === 'json') {
             $dtype = 5;
-            $type = \PDO::PARAM_STR;
             $value = json_encode($value);
         } else if ($var === 'obj') {
               $dtype = 6;
-            $type = \PDO::PARAM_STR;
             $value = serialize($value);
         } else {
             $value = (string)$value;
@@ -356,7 +359,8 @@ class AdvParser
     }
     static function getType(&$str)
     {   
-        if (substr($str, -1) === ']') {
+        $len = strlen($str);
+        if ($str[$len - 1] === ']') {
             $start = strrpos($str, '[');
             if ($start === false) {
                 return '';
@@ -370,9 +374,9 @@ class AdvParser
     static function rmComments($str) {
         $i = strpos($str,'#');
         if ($i !== false) {
-            $str = substr($str,0,$i);
+            $str = trim(substr($str,0,$i));
         }
-        return trim($str);
+        return $str;
     }
     static function conditions($dt, &$values = false, &$map = false, &$index = 0)
     {
@@ -381,7 +385,7 @@ class AdvParser
             $num = 0;
             $sql = '';
             foreach ($dt as $key => &$val) {
-                if (substr($key, 0, 1) === '#') {
+                if ($key[0] === '#') {
                     $raw = true;
                     $key = substr($key, 1);
                 } else {
@@ -489,7 +493,7 @@ class AdvParser
     }
     static function JOIN($join, &$sql) {
         foreach ($join as $key => &$val) {
-                if (substr($key, 0, 1) === '#') {
+                if ($key[0] === '#') {
                     $raw = true;
                     $key = substr($key, 1);
                 } else {
@@ -541,7 +545,7 @@ class AdvParser
                 $into = ' ' . $columns[0] . ' ';
             }
             if ($len > $req) { 
-                for ($i = $req; $i < $len; $i++) {
+                for ($i = $req; isset($columns[$i]); $i++) {
                     $b = self::getType($columns[$i]);
                     $t = $b ? self::getType($columns[$i]) : false;
                     if (!$t && $b) {
@@ -609,7 +613,7 @@ class AdvParser
         $multi   = isset($data[0]);
         $dt      = $multi ? $data[0] : $data;
         foreach ($dt as $key => &$val) {
-            if (substr($key, 0, 1) === '#') {
+            if ($key[0] === '#') {
                 $raw = true;
                 $key = substr($key, 1);
             } else {
@@ -654,7 +658,7 @@ class AdvParser
         $multi      = isset($data[0]);
         $dt         = $multi ? $data[0] : $data;
         foreach ($dt as $key => &$val) {
-            if (substr($key, 0, 1) === '#') {
+            if ($key[0] === '#') {
                 $raw = true;
                 $key = substr($key, 1);
             } else {
