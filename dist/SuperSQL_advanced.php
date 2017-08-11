@@ -531,23 +531,25 @@ class AdvParser
         if (!isset($columns[0])) { 
             $sql .= '*';
         } else { 
-            $len = count($columns);
             $req  = 0;
             $into = '';
             if ($columns[0] === 'DISTINCT') {
                 $req = 1;
                 $sql .= 'DISTINCT ';
+                array_splice($columns,0,1);
             } else if (substr($columns[0], 0, 11) === 'INSERT INTO') {
                 $req = 1;
                 $sql = $columns[0] . ' ' . $sql;
+                array_splice($columns,0,1);
             } else if (substr($columns[0], 0, 4) === 'INTO') {
                 $req  = 1;
                 $into = ' ' . $columns[0] . ' ';
+                array_splice($columns,0,1);
             }
-            if ($len > $req) { 
-                for ($i = $req; isset($columns[$i]); $i++) {
-                    $b = self::getType($columns[$i]);
-                    $t = $b ? self::getType($columns[$i]) : false;
+            if (isset($columns[0])) { 
+                foreach ($columns as $i => &$val) {
+                    $b = self::getType($val);
+                    $t = $b ? self::getType($val) : false;
                     if (!$t && $b) {
                         if (!($b === 'int' || $b === 'string' || $b === 'json' || $b === 'obj' || $b === 'bool')) {
                             $t = $b;
@@ -557,15 +559,15 @@ class AdvParser
                     if ($b) {
                         if (!$outTypes) $outTypes = array();
                         if ($t) {
-                      $outTypes[$t] = $b;
+                        $outTypes[$t] = $b;
                         } else {
-                        $outTypes[$columns[$i]] = $b;
+                        $outTypes[$val] = $b;
                         }
                     }
-                    if ($i > $req) {
+                    if ($i != 0) {
                         $sql .= ', ';
                     }
-                    $sql .= self::quote($columns[$i]);
+                    $sql .= self::quote($val);
                     if ($t)
                         $sql .= ' AS `' . $t . '`';
                 }
