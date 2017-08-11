@@ -266,9 +266,6 @@
                     <a href="#simple" class="toc-h2 toc-link" data-title="Basics">Simple</a>
                   </li>
                   <li>
-                    <a href="#cache" class="toc-h2 toc-link" data-title="Basics">Cache</a>
-                  </li>
-                  <li>
                     <a href="#custom-queries" class="toc-h2 toc-link" data-title="Basics">Custom Queries</a>
                   </li>
               </ul>
@@ -372,6 +369,9 @@
                   <li>
                     <a href="#logging" class="toc-h2 toc-link" data-title="Super Advanced">Logging</a>
                   </li>
+                  <li>
+                    <a href="#modelock" class="toc-h2 toc-link" data-title="Super Advanced">modeLock</a>
+                  </li>
               </ul>
           </li>
       </div>
@@ -402,7 +402,7 @@
 </ol>
 <h3 id='main-features'>Main Features</h3>
 <ol>
-<li>Very small - 28.5KB one file (Unminified, <code>dist/SuperSQL.php</code>. Minified version: 11.8KB)</li>
+<li>Very small - 28.5KB one file (Unminified, <code>dist/SuperSQL.php</code>. Minified version: 12KB)</li>
 <li>Simple and easy - Very easy to lean. We also provide a simple and advanced API</li>
 <li>Compatability - Supports major SQL databases</li>
 <li>Customisability - We offer multiple files for your needs</li>
@@ -431,7 +431,7 @@
 <p>These are the basic functionalities of SuperSQL. </p>
 
 <aside class="notice">
-Most of the features listed here are for ADVANCED API. Except for Simple (Simple API), Cache (Its global), and Responses
+Most of the features listed here are for ADVANCED API. Except for Simple (Simple API) and Responses
 </aside>
 <h2 id='responses'>Responses</h2>
 <blockquote>
@@ -467,8 +467,8 @@ Most of the features listed here are for ADVANCED API. Except for Simple (Simple
 </span><span class="cp">?&gt;</span>
 </code></pre>
 <p>When you make a query, SuperSQL will return a SQLResponse object.</p>
-<h3 id='response-gt-getdata'>Response-&gt;getData()</h3>
-<p>Get all rows</p>
+<h3 id='response-gt-getdata-dontfetch-false'>Response-&gt;getData($dontFetch = false)</h3>
+<p>Get all rows. If dontfetch is true, then it will only return the results that have already been fetched</p>
 <h3 id='response-gt-error'>Response-&gt;error()</h3>
 <p>Returns error object if there is one. False otherwise</p>
 <h3 id='response-gt-getaffected'>Response-&gt;getAffected()</h3>
@@ -479,7 +479,7 @@ Most of the features listed here are for ADVANCED API. Except for Simple (Simple
 <p>Reset iterator.</p>
 
 <aside class="notice">
-All rows are retrieved and stored at object initialisation. `Response->next()` or `Response->reset()` does not affect the database or connection
+Using Response->next is recommended as it is more efficient - It will fetch the row from db when it gets there, rather than fetching all at start
 </aside>
 <h2 id='conditionals'>Conditionals</h2>
 <blockquote>
@@ -680,8 +680,6 @@ Aliases go after the key, not before ex: `[alias]key` is WRONG, `key[alias]` is 
 <aside class="success">
 Use simple API as much as you can! It is lightning fast! Otherwise, use the helper functions - they will decide for you.
 </aside>
-<h2 id='cache'>Cache</h2>
-<p>Performance is boosted for a query if an identical query before it (with different values [EG where vals, join, insert]), is made right before. You can also clear the cache by doing: <code>$SuperSQL-&gt;clearCache()</code></p>
 <h2 id='custom-queries'>Custom Queries</h2>
 <p>Custom queries can be made using <code>$SuperSQL-&gt;query($query)</code>.</p>
 
@@ -818,7 +816,6 @@ You can also use some special operators on the data argument. Example: `$SuperSQ
 <li>You cannot use other opererators besides <code>=</code> (Equal to)</li>
 <li>No binds - Only <code>AND</code> is used</li>
 <li>No multi-querying</li>
-<li>No cache</li>
 <li>No type casting</li>
 </ul>
 
@@ -1138,9 +1135,7 @@ If your using the built/compiled file, you must include `dist/SuperSQL_helper.ph
 <h3 id='da-log-what-does-it-mean'>Da log - What does it mean?</h3><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="nv">$log</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">[</span>
-    <span class="s2">"fromCache"</span> <span class="c1">// If this is there, it means it used the cache.
-</span>    <span class="s2">"SELECT * FROM `table` WHERE `test` = ?"</span><span class="p">,</span> <span class="c1">// SQL base
-</span>    <span class="s2">"s"</span><span class="p">,</span> <span class="c1">// String of arg types
+    <span class="s2">"SELECT * FROM `table` WHERE `test` = ?"</span><span class="p">,</span> <span class="c1">// SQL base
 </span>    <span class="p">[[</span><span class="mi">24424</span><span class="p">,</span><span class="mi">1</span><span class="p">]],</span> <span class="c1">// Array of initial values with types. In this case, the value is 24424 and the type is an INT (PDO::PARAM_INT)
 </span>    <span class="p">[[</span><span class="s2">"0"</span><span class="o">:</span><span class="mi">234</span><span class="p">]]</span> <span class="c1">// Multi-query array
 </span>    <span class="p">]</span>
@@ -1148,12 +1143,15 @@ If your using the built/compiled file, you must include `dist/SuperSQL_helper.ph
 <span class="cp">?&gt;</span>
 </code></pre>
 <ul>
-<li>fromCache - If there, it means it reused an old query for efficiency</li>
 <li>SQL - SQL base. <code>?</code> are replaced with values</li>
-<li>typeString - String of types, mysqli_bind_param style.</li>
 <li>Values - Initial values with types. NOTE: This is bound onto the SQL base string</li>
 <li>Insert - Multi-query array</li>
 </ul>
+<h2 id='modelock'>modeLock</h2><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">modeLock</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+<span class="cp">?&gt;</span>
+</code></pre>
+<p>Modelock locks the fetch mode. By default, fetching is dynamic for performance. However, if you want to have it fetch all rows at the start, then set to true.</p>
 
       </div>
       <div class="dark-box">
