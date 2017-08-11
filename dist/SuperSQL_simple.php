@@ -290,7 +290,7 @@ class SuperSQL
     function sSELECT($table, $columns = array(), $where = array(), $append = "")
     {
         $d = SimParser::SELECT($table, $columns, $where, $append);
-        return $this->con->query($d[0], $d[1],$this->lockMode ? 0 : 1);
+        return $this->con->query($d[0], $d[1],null,$this->lockMode ? 0 : 1);
     }
     function sINSERT($table, $data)
     {
