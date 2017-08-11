@@ -36,56 +36,89 @@ class Response
 {
     public $result;
     public $affected;
-    public $ind;
+    public $ind = 0;
     public $error;
     public $errorData;
+    public $outTypes;
+    public $complete = false;
+    public $stmt;
     
     /**
      * Gets data from a query
      */
-    function __construct($data, $error, $outtypes)
+    function __construct($data, $error, &$outtypes, &$mode)
     {
-  
         $this->error = !$error;
         if (!$error) {
             $this->errorData = $data->errorInfo();
         } else {
+            $this->outTypes = $outtypes;
+            $this->init($data,$mode);
+            $this->affected = $data->rowCount();
+        }
+    }
+    function init(&$data, &$mode) {
+        if ($mode === 0) { // fetch all
+            $outtypes = $this->outTypes;
             $d = $data->fetchAll();
+            
+            if ($outtypes) {
+                foreach ($d as $i => &$row) {
+                    $this->map($row,$outtypes);
+                }
+            }
             $this->result = $d;
-            if (count($outtypes) != 0) {
-                foreach ($d as $i => $row) {
+            $this->complete = true;
+        } else if ($mode === 1) { // fetch row-by-row
+            $this->stmt = $data;
+            $this->result = array();
+        }
+    }
+    
+    function fetchNextRow() {
+       $row = $this->stmt->fetch();
+        if ($row) {
+         if ($this->outTypes) {
+        $this->map($row,$this->outTypes);   
+        }
+        array_push($this->result,$row);
+        return $row;
+        } else {
+            $this->complete = true;
+            $this->stmt->closeCursor();
+            $this->stmt = null;
+            return false;
+        }
+    }
+    function fetchAll() {
+        while ($row = $this->fetchNextRow()) {
+            
+        }
+    }
+    
+    function map(&$row,&$outtypes) {
                     foreach ($outtypes as $col => $dt) {
                         if (isset($row[$col])) {
                             switch ($dt) {
-                                case "int":
-                                    $this->result[$i][$col] = (int)$row[$col];
+                                case 'int':
+                                    $row[$col] = (int)$row[$col];
                                     break;
-                                case "string":
-                                    $this->result[$i][$col] = (string)$row[$col];
+                                case 'string':
+                                     $row[$col] = (string)$row[$col];
                                     break;
-                                case "bool":
-                                    $this->result[$i][$col] = $row[$col] ? true : false;
+                                case 'bool':
+                                     $row[$col] = $row[$col] ? true : false;
                                     break;
-                                case "json":
-                                    $this->result[$i][$col] = json_decode($row[$col]);
+                                case 'json':
+                                    $row[$col] = json_decode($row[$col]);
                                     break;
-                                case "obj":
-                                    $this->result[$i][$col] = unserialize($row[$col]);
+                                case 'obj':
+                                    $row[$col] = unserialize($row[$col]);
                                     break;
                             }
                         }
-                    }
-                }
-            }
-            $this->affected = $data->rowCount();
-        }
-        $this->ind = 0;
-        
-        $data->closeCursor();
-        
-        
+                    }   
     }
-    
     /**
      * Returns error data if there is one
      */
@@ -99,11 +132,12 @@ class Response
      *
      * @returns {Array}
      */
-    function getData()
+    function getData($current = false)
     {
+        if (!$this->complete && !$current) $this->fetchAll();
         return $this->result;
     }
-    
+
     /**
      * Gets number of affected rows from the query
      *
@@ -114,12 +148,23 @@ class Response
         return $this->affected;
     }
     
+    function countRows() {
+        return count($this->result);
+    }
     /**
      * Gets next row
      */
     function next()
     {
-        return $this->result[$this->ind++];
+        if (isset($this->result[$this->ind])) {
+            return $this->result[$this->ind++];
+        } else if (!$this->complete) {
+            $row = $this->fetchNextRow();
+            $this->ind++;
+            return $row;
+        } else {
+            return false;
+        }
     }
     
     /**
@@ -134,7 +179,6 @@ class Response
 
 class Connector
 {
-    public $queries = array();
     public $db;
     public $log = array();
     public $dev = false;
@@ -157,14 +201,10 @@ class Connector
      *
      * @returns {SQLResponse}
      */
-    function query($query,$obj = null,$outtypes = array())
+    function query($query,$obj = null,$outtypes = null, $mode = 0)
     {
-        if (isset($this->queries[$query])) {
-            $q = $this->queries[$query];
-        } else {
             $q = $this->db->prepare($query);
-            $this->queries[$query] = $q;
-        }
+       
         if ($obj) $e = $q->execute($obj);
         else $e = $q->execute();
         
@@ -173,7 +213,7 @@ class Connector
                 $query,
                 $obj
             ));
-        return new Response($q,$e,$outtypes);
+        return new Response($q,$e,$outtypes,$mode);
     }
     
     /**
@@ -185,60 +225,31 @@ class Connector
      *
      * @returns {SQLResponse|SQLResponse[]}
      */
-    function _query($sql, $values, $insert, $typeString, $outtypes = array())
+    function _query(&$sql, $values, &$insert, &$outtypes = null, $mode = 0)
     {
-        // echo json_encode(array($sql,$insert));
-        // return;
-        if (isset($this->queries[$sql . "|" . $typeString])) { // Cache
-            $s = $this->queries[$sql . "|" . $typeString];
-            $q = $s[1];
-            $v = &$s[0];
-            foreach ($values as $key => $vq) {
-                $v[$key][0] = $vq[0];
-            }
-            
-            if ($this->dev)
-                array_push($this->log, array(
-                    "fromcache",
+        $q                   = $this->db->prepare($sql);
+         if ($this->dev) 
+             array_push($this->log,array(
                     $sql,
-                    $typeString,
                     $values,
                     $insert
-                ));
-        } else {
-            $q                   = $this->db->prepare($sql);
-             $v = $values;
-            foreach ($v as $key => &$va) {
+             ));
+        foreach ($values as $key => &$va) {
                 $q->bindParam($key + 1, $va[0],$va[1]);
-            }
-           
-            
-            $this->queries[$sql . "|" . $typeString] = array(&$v,$q);
-            if ($this->dev)
-                array_push($this->log, array(
-                    $sql,
-                    $typeString,
-                    $values,
-                    $insert
-                ));
         }
-        
-        if (count($insert) == 0) { // Single query
-            $e = $q->execute();
-            return new Response($q, $e, $outtypes);
+         $e = $q->execute();
+        if (!isset($insert[0])) { // Single query
+            return new Response($q, $e, $outtypes, $mode);
         } else { // Multi Query
             $responses = array();
-            
-            $e = $q->execute();
-            array_push($responses,new Response($q, $e, $outtypes));
-            
+            array_push($responses,new Response($q, $e, $outtypes, 0));
             foreach ($insert as $key => $value) {
-                foreach ($value as $k => $val) {
-                    $v[$k][0] = $val;
+                foreach ($value as $k => &$val) {
+                    $values[$k][0] = $val;
                 }
                 
                 $e = $q->execute();
-                array_push($responses, new Response($q, $e, $outtypes));
+                array_push($responses, new Response($q, $e, $outtypes, 0));
             }
             return $responses;
         }
@@ -252,13 +263,6 @@ class Connector
         $this->db      = null;
         $this->queries = null;
         
-    }
-    /**
-     * Clears cache
-     */
-    function clearCache()
-    {
-        $this->queries = array();
     }
 }
 // BUILD BETWEEN

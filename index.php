@@ -44,6 +44,7 @@ use SuperSQL\Connector as Connector;
 class SuperSQL
 {
     public $con;
+    public $lockMode = false;
     
     /**
      * Creates a connection
@@ -69,12 +70,12 @@ class SuperSQL
      */
     function SELECT($table, $columns = array(), $where = array(), $join = null, $limit = false)
     {
-        if ((gettype($join) == "integer" || gettype($join) == "string") && !$limit) {
+        if ((is_int($join) || is_string($join)) && !$limit) {
             $limit = $join;
             $join  = null;
         }
         $d = AdvParser::SELECT($table, $columns, $where, $join, $limit);
-        return $this->con->_query($d[0], $d[1], $d[2], $d[3], $d[4]);
+        return $this->con->_query($d[0], $d[1], $d[2], $d[3], $this->lockMode ? 0 : 1);
     }
     
     /**
@@ -88,7 +89,7 @@ class SuperSQL
     function INSERT($table, $data)
     {
         $d = AdvParser::INSERT($table, $data);
-        return $this->con->_query($d[0], $d[1], $d[2], $d[3]);
+        return $this->con->_query($d[0], $d[1], $d[2]);
     }
     
     /**
@@ -103,7 +104,7 @@ class SuperSQL
     function UPDATE($table, $data, $where = array())
     {
         $d = AdvParser::UPDATE($table, $data, $where);
-        return $this->con->_query($d[0], $d[1], $d[2], $d[3]);
+        return $this->con->_query($d[0], $d[1], $d[2]);
     }
     
     /**
@@ -117,7 +118,7 @@ class SuperSQL
     function DELETE($table, $where = array())
     {
         $d = AdvParser::DELETE($table, $where);
-        return $this->con->_query($d[0], $d[1], $d[2], $d[3]);
+        return $this->con->_query($d[0], $d[1], $d[2]);
     }
     // BUILD ADVANCED BETWEEN
     
@@ -135,7 +136,7 @@ class SuperSQL
     function sSELECT($table, $columns = array(), $where = array(), $append = "")
     {
         $d = SimParser::SELECT($table, $columns, $where, $append);
-        return $this->con->query($d[0], $d[1]);
+        return $this->con->query($d[0], $d[1],$this->lockMode ? 0 : 1);
     }
     
     /**
@@ -213,13 +214,6 @@ class SuperSQL
     {
         return $this->con->log;
     }
-    /**
-     * Clear cache
-     */
-    function clearCache() 
-    {
-        $this->con->clearCache();
-    }
     
     /**
      * Transaction
@@ -233,6 +227,10 @@ class SuperSQL
             $this->con->db->commit();
         
         return $r;
+    }
+    
+    function modeLock($val) {
+        $this->lockMode = $val;
     }
     
 }

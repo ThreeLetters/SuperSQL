@@ -62,12 +62,12 @@ Full documentation is here: https://threeletters.github.io/SuperSQL/
 Not much - they are basically the equivalant - However, SuperSQL is slightly more advanced.
 
 * Response class - SuperSQL has a response class to access crucial information, such as errors
-* Cache - SuperSQL caches queries to re-execute them later
 * Helper - SuperSQL comes with a helper class, with helper functions, while meedoo has it built right in.
 * Simple API - SuperSQL comes with a simple api for simple queries to increase performance. No need to go overkill for something as simple as `SELECT * FROM table`
 * Smaller & lightweight - SuperSQL is smaller than medoo
 * Development - SuperSQL's code is well structured and it is commented - so you can understand it more
 * Medoo has source mapping - SuperSQL doesnt support it yet
+* SuperSQL is faster - Using xdebug, we found that superSQL is faster than medoo. (x1000,6%)
 
 ## Special thanks
 * @LegitSoulja - SlickInject

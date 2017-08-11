@@ -3,8 +3,8 @@
  Author: Andrews54757
  License: MIT (https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE)
  Source: https://github.com/ThreeLetters/SQL-Library
- Build: v1.0.1
- Built on: 09/08/2017
+ Build: v1.0.2
+ Built on: 10/08/2017
 */
 
 // lib/connector/index.php
@@ -12,62 +12,108 @@ class Response
 {
     public $result;
     public $affected;
-    public $ind;
+    public $ind = 0;
     public $error;
     public $errorData;
-    function __construct($data, $error, $outtypes)
+    public $outTypes;
+    public $complete = false;
+    public $stmt;
+    function __construct($data, $error, &$outtypes, &$mode)
     {
         $this->error = !$error;
         if (!$error) {
             $this->errorData = $data->errorInfo();
         } else {
+            $this->outTypes = $outtypes;
+            $this->init($data,$mode);
+            $this->affected = $data->rowCount();
+        }
+    }
+    function init(&$data, &$mode) {
+        if ($mode === 0) { 
+            $outtypes = $this->outTypes;
             $d = $data->fetchAll();
+            if ($outtypes) {
+                foreach ($d as $i => &$row) {
+                    $this->map($row,$outtypes);
+                }
+            }
             $this->result = $d;
-            if (count($outtypes) != 0) {
-                foreach ($d as $i => $row) {
+            $this->complete = true;
+        } else if ($mode === 1) { 
+            $this->stmt = $data;
+            $this->result = array();
+        }
+    }
+    function fetchNextRow() {
+       $row = $this->stmt->fetch();
+        if ($row) {
+         if ($this->outTypes) {
+        $this->map($row,$this->outTypes);   
+        }
+        array_push($this->result,$row);
+        return $row;
+        } else {
+            $this->complete = true;
+            $this->stmt->closeCursor();
+            $this->stmt = null;
+            return false;
+        }
+    }
+    function fetchAll() {
+        while ($row = $this->fetchNextRow()) {
+        }
+    }
+    function map(&$row,&$outtypes) {
                     foreach ($outtypes as $col => $dt) {
                         if (isset($row[$col])) {
                             switch ($dt) {
-                                case "int":
-                                    $this->result[$i][$col] = (int)$row[$col];
+                                case 'int':
+                                    $row[$col] = (int)$row[$col];
                                     break;
-                                case "string":
-                                    $this->result[$i][$col] = (string)$row[$col];
+                                case 'string':
+                                     $row[$col] = (string)$row[$col];
                                     break;
-                                case "bool":
-                                    $this->result[$i][$col] = $row[$col] ? true : false;
+                                case 'bool':
+                                     $row[$col] = $row[$col] ? true : false;
                                     break;
-                                case "json":
-                                    $this->result[$i][$col] = json_decode($row[$col]);
+                                case 'json':
+                                    $row[$col] = json_decode($row[$col]);
                                     break;
-                                case "obj":
-                                    $this->result[$i][$col] = unserialize($row[$col]);
+                                case 'obj':
+                                    $row[$col] = unserialize($row[$col]);
                                     break;
                             }
                         }
-                    }
-                }
-            }
-            $this->affected = $data->rowCount();
-        }
-        $this->ind = 0;
-        $data->closeCursor();
+                    }   
     }
     function error()
     {
         return $this->error ? $this->errorData : false;
     }
-    function getData()
+    function getData($current = false)
     {
+        if (!$this->complete && !$current) $this->fetchAll();
         return $this->result;
     }
     function getAffected()
     {
         return $this->affected;
     }
+    function countRows() {
+        return count($this->result);
+    }
     function next()
     {
-        return $this->result[$this->ind++];
+        if (isset($this->result[$this->ind])) {
+            return $this->result[$this->ind++];
+        } else if (!$this->complete) {
+            $row = $this->fetchNextRow();
+            $this->ind++;
+            return $row;
+        } else {
+            return false;
+        }
     }
     function reset()
     {
@@ -76,7 +122,6 @@ class Response
 }
 class Connector
 {
-    public $queries = array();
     public $db;
     public $log = array();
     public $dev = false;
@@ -85,14 +130,9 @@ class Connector
         $this->db  = new \PDO($dsn, $user, $pass);
         $this->log = array();
     }
-    function query($query,$obj = null,$outtypes = array())
+    function query($query,$obj = null,$outtypes = null, $mode = 0)
     {
-        if (isset($this->queries[$query])) {
-            $q = $this->queries[$query];
-        } else {
             $q = $this->db->prepare($query);
-            $this->queries[$query] = $q;
-        }
         if ($obj) $e = $q->execute($obj);
         else $e = $q->execute();
         if ($this->dev)
@@ -100,53 +140,32 @@ class Connector
                 $query,
                 $obj
             ));
-        return new Response($q,$e,$outtypes);
+        return new Response($q,$e,$outtypes,$mode);
     }
-    function _query($sql, $values, $insert, $typeString, $outtypes = array())
+    function _query(&$sql, $values, &$insert, &$outtypes = null, $mode = 0)
     {
-        if (isset($this->queries[$sql . "|" . $typeString])) { 
-            $s = $this->queries[$sql . "|" . $typeString];
-            $q = $s[1];
-            $v = &$s[0];
-            foreach ($values as $key => $vq) {
-                $v[$key][0] = $vq[0];
-            }
-            if ($this->dev)
-                array_push($this->log, array(
-                    "fromcache",
+        $q                   = $this->db->prepare($sql);
+         if ($this->dev) 
+             array_push($this->log,array(
                     $sql,
-                    $typeString,
                     $values,
                     $insert
-                ));
-        } else {
-            $q                   = $this->db->prepare($sql);
-             $v = $values;
-            foreach ($v as $key => &$va) {
+             ));
+        foreach ($values as $key => &$va) {
                 $q->bindParam($key + 1, $va[0],$va[1]);
-            }
-            $this->queries[$sql . "|" . $typeString] = array(&$v,$q);
-            if ($this->dev)
-                array_push($this->log, array(
-                    $sql,
-                    $typeString,
-                    $values,
-                    $insert
-                ));
         }
-        if (count($insert) == 0) { 
-            $e = $q->execute();
-            return new Response($q, $e, $outtypes);
+         $e = $q->execute();
+        if (!isset($insert[0])) { 
+            return new Response($q, $e, $outtypes, $mode);
         } else { 
             $responses = array();
-            $e = $q->execute();
-            array_push($responses,new Response($q, $e, $outtypes));
+            array_push($responses,new Response($q, $e, $outtypes, 0));
             foreach ($insert as $key => $value) {
-                foreach ($value as $k => $val) {
-                    $v[$k][0] = $val;
+                foreach ($value as $k => &$val) {
+                    $values[$k][0] = $val;
                 }
                 $e = $q->execute();
-                array_push($responses, new Response($q, $e, $outtypes));
+                array_push($responses, new Response($q, $e, $outtypes, 0));
             }
             return $responses;
         }
@@ -156,10 +175,6 @@ class Connector
         $this->db      = null;
         $this->queries = null;
     }
-    function clearCache()
-    {
-        $this->queries = array();
-    }
 }
 
 // lib/parser/Simple.php
@@ -167,14 +182,14 @@ class SimParser
 {
     public static function WHERE($where, &$sql, &$insert)
     {
-        if (count($where) != 0) {
-            $sql .= " WHERE ";
+        if (!empty($where)) {
+            $sql .= ' WHERE ';
             $i = 0;
             foreach ($where as $key => $value) {
-                if ($i != 0) {
-                    $sql .= " AND ";
+                if ($i !== 0) {
+                    $sql .= ' AND ';
                 }
-                $sql .= "`" . $key . "` = ?";
+                $sql .= '`' . $key . '` = ?';
                 array_push($insert,$value);
                 $i++;
             }
@@ -182,22 +197,22 @@ class SimParser
     }
     public static function SELECT($table, $columns, $where, $append)
     {
-        $sql    = "SELECT ";
+        $sql    = 'SELECT ';
         $insert = array();
-        $len    = count($columns);
-        if ($len == 0) { 
-            $sql .= "*";
+        if (!isset($columns[0])) { 
+            $sql .= '*';
         } else { 
+            $len    = count($columns);
             for ($i = 0; $i < $len; $i++) {
-                if ($i != 0) {
-                    $sql .= ", ";
+                if ($i !== 0) {
+                    $sql .= ', ';
                 }
-                $sql .= "`" . $columns[$i] . "`";
+                $sql .= '`' . $columns[$i] . '`';
             }
         }
-        $sql .= " FROM `" . $table . "`";
+        $sql .= ' FROM `' . $table . '`';
         self::WHERE($where, $sql, $insert);
-       if ($append) $sql .= " " . $append;
+       if ($append) $sql .= ' ' . $append;
         return array(
             $sql,
             $insert
@@ -205,21 +220,21 @@ class SimParser
     }
     public static function INSERT($table, $data)
     {
-        $sql    = "INSERT INTO `" . $table . "` (";
-        $add    = ") VALUES (";
+        $sql    = 'INSERT INTO `' . $table . '` (';
+        $add    = ') VALUES (';
         $insert = array();
         $i = 0;
         foreach ($data as $key => $value) {
-            if ($i != 0) {
-                $sql .= ", ";
-                $add .= ", ";
+            if ($i !== 0) {
+                $sql .= ', ';
+                $add .= ', ';
             }
-            $sql .= "`" . $key . "`";
-            $add .= "?";
+            $sql .= '`' . $key . '`';
+            $add .= '?';
             array_push($insert, $value);
             $i++;
         }
-        $sql .= $add . ")";
+        $sql .= $add . ')';
         return array(
             $sql,
             $insert
@@ -227,14 +242,14 @@ class SimParser
     }
     public static function UPDATE($table, $data, $where)
     {
-        $sql    = "UPDATE `" . $table . "` SET ";
+        $sql    = 'UPDATE `' . $table . '` SET ';
         $insert = array();
         $i = 0;
         foreach ($data as $key => $value) {
-            if ($i != 0) {
-                $sql .= ", ";
+            if ($i !== 0) {
+                $sql .= ', ';
             }
-            $sql .= "`" . $key . "` = ?";
+            $sql .= '`' . $key . '` = ?';
             array_push($insert, $value);
             $i++;
         }
@@ -246,7 +261,7 @@ class SimParser
     }
     public static function DELETE($table, $where)
     {
-        $sql    = "DELETE FROM `" . $table . "`";
+        $sql    = 'DELETE FROM `' . $table . '`';
         $insert = array();
         self::WHERE($where, $sql, $insert);
         return array(
@@ -260,6 +275,7 @@ class SimParser
 class SuperSQL
 {
     public $con;
+    public $lockMode = false;
     function __construct($dsn, $user, $pass)
     {
         $this->con = new Connector($dsn, $user, $pass);
@@ -267,7 +283,7 @@ class SuperSQL
     function sSELECT($table, $columns = array(), $where = array(), $append = "")
     {
         $d = SimParser::SELECT($table, $columns, $where, $append);
-        return $this->con->query($d[0], $d[1]);
+        return $this->con->query($d[0], $d[1],$this->lockMode ? 0 : 1);
     }
     function sINSERT($table, $data)
     {
@@ -300,10 +316,6 @@ class SuperSQL
     {
         return $this->con->log;
     }
-    function clearCache() 
-    {
-        $this->con->clearCache();
-    }
     function transact($func) {
         $this->con->db->beginTransaction();
         $r = $func($this);
@@ -312,6 +324,9 @@ class SuperSQL
          else 
             $this->con->db->commit();
         return $r;
+    }
+    function modeLock($val) {
+        $this->lockMode = $val;
     }
 }
 ?>

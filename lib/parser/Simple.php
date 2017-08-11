@@ -37,15 +37,15 @@ class SimParser
 {
     public static function WHERE($where, &$sql, &$insert)
     {
-        if (count($where) != 0) {
-            $sql .= " WHERE ";
+        if (!empty($where)) {
+            $sql .= ' WHERE ';
             $i = 0;
             foreach ($where as $key => $value) {
                 
-                if ($i != 0) {
-                    $sql .= " AND ";
+                if ($i !== 0) {
+                    $sql .= ' AND ';
                 }
-                $sql .= "`" . $key . "` = ?";
+                $sql .= '`' . $key . '` = ?';
                 array_push($insert,$value);
                 $i++;
             }
@@ -53,25 +53,25 @@ class SimParser
     }
     public static function SELECT($table, $columns, $where, $append)
     {
-        $sql    = "SELECT ";
+        $sql    = 'SELECT ';
         $insert = array();
-        $len    = count($columns);
-        if ($len == 0) { // none
-            $sql .= "*";
+        if (!isset($columns[0])) { // none
+            $sql .= '*';
         } else { // some
+            $len    = count($columns);
             for ($i = 0; $i < $len; $i++) {
-                if ($i != 0) {
-                    $sql .= ", ";
+                if ($i !== 0) {
+                    $sql .= ', ';
                 }
-                $sql .= "`" . $columns[$i] . "`";
+                $sql .= '`' . $columns[$i] . '`';
             }
         }
         
-        $sql .= " FROM `" . $table . "`";
+        $sql .= ' FROM `' . $table . '`';
         
         self::WHERE($where, $sql, $insert);
         
-       if ($append) $sql .= " " . $append;
+       if ($append) $sql .= ' ' . $append;
         
         return array(
             $sql,
@@ -80,25 +80,25 @@ class SimParser
     }
     public static function INSERT($table, $data)
     {
-        $sql    = "INSERT INTO `" . $table . "` (";
-        $add    = ") VALUES (";
+        $sql    = 'INSERT INTO `' . $table . '` (';
+        $add    = ') VALUES (';
         $insert = array();
         
         $i = 0;
         
         foreach ($data as $key => $value) {
             
-            if ($i != 0) {
-                $sql .= ", ";
-                $add .= ", ";
+            if ($i !== 0) {
+                $sql .= ', ';
+                $add .= ', ';
             }
-            $sql .= "`" . $key . "`";
-            $add .= "?";
+            $sql .= '`' . $key . '`';
+            $add .= '?';
             array_push($insert, $value);
             $i++;
         }
         
-        $sql .= $add . ")";
+        $sql .= $add . ')';
         
         return array(
             $sql,
@@ -107,15 +107,15 @@ class SimParser
     }
     public static function UPDATE($table, $data, $where)
     {
-        $sql    = "UPDATE `" . $table . "` SET ";
+        $sql    = 'UPDATE `' . $table . '` SET ';
         $insert = array();
         
         $i = 0;
         foreach ($data as $key => $value) {
-            if ($i != 0) {
-                $sql .= ", ";
+            if ($i !== 0) {
+                $sql .= ', ';
             }
-            $sql .= "`" . $key . "` = ?";
+            $sql .= '`' . $key . '` = ?';
             array_push($insert, $value);
             $i++;
         }
@@ -128,7 +128,7 @@ class SimParser
     }
     public static function DELETE($table, $where)
     {
-        $sql    = "DELETE FROM `" . $table . "`";
+        $sql    = 'DELETE FROM `' . $table . '`';
         $insert = array();
         
         self::WHERE($where, $sql, $insert);

@@ -3,8 +3,8 @@
  Author: Andrews54757
  License: MIT (https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE)
  Source: https://github.com/ThreeLetters/SQL-Library
- Build: v1.0.1
- Built on: 09/08/2017
+ Build: v1.0.2
+ Built on: 10/08/2017
 */
 
 
@@ -15,15 +15,14 @@ class SQLHelper
     function __construct($dt,$db = null,$user = null,$pass = null,$options = array())
     {
         $this->connections = array();
-        $type = gettype($dt);
-        if ($type == "array") {
-            if (gettype($dt[0]) == "array") {
+        if (is_array($dt)) {
+            if (is_array($dt[0])) {
                 foreach ($dt as $key => $v) {
-                $host = isset($v["host"]) ? $v["host"] : "";
-                $db = isset($v["db"]) ? $v["db"] : "";
-                $user = isset($v["user"]) ? $v["user"] : "";
-                $pass = isset($v["password"]) ? $v["password"] : "";
-                $opt = isset($v["options"]) ? $v["options"] : array();
+                $host = isset($v['host']) ? $v['host'] : '';
+                $db = isset($v['db']) ? $v['db'] : '';
+                $user = isset($v['user']) ? $v['user'] : '';
+                $pass = isset($v['password']) ? $v['password'] : '';
+                $opt = isset($v['options']) ? $v['options'] : array();
                 $s = self::connect($host,$db,$user,$pass,$opt);
                 array_push($this->connections,$s);
                 }
@@ -33,7 +32,7 @@ class SQLHelper
                  }
             }
             $this->s = $this->connections[0];
-        } else if ($type == "string") {
+        } else if (is_string($dt)) {
             $this->s = self::connect($dt,$db,$user,$pass,$options);
             array_push($this->connections,$this->s);
         } else {
@@ -43,75 +42,75 @@ class SQLHelper
     }
     static function connect($host, $db, $user, $pass, $options = array())
     {
-        $dbtype = "mysql";
+        $dbtype = 'mysql';
         $dsn    = false;
-        if (gettype($options) == "string") {
-            if (strpos($options, ":") !== false) {
+        if (is_string($options)) {
+            if (strpos($options, ':') !== false) {
                 $dsn = $options;
             } else {
                 $dbtype = strtolower($options);
             }
-        } else if (isset($options["dbtype"]))
-            $dbtype = strtolower($options["dbtype"]);
+        } else if (isset($options['dbtype']))
+            $dbtype = strtolower($options['dbtype']);
         if (!$dsn) {
-            $driver = "";
+            $driver = '';
             switch ($dbtype) {
-                case "pgsql":
-                    $driver = "pgsql";
+                case 'pgsql':
+                    $driver = 'pgsql';
                     $data   = array(
-                        "dbname" => $db,
-                        "host" => $host
+                        'dbname' => $db,
+                        'host' => $host
                     );
-                    if (isset($options["port"]))
-                        $data["port"] = $options["port"];
+                    if (isset($options['port']))
+                        $data['port'] = $options['port'];
                     break;
-                case "sybase":
-                    $driver = "dblib";
+                case 'sybase':
+                    $driver = 'dblib';
                     $data   = array(
-                        "dbname" => $db,
-                        "host" => $host
+                        'dbname' => $db,
+                        'host' => $host
                     );
-                    if (isset($options["port"]))
-                        $data["port"] = $options["port"];
+                    if (isset($options['port']))
+                        $data['port'] = $options['port'];
                     break;
-                case "oracle":
-                    $driver = "oci";
+                case 'oracle':
+                    $driver = 'oci';
                     $data   = array(
-                        "dbname" => isset($host) ? "//" . $host . ":" . (isset($options["port"]) ? $options["port"] : "1521") . "/" . $db : $db
+                        'dbname' => isset($host) ? '//' . $host . ':' . (isset($options['port']) ? $options['port'] : '1521') . '/' . $db : $db
                     );
                     break;
                 default:
-                    $driver = "mysql";
+                    $driver = 'mysql';
                     $data   = array(
-                        "dbname" => $db
+                        'dbname' => $db
                     );
-                    if (isset($options["socket"]))
-                        $data["unix_socket"] = $options["socket"];
+                    if (isset($options['socket']))
+                        $data['unix_socket'] = $options['socket'];
                     else {
-                        $data["host"] = $host;
-                        if (isset($options["port"]))
-                            $data["port"] = $options["port"];
+                        $data['host'] = $host;
+                        if (isset($options['port']))
+                            $data['port'] = $options['port'];
                     }
                     break;
             }
-            $dsn = $driver . ":";
+            $dsn = $driver . ':';
             if (isset($options['charset'])) {
                 $data['charset'] = $options['charset'];
             }
-            $dsn = $driver . ":";
+            $dsn = $driver . ':';
             $b   = 0;
             foreach ($data as $key => $val) {
                 if ($b != 0) {
-                    $dsn .= ";";
+                    $dsn .= ';';
                 }
-                $dsn .= $key . "=" . $val;
+                $dsn .= $key . '=' . $val;
                 $b++;
             }
         }
         return new SuperSQL($dsn, $user, $pass);
     }
     private static function rmComments($str) {
-        $i = strpos($str,"#");
+        $i = strpos($str,'#');
         if ($i !== false) {
             $str = substr($str,0,$i);
         }
@@ -119,14 +118,14 @@ class SQLHelper
     }
     private static function escape($value) {
         $var = strtolower(gettype($value));
-        if ($var == "boolean") {
-            $value = $value ? "1" : "0";
-        } else if ($var == "string") {
-            $value = "'" . $value . "'";
-        } else if ($var == "double" || $var == "integer") {
+        if ($var == 'boolean') {
+            $value = $value ? '1' : '0';
+        } else if ($var == 'string') {
+            $value = '\'' . $value . '\'';
+        } else if ($var == 'double' || $var == 'integer') {
             $value = (int) $value;
-        } else if ($var == "null") {
-            $value = "0";
+        } else if ($var == 'null') {
+            $value = '0';
         }
         return $value;
     }
@@ -134,7 +133,7 @@ class SQLHelper
         if (is_numeric($value)) {
             return (int)$value;
         } else {
-        return "'" . $value . "'";
+        return '\'' . $value . '\'';
         }
     }
     private static function includes($val,$arr) {
@@ -145,9 +144,9 @@ class SQLHelper
     }
     private static function containsAdv($arr) {
         foreach ($arr as $key => $val) {
-           if (gettype($val) == "array") return true;
-            if (self::includes($key,array("[","#")) || self::includes($val,array("["))) return true;
-            if (self::includes($val,array("DISTINCT","INSERT INTO","INTO"))) return true;
+           if (is_array($val)) return true;
+            if (self::includes($key,array('[','#')) || self::includes($val,array('['))) return true;
+            if (self::includes($val,array('DISTINCT','INSERT INTO','INTO'))) return true;
         }
         return false;
     }
@@ -169,57 +168,57 @@ class SQLHelper
     }
     function create($table, $data)
     {
-        $sql = "CREATE TABLE `" . $table . "` (";
+        $sql = 'CREATE TABLE `' . $table . '` (';
         $i   = 0;
         foreach ($data as $key => $val) {
             if ($i != 0) {
-                $sql .= ", ";
+                $sql .= ', ';
             }
-            $sql .= "`" . $key . "` " . $val;
+            $sql .= '`' . $key . '` ' . $val;
             $i++;
         }
-        $sql .= ")";
+        $sql .= ')';
         return $this->s->query($sql);
     }
     function drop($table)
     {
-        return $this->s->query("DROP TABLE `" . $table . "`");
+        return $this->s->query('DROP TABLE `' . $table . '`');
     }
     function replace($table,$data,$where = array()) {
         $newData = array();
         foreach ($data as $key => $val) {
-            $str = "`" . self::rmComments($key) . "`";
+            $str = '`' . self::rmComments($key) . '`';
             foreach ($val as $k => $v) {
-                $str = "REPLACE(" . $str . ", " . self::escape2($k) . ", " . self::escape($v) . ")";
+                $str = 'REPLACE(' . $str . ', ' . self::escape2($k) . ', ' . self::escape($v) . ')';
             }
-            $newData["#" . $key] = $str;
+            $newData['#' . $key] = $str;
         }
         return $this->s->UPDATE($table,$newData,$where);
     }
     function select($table,$columns = array(),$where = array(),$join = null,$limit = false) {
-        if (gettype($table) == "array" || self::containsAdv($columns) || self::containsAdv($where) || $join) {
+        if (is_array($table) || self::containsAdv($columns) || self::containsAdv($where) || $join) {
             return $this->s->SELECT($table,$columns,$where,$join,$limit);
         } else {
-            if (gettype($limit) == "integer") $limit = "LIMIT " . (int)$limit;
+            if (is_int($limit)) $limit = 'LIMIT ' . (int)$limit;
             return $this->s->sSELECT($table,$columns,$where,$limit);
         }
     }
     function insert($table,$data) {
-         if (gettype($table) == "array" || self::containsAdv($data)) {
+         if (is_array($table) || self::containsAdv($data)) {
             return $this->s->INSERT($table,$data);
          } else {
             return $this->s->sINSERT($table,$data);
          }      
     }
     function update($table,$data,$where = array()) {
-        if (gettype($table) == "array" || self::containsAdv($data) || self::containsAdv($where)) {
+        if (is_array($table) || self::containsAdv($data) || self::containsAdv($where)) {
             return $this->s->UPDATE($table,$data,$where);
          } else {
                return $this->s->sUPDATE($table,$data,$where);
          } 
     }
     function delete($table,$where = array()) {
-         if (gettype($table) == "array" || self::containsAdv($where)) {
+         if (is_array($table) || self::containsAdv($where)) {
             return $this->s->DELETE($table,$where);
          } else {
             return $this->s->sDELETE($table,$where);
@@ -230,28 +229,27 @@ class SQLHelper
         if ($join) {
             AdvParser::JOIN($join,$sql);
         }
-        $typeString = "";
         if (count($where) != 0) {
-            $sql .= " WHERE ";
+            $sql .= ' WHERE ';
             $sql .= AdvParser::conditions($where, $values);
         }
        $res = $this->_query($sql,$values)[0];
        return $res->fetchColumn();
     }
     function count($table, $where = array(), $join = array()) {
-       return $this->sqBase("SELECT COUNT(*) FROM `" . $table . "`",$where,$join);
+       return $this->sqBase('SELECT COUNT(*) FROM `' . $table . '`',$where,$join);
     }
     function avg() {
-       return $this->sqBase("SELECT AVG(`" . $column ."`) FROM `" . $table . "`",$where,$join);
+       return $this->sqBase('SELECT AVG(`' . $column .'`) FROM `' . $table . '`',$where,$join);
     }
     function max($table, $column, $where = array(), $join = array()) {
-        return $this->sqBase("SELECT MAX(`" . $column ."`) FROM `" . $table . "`",$where,$join);
+        return $this->sqBase('SELECT MAX(`' . $column .'`) FROM `' . $table . '`',$where,$join);
     }
     function min($table, $column, $where = array(), $join = array()) {
-        return $this->sqBase("SELECT MIN(`" . $column ."`) FROM `" . $table . "`",$where,$join);
+        return $this->sqBase('SELECT MIN(`' . $column .'`) FROM `' . $table . '`',$where,$join);
     }
     function sum($table, $column, $where = array(), $join = array()) {
-        return $this->sqBase("SELECT SUM(`" . $column ."`) FROM `" . $table . "`",$where,$join);
+        return $this->sqBase('SELECT SUM(`' . $column .'`) FROM `' . $table . '`',$where,$join);
     }
     function _query($sql, $obj) {
         $q = $this->s->con->db->prepare($sql);
