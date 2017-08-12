@@ -8,7 +8,7 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <title>SuperSQL</title>
 
-    <style>
+     <style>
       .highlight table td { padding: 5px; }
 .highlight table pre { margin: 0; }
 .highlight .gh {
@@ -384,7 +384,11 @@
     <div class="page-wrapper">
       <div class="dark-box"></div>
       <div class="content">
-        <h1 id='supersql-overview'>SuperSQL - Overview</h1><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+        <h1 id='supersql-overview'>SuperSQL - Overview</h1>
+<blockquote>
+<p>Setup</p>
+</blockquote>
+<pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="c1">// MySql setup
 </span><span class="nv">$host</span> <span class="o">=</span> <span class="s2">"localhost"</span><span class="p">;</span>
 <span class="nv">$db</span> <span class="o">=</span> <span class="s2">"test"</span><span class="p">;</span>
@@ -393,6 +397,13 @@
 
 <span class="nv">$dsn</span> <span class="o">=</span> <span class="s2">"mysql:host=</span><span class="nv">$host</span><span class="s2">;port=3306;dbname=</span><span class="nv">$db</span><span class="s2">;charset=utf8"</span><span class="p">;</span>
 <span class="nv">$SuperSQL</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SuperSQL</span><span class="p">(</span><span class="nv">$dsn</span><span class="p">,</span><span class="nv">$user</span><span class="p">,</span><span class="nv">$pass</span><span class="p">);</span>
+<span class="cp">?&gt;</span>
+</code></pre>
+<blockquote>
+<p>Setup with helper</p>
+</blockquote>
+<pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$SuperSQL</span> <span class="o">=</span> <span class="nx">SQLHelper</span><span class="o">::</span><span class="na">connect</span><span class="p">(</span><span class="nv">$host</span><span class="p">,</span><span class="nv">$db</span><span class="p">,</span><span class="nv">$user</span><span class="p">,</span><span class="nv">$pass</span><span class="p">);</span>
 <span class="cp">?&gt;</span>
 </code></pre>
 <p>SlickInject and Medoo on steroids - The most advanced and lightweight library of it&#39;s kind.</p>
@@ -916,9 +927,9 @@ $SuperSQL-&gt;sDELETE(&quot;hackers&quot;,[ // DELETE FROM `hackers` WHERE `stat
 If your using the built/compiled file, you must include `dist/SuperSQL_helper.php` too
 </aside>
 <h2 id='sqlhelper-connect'>SQLHelper::connect</h2><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
-<span class="nv">$SuperSQL</span> <span class="o">=</span> <span class="nx">SQLHelper</span><span class="o">::</span><span class="na">connect</span><span class="p">(</span><span class="s2">"localhost"</span><span class="p">,</span><span class="s2">"root"</span><span class="p">,</span><span class="s2">"1234"</span><span class="p">);</span> <span class="c1">// mysql
+<span class="nv">$SuperSQL</span> <span class="o">=</span> <span class="nx">SQLHelper</span><span class="o">::</span><span class="na">connect</span><span class="p">(</span><span class="s2">"localhost"</span><span class="p">,</span><span class="s2">"mydb"</span><span class="p">,</span><span class="s2">"root"</span><span class="p">,</span><span class="s2">"1234"</span><span class="p">);</span> <span class="c1">// mysql
 </span>
-<span class="nv">$SuperSQL</span> <span class="o">=</span> <span class="nx">SQLHelper</span><span class="o">::</span><span class="na">connect</span><span class="p">(</span><span class="s2">"localhost"</span><span class="p">,</span><span class="s2">"root"</span><span class="p">,</span><span class="s2">"1234"</span><span class="p">,</span> <span class="nv">$dbtype</span><span class="p">);</span> <span class="c1">// others
+<span class="nv">$SuperSQL</span> <span class="o">=</span> <span class="nx">SQLHelper</span><span class="o">::</span><span class="na">connect</span><span class="p">(</span><span class="s2">"localhost"</span><span class="p">,</span><span class="s2">"mydb"</span><span class="p">,</span><span class="s2">"root"</span><span class="p">,</span><span class="s2">"1234"</span><span class="p">,</span> <span class="nv">$dbtype</span><span class="p">);</span> <span class="c1">// others
 </span><span class="cp">?&gt;</span>
 </code></pre>
 <p>Connect easily to any database.</p>
