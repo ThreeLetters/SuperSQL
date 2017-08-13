@@ -7,8 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <title>SuperSQL</title>
-
-     <style>
+    <style>
       .highlight table td { padding: 5px; }
 .highlight table pre { margin: 0; }
 .highlight .gh {
@@ -836,16 +835,14 @@ If your only going to use simple API, you can just include `dist/SuperSQL_simple
 </aside>
 <h2 id='sselect'>sSELECT</h2>
 <blockquote>
-<p>sSELECT
-<code>php
-&lt;?php
-$SuperSQL-&gt;sSELECT(&quot;citizens&quot;,[&quot;name&quot;,&quot;age&quot;],[ // SELECT `name`, `age` FROM `citizens` WHERE `in_trouble` = 1
-    &quot;in_trouble&quot; =&gt; 1
-]);
-?&gt;
-</code></p>
+<p>sSELECT</p>
 </blockquote>
-
+<pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">sSELECT</span><span class="p">(</span><span class="s2">"citizens"</span><span class="p">,[</span><span class="s2">"name"</span><span class="p">,</span><span class="s2">"age"</span><span class="p">],[</span> <span class="c1">// SELECT `name`, `age` FROM `citizens` WHERE `in_trouble` = 1
+</span>    <span class="s2">"in_trouble"</span> <span class="o">=&gt;</span> <span class="mi">1</span>
+<span class="p">]);</span>
+<span class="cp">?&gt;</span>
+</code></pre>
 <p><strong>SuperSQL-&gt;SELECT($table, $columns, $where[, $append);</strong></p>
 
 <ul>
@@ -856,17 +853,15 @@ $SuperSQL-&gt;sSELECT(&quot;citizens&quot;,[&quot;name&quot;,&quot;age&quot;],[ 
 </ul>
 <h2 id='sinsert'>sINSERT</h2>
 <blockquote>
-<p>sINSERT
-<code>php
-&lt;?php
-$SuperSQL-&gt;sINSERT(&quot;message_board&quot;,array( // INSERT INTO `message_board` (`title`, `SuperSQL`) VALUES (&#39;SuperSQL Saves The Day&#39;, &#39;SuperSQL rocks!&#39;)
-    &quot;title&quot; =&gt; &quot;SuperSQL Saves The Day&quot;,
-    &quot;message&quot; =&gt; &quot;SuperSQL rocks!&quot;
-));
-?&gt;
-</code></p>
+<p>sINSERT</p>
 </blockquote>
-
+<pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">sINSERT</span><span class="p">(</span><span class="s2">"message_board"</span><span class="p">,</span><span class="k">array</span><span class="p">(</span> <span class="c1">// INSERT INTO `message_board` (`title`, `SuperSQL`) VALUES ('SuperSQL Saves The Day', 'SuperSQL rocks!')
+</span>    <span class="s2">"title"</span> <span class="o">=&gt;</span> <span class="s2">"SuperSQL Saves The Day"</span><span class="p">,</span>
+    <span class="s2">"message"</span> <span class="o">=&gt;</span> <span class="s2">"SuperSQL rocks!"</span>
+<span class="p">));</span>
+<span class="cp">?&gt;</span>
+</code></pre>
 <p><strong>SuperSQL-&gt;sINSERT($table, $data);</strong></p>
 
 <ul>
@@ -875,19 +870,17 @@ $SuperSQL-&gt;sINSERT(&quot;message_board&quot;,array( // INSERT INTO `message_b
 </ul>
 <h2 id='supdate'>sUPDATE</h2>
 <blockquote>
-<p>sUPDATE
-<code>php
-&lt;?php
-$SuperSQL-&gt;sUPDATE(&quot;developers&quot;,[ // UPDATE `developers` SET `is_happy` = 1, `reason` = &#39;Becaz SuperSQL is awesome!&#39; WHERE `is_happy` = 0
-&quot;is_happy&quot; =&gt; 0,
-],[
-&quot;is_happy&quot; =&gt; 1,
-&quot;reason&quot; =&gt; &quot;Becaz SuperSQL is awesome!&quot;
-]);
-?&gt;
-</code></p>
+<p>sUPDATE</p>
 </blockquote>
-
+<pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">sUPDATE</span><span class="p">(</span><span class="s2">"developers"</span><span class="p">,[</span> <span class="c1">// UPDATE `developers` SET `is_happy` = 1, `reason` = 'Becaz SuperSQL is awesome!' WHERE `is_happy` = 0
+</span><span class="s2">"is_happy"</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">],[</span>
+<span class="s2">"is_happy"</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span>
+<span class="s2">"reason"</span> <span class="o">=&gt;</span> <span class="s2">"Becaz SuperSQL is awesome!"</span>
+<span class="p">]);</span>
+<span class="cp">?&gt;</span>
+</code></pre>
 <p><strong>SuperSQL-&gt;sUPDATE($table, $data, $where);</strong></p>
 
 <ul>
@@ -897,17 +890,15 @@ $SuperSQL-&gt;sUPDATE(&quot;developers&quot;,[ // UPDATE `developers` SET `is_ha
 </ul>
 <h2 id='sdelete'>sDELETE</h2>
 <blockquote>
-<p>sDELETE
-<code>php
-&lt;?php
-$SuperSQL-&gt;sDELETE(&quot;hackers&quot;,[ // DELETE FROM `hackers` WHERE `status` = &#39;Tried to SQL Inject attack a site&#39; AND `encountered` = &#39;SuperSQL&#39;
-    &quot;status&quot; =&gt; &quot;Tried to SQL Inject attack a site&quot;,
-    &quot;encountered&quot; =&gt; &quot;SuperSQL&quot;
-]);
-?&gt;
-</code></p>
+<p>sDELETE</p>
 </blockquote>
-
+<pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">sDELETE</span><span class="p">(</span><span class="s2">"hackers"</span><span class="p">,[</span> <span class="c1">// DELETE FROM `hackers` WHERE `status` = 'Tried to SQL Inject attack a site' AND `encountered` = 'SuperSQL'
+</span>    <span class="s2">"status"</span> <span class="o">=&gt;</span> <span class="s2">"Tried to SQL Inject attack a site"</span><span class="p">,</span>
+    <span class="s2">"encountered"</span> <span class="o">=&gt;</span> <span class="s2">"SuperSQL"</span>
+<span class="p">]);</span>
+<span class="cp">?&gt;</span>
+</code></pre>
 <p><strong>SuperSQL-&gt;DELETE($table, $where);</strong></p>
 
 <ul>
