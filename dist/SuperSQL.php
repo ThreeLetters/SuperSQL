@@ -287,8 +287,8 @@ class AdvParser
 {
     static function getArg(&$str)
     {
-        if ($str[0] === '[' && substr($str, 3, 1) === ']') {
-            $out = substr($str, 1, 2);
+        if ($str[0] === '[' && $str[3] === ']') {
+            $out = $str[1] . $str[2];
             $str = substr($str, 4);
             return $out;
         } else {
