@@ -193,7 +193,7 @@ class AdvParser
 {
     static function getArg(&$str)
     {
-        if ($str[0] === '[' && $str[3] === ']') {
+        if (isset($str[3]) && $str[0] === '[' && $str[3] === ']') {
             $out = $str[1] . $str[2];
             $str = substr($str, 4);
             return $out;
@@ -362,8 +362,7 @@ class AdvParser
     }
     static function getType(&$str)
     {   
-        $len = strlen($str);
-        if ($str[$len - 1] === ']') {
+        if (isset($str[1]) && $str[strlen($str) - 1] === ']') {
             $start = strrpos($str, '[');
             if ($start === false) {
                 return '';
