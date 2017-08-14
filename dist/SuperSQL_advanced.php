@@ -4,7 +4,7 @@
  License: MIT (https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE)
  Source: https://github.com/ThreeLetters/SQL-Library
  Build: v1.0.2
- Built on: 11/08/2017
+ Built on: 14/08/2017
 */
 
 // lib/connector/index.php
@@ -29,7 +29,7 @@ class Response
             $this->affected = $data->rowCount();
         }
     }
-    function init(&$data, &$mode) {
+    private function init(&$data, &$mode) {
         if ($mode === 0) { 
             $outtypes = $this->outTypes;
             $d = $data->fetchAll();
@@ -52,7 +52,7 @@ class Response
             $this->stmt = null;
         }
     }
-    function fetchNextRow() {
+    private function fetchNextRow() {
        $row = $this->stmt->fetch();
         if ($row) {
          if ($this->outTypes) {
@@ -67,7 +67,7 @@ class Response
             return false;
         }
     }
-    function fetchAll() {
+    private function fetchAll() {
         while ($row = $this->fetchNextRow()) {
         }
     }
@@ -147,7 +147,11 @@ class Connector
                 $query,
                 $obj
             ));
-        return new Response($q,$e,$outtypes,$mode);
+        if ($mode !== 3) {
+         return new Response($q,$e,$outtypes,$mode);   
+        } else {
+        return $q;
+        }
     }
     function _query(&$sql, $values, &$insert, &$outtypes = null, $mode = 0)
     {
@@ -304,12 +308,11 @@ class AdvParser
     {
         if (is_array($table)) {
             $sql = '';
-            $c = count($table);
-            for ($i = 0; $i < $c; $i++) {
-                $t = self::getType($table[$i]);
+            foreach ($table as $i => &$val) {
+                $t = self::getType($val);
                 if ($i !== 0)
                     $sql .= ', ';
-                $sql .= '`' . $table[$i] . '`';
+                $sql .= '`' . $val . '`';
                 if ($t)
                     $sql .= ' AS `' . $t . '`';
             }
@@ -533,6 +536,8 @@ class AdvParser
         } else { 
             $req  = 0;
             $into = '';
+            $f = $columns[0][0];
+            if ($f === 'D' || $f === 'I') {
             if ($columns[0] === 'DISTINCT') {
                 $req = 1;
                 $sql .= 'DISTINCT ';
@@ -545,6 +550,7 @@ class AdvParser
                 $req  = 1;
                 $into = ' ' . $columns[0] . ' ';
                 array_splice($columns,0,1);
+            }
             }
             if (isset($columns[0])) { 
                 foreach ($columns as $i => &$val) {
@@ -775,9 +781,9 @@ class SuperSQL
         $d = AdvParser::DELETE($table, $where);
         return $this->con->_query($d[0], $d[1], $d[2]);
     }
-    function query($query, $obj = null)
+    function query($query, $obj = null,$outtypes = null, $mode = 0)
     {
-        return $this->con->query($query, $obj);
+        return $this->con->query($query, $obj, $outtypes, $mode);
     }
     function close()
     {

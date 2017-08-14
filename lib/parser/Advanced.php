@@ -197,13 +197,12 @@ class AdvParser
     {
         if (is_array($table)) {
             $sql = '';
-            $c = count($table);
-            for ($i = 0; $i < $c; $i++) {
-                $t = self::getType($table[$i]);
+            foreach ($table as $i => &$val) {
+                $t = self::getType($val);
                 
                 if ($i !== 0)
                     $sql .= ', ';
-                $sql .= '`' . $table[$i] . '`';
+                $sql .= '`' . $val . '`';
                 
                 if ($t)
                     $sql .= ' AS `' . $t . '`';
@@ -475,6 +474,9 @@ class AdvParser
         } else { // some
             $req  = 0;
             $into = '';
+            
+            $f = $columns[0][0];
+            if ($f === 'D' || $f === 'I') {
             if ($columns[0] === 'DISTINCT') {
                 $req = 1;
                 $sql .= 'DISTINCT ';
@@ -488,7 +490,7 @@ class AdvParser
                 $into = ' ' . $columns[0] . ' ';
                 array_splice($columns,0,1);
             }
-            
+            }
             if (isset($columns[0])) { // has var
                 
                 foreach ($columns as $i => &$val) {

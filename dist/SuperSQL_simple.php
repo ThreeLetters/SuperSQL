@@ -4,7 +4,7 @@
  License: MIT (https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE)
  Source: https://github.com/ThreeLetters/SQL-Library
  Build: v1.0.2
- Built on: 11/08/2017
+ Built on: 14/08/2017
 */
 
 // lib/connector/index.php
@@ -29,7 +29,7 @@ class Response
             $this->affected = $data->rowCount();
         }
     }
-    function init(&$data, &$mode) {
+    private function init(&$data, &$mode) {
         if ($mode === 0) { 
             $outtypes = $this->outTypes;
             $d = $data->fetchAll();
@@ -52,7 +52,7 @@ class Response
             $this->stmt = null;
         }
     }
-    function fetchNextRow() {
+    private function fetchNextRow() {
        $row = $this->stmt->fetch();
         if ($row) {
          if ($this->outTypes) {
@@ -67,7 +67,7 @@ class Response
             return false;
         }
     }
-    function fetchAll() {
+    private function fetchAll() {
         while ($row = $this->fetchNextRow()) {
         }
     }
@@ -147,7 +147,11 @@ class Connector
                 $query,
                 $obj
             ));
-        return new Response($q,$e,$outtypes,$mode);
+        if ($mode !== 3) {
+         return new Response($q,$e,$outtypes,$mode);   
+        } else {
+        return $q;
+        }
     }
     function _query(&$sql, $values, &$insert, &$outtypes = null, $mode = 0)
     {
@@ -307,9 +311,9 @@ class SuperSQL
         $d = SimParser::DELETE($table, $where);
         return $this->con->query($d[0], $d[1]);
     }
-    function query($query, $obj = null)
+    function query($query, $obj = null,$outtypes = null, $mode = 0)
     {
-        return $this->con->query($query, $obj);
+        return $this->con->query($query, $obj, $outtypes, $mode);
     }
     function close()
     {

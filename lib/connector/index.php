@@ -57,7 +57,7 @@ class Response
             $this->affected = $data->rowCount();
         }
     }
-    function init(&$data, &$mode) {
+    private function init(&$data, &$mode) {
         if ($mode === 0) { // fetch all
             $outtypes = $this->outTypes;
             $d = $data->fetchAll();
@@ -81,7 +81,7 @@ class Response
             $this->stmt = null;
         }
     }
-    function fetchNextRow() {
+    private function fetchNextRow() {
        $row = $this->stmt->fetch();
         if ($row) {
          if ($this->outTypes) {
@@ -96,7 +96,7 @@ class Response
             return false;
         }
     }
-    function fetchAll() {
+    private function fetchAll() {
         while ($row = $this->fetchNextRow()) {
             
         }
@@ -219,7 +219,11 @@ class Connector
                 $query,
                 $obj
             ));
-        return new Response($q,$e,$outtypes,$mode);
+        if ($mode !== 3) {
+         return new Response($q,$e,$outtypes,$mode);   
+        } else {
+        return $q;
+        }
     }
     
     /**
