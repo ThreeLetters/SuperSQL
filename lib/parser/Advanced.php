@@ -92,36 +92,37 @@ class AdvParser
                 $key = substr($key, $b + 1);
             
             if ($key[0] === '#') {
-                    $key = substr($key, 1);
-             }
+                $key = substr($key, 1);
+            }
             
         }
         function escape($val, $dt)
         {
-        if (!isset($dt[2])) return $val;
-        switch ($dt[2]) {
-            case 0: //Bool
-                return $val ? '1' : '0';
-                break;
-            case 1: // int
-                return (int)$val;
-                break;
-            case 2: // string
-                return (string)$val;
-                break;
-            case 3: // lob
+            if (!isset($dt[2]))
                 return $val;
-                break;
-            case 4: // null
-                return null;
-                 break;
-            case 5: // json
-                return json_encode($val);
-                break;
-            case 6: // seriealise
-                return serialize($val);
-                break;
-        }
+            switch ($dt[2]) {
+                case 0: //Bool
+                    return $val ? '1' : '0';
+                    break;
+                case 1: // int
+                    return (int) $val;
+                    break;
+                case 2: // string
+                    return (string) $val;
+                    break;
+                case 3: // lob
+                    return $val;
+                    break;
+                case 4: // null
+                    return null;
+                    break;
+                case 5: // json
+                    return json_encode($val);
+                    break;
+                case 6: // seriealise
+                    return serialize($val);
+                    break;
+            }
         }
         function recurse(&$holder, $val, $indexes, $par, $values)
         {
@@ -138,16 +139,18 @@ class AdvParser
                     if (isset($v[0])) {
                         foreach ($v as $i => &$j) {
                             $a = $d + $i;
-                            if (isset($holder[$a])) echo 'SUPERSQL WARN: Key collision: ' . $k;
-                            $holder[$a] = escape($j,$values[$a]);
+                            if (isset($holder[$a]))
+                                echo 'SUPERSQL WARN: Key collision: ' . $k;
+                            $holder[$a] = escape($j, $values[$a]);
                         }
                     } else {
                         recurse($holder, $v, $indexes, $par . '/' . $k, $values);
                     }
                 } else {
-                 
-                      if (isset($holder[$d])) echo 'SUPERSQL WARN: Key collision: ' . $k;
-                    $holder[$d] = escape($v,$values[$d]);
+                    
+                    if (isset($holder[$d]))
+                        echo 'SUPERSQL WARN: Key collision: ' . $k;
+                    $holder[$d] = escape($v, $values[$d]);
                 }
             }
         }
@@ -171,18 +174,18 @@ class AdvParser
      */
     static function quote($str)
     {
-        if (strpos($str,'.') === false) {
+        if (strpos($str, '.') === false) {
             return '`' . $str . '`';
         } else {
-        $str = explode('.', $str);
-        $out = '';
-        $c = count($str);
-        for ($i = 0; $i < $c; $i++) {
-            if ($i !== 0)
-                $out .= '.';
-            $out .= '`' . $str[$i] . '`';
-        }
-        return $out;
+            $str = explode('.', $str);
+            $out = '';
+            $c   = count($str);
+            for ($i = 0; $i < $c; $i++) {
+                if ($i !== 0)
+                    $out .= '.';
+                $out .= '`' . $str[$i] . '`';
+            }
+            return $out;
         }
     }
     
@@ -216,12 +219,12 @@ class AdvParser
     static function value($type, $value)
     {
         $var = $type ? $type : gettype($value);
-
-        $type = \PDO::PARAM_STR;
+        
+        $type  = \PDO::PARAM_STR;
         $dtype = 2;
-    
+        
         if ($var === 'integer' || $var === 'int' || $var === 'double' || $var === 'doub') {
-            $type = \PDO::PARAM_INT;
+            $type  = \PDO::PARAM_INT;
             $dtype = 1;
             $value = (int) $value;
         } else if ($var === 'string' || $var === 'str') {
@@ -236,19 +239,19 @@ class AdvParser
             $type  = \PDO::PARAM_NULL;
             $value = null;
         } else if ($var === 'resource' || $var === 'lob') {
-            $type = \PDO::PARAM_LOB;
+            $type  = \PDO::PARAM_LOB;
             $dtype = 3;
         } else if ($var === 'json') {
             $dtype = 5;
             $value = json_encode($value);
         } else if ($var === 'obj') {
-              $dtype = 6;
+            $dtype = 6;
             $value = serialize($value);
         } else {
-            $value = (string)$value;
+            $value = (string) $value;
             echo 'SUPERSQL WARN: Invalid type ' . $var . ' Assumed STRING';
         }
-      
+        
         return array(
             $value,
             $type,
@@ -257,7 +260,7 @@ class AdvParser
     }
     
     static function getType(&$str)
-    {   
+    {
         if (isset($str[1]) && $str[strlen($str) - 1] === ']') {
             $start = strrpos($str, '[');
             
@@ -272,10 +275,11 @@ class AdvParser
         
     }
     
-    static function rmComments($str) {
-        $i = strpos($str,'#');
+    static function rmComments($str)
+    {
+        $i = strpos($str, '#');
         if ($i !== false) {
-            $str = trim(substr($str,0,$i));
+            $str = trim(substr($str, 0, $i));
         }
         return $str;
     }
@@ -307,8 +311,8 @@ class AdvParser
                 $useBind     = !isset($val[0]);
                 $newJoin     = $join;
                 $newOperator = $operator;
-                $type = $raw ? false : self::getType($key);
-                $column = self::quote(self::rmComments($key));
+                $type        = $raw ? false : self::getType($key);
+                $column      = self::quote(self::rmComments($key));
                 
                 switch ($arg) {
                     case '||':
@@ -339,10 +343,10 @@ class AdvParser
                         break;
                     case '~~':
                         $newOperator = ' LIKE ';
-                        break; 
+                        break;
                     case '!~':
                         $newOperator = ' NOT LIKE ';
-                        break; 
+                        break;
                     default:
                         if (!$useBind || $arg === '==')
                             $newOperator = ' = '; // reset
@@ -351,7 +355,7 @@ class AdvParser
                 
                 if ($num !== 0)
                     $sql .= $join;
-            
+                
                 
                 if (is_array($val) && $type !== 'json' && $type !== 'obj') {
                     if ($useBind) {
@@ -383,7 +387,7 @@ class AdvParser
                 } else {
                     $sql .= $column . $newOperator;
                     if ($raw) {
-                          $sql .= $val;
+                        $sql .= $val;
                     } else {
                         if ($values !== false) {
                             $sql .= '?';
@@ -401,7 +405,7 @@ class AdvParser
                         }
                     }
                 }
-                 $num++;
+                $num++;
             }
             return $sql;
         };
@@ -409,43 +413,44 @@ class AdvParser
         return $build($build, $dt, $map, $index, $values);
     }
     
-    static function JOIN($join, &$sql) {
+    static function JOIN($join, &$sql)
+    {
         foreach ($join as $key => &$val) {
-                if ($key[0] === '#') {
-                    $raw = true;
-                    $key = substr($key, 1);
-                } else {
-                    $raw = false;
-                }
-                
-                $arg = self::getArg($key);
-                switch ($arg) {
-                    case '<<':
-                        
-                        $sql .= ' RIGHT JOIN ';
-                        break;
-                    case '>>':
-                        
-                        $sql .= ' LEFT JOIN ';
-                        break;
-                    case '<>':
-                        
-                        $sql .= ' FULL JOIN ';
-                        break;
-                    default: // inner join
-                        
-                        $sql .= ' JOIN ';
-                        break;
-                }
-                
-                $sql .= '`' . $key . '` ON ';
-                
-                if ($raw) {
-                    $sql .= 'val';
-                } else {
-                    $sql .= self::conditions($val);
-                }
+            if ($key[0] === '#') {
+                $raw = true;
+                $key = substr($key, 1);
+            } else {
+                $raw = false;
             }
+            
+            $arg = self::getArg($key);
+            switch ($arg) {
+                case '<<':
+                    
+                    $sql .= ' RIGHT JOIN ';
+                    break;
+                case '>>':
+                    
+                    $sql .= ' LEFT JOIN ';
+                    break;
+                case '<>':
+                    
+                    $sql .= ' FULL JOIN ';
+                    break;
+                default: // inner join
+                    
+                    $sql .= ' JOIN ';
+                    break;
+            }
+            
+            $sql .= '`' . $key . '` ON ';
+            
+            if ($raw) {
+                $sql .= 'val';
+            } else {
+                $sql .= self::conditions($val);
+            }
+        }
     }
     
     /**
@@ -464,8 +469,8 @@ class AdvParser
         $sql = 'SELECT ';
         
         
-        $values = array();
-        $insert = array();
+        $values   = array();
+        $insert   = array();
         $outTypes = null;
         
         if (!isset($columns[0])) { // none
@@ -476,45 +481,45 @@ class AdvParser
             
             $f = $columns[0][0];
             if ($f === 'D' || $f === 'I') {
-            if ($columns[0] === 'DISTINCT') {
-                $req = 1;
-                $sql .= 'DISTINCT ';
-                array_splice($columns,0,1);
-            } else if (substr($columns[0], 0, 11) === 'INSERT INTO') {
-                $req = 1;
-                $sql = $columns[0] . ' ' . $sql;
-                array_splice($columns,0,1);
-            } else if (substr($columns[0], 0, 4) === 'INTO') {
-                $req  = 1;
-                $into = ' ' . $columns[0] . ' ';
-                array_splice($columns,0,1);
-            }
+                if ($columns[0] === 'DISTINCT') {
+                    $req = 1;
+                    $sql .= 'DISTINCT ';
+                    array_splice($columns, 0, 1);
+                } else if (substr($columns[0], 0, 11) === 'INSERT INTO') {
+                    $req = 1;
+                    $sql = $columns[0] . ' ' . $sql;
+                    array_splice($columns, 0, 1);
+                } else if (substr($columns[0], 0, 4) === 'INTO') {
+                    $req  = 1;
+                    $into = ' ' . $columns[0] . ' ';
+                    array_splice($columns, 0, 1);
+                }
             }
             if (isset($columns[0])) { // has var
                 
                 foreach ($columns as $i => &$val) {
-                    $b = self::getType($val);
-                    $t = $b ? self::getType($val) : false;
-                    if (!$t && $b) {
-                        if (!($b === 'int' || $b === 'string' || $b === 'json' || $b === 'obj' || $b === 'bool')) {
-                            $t = $b;
-                            $b = false;   
+                    $alias = self::getType($val); // get type || alias
+                    if ($alias) { // name[alias][type]
+                        $a = self::getType($val); // get alias
+                        if ($a) {
+                            $type  = $alias; // flip
+                            $alias = $a;
+                        } else if ($alias === "int" || $alias === "bool" || $alias === "string" || $alias === "json" || $alias === "obj") {
+                            $type  = $alias;
+                            $alias = false;
                         }
-                    }
-                    if ($b) {
-                        if (!$outTypes) $outTypes = array();
-                        if ($t) {
-                        $outTypes[$t] = $b;
-                        } else {
-                        $outTypes[$val] = $b;
+                        if ($type) {
+                            if (!$outTypes)
+                                $outTypes = array();
+                            $outTypes[$alias ? $alias : $val] = $type;
                         }
                     }
                     if ($i != 0) {
                         $sql .= ', ';
                     }
                     $sql .= self::quote($val);
-                    if ($t)
-                        $sql .= ' AS `' . $t . '`';
+                    if ($alias)
+                        $sql .= ' AS `' . $alias . '`';
                 }
                 
             } else
@@ -525,7 +530,7 @@ class AdvParser
         $sql .= ' FROM ' . self::table($table);
         
         if ($join) {
-            self::JOIN($join,$sql);
+            self::JOIN($join, $sql);
         }
         if (!empty($where)) {
             $sql .= ' WHERE ';
@@ -540,12 +545,12 @@ class AdvParser
         
         if ($limit) {
             if (is_int($limit)) {
-                 $sql .= ' LIMIT ' . $limit; 
+                $sql .= ' LIMIT ' . $limit;
             } else if (is_string($limit)) {
-                 $sql .= ' ' . $limit; 
+                $sql .= ' ' . $limit;
             }
         }
-           
+        
         
         return array(
             $sql,
@@ -566,10 +571,10 @@ class AdvParser
      */
     static function INSERT($table, $data)
     {
-        $sql        = 'INSERT INTO ' . self::table($table) . ' (';
-        $values     = array();
-        $insert     = array();
-        $append     = '';
+        $sql    = 'INSERT INTO ' . self::table($table) . ' (';
+        $values = array();
+        $insert = array();
+        $append = '';
         
         $i       = 0;
         $b       = 0;
@@ -626,14 +631,14 @@ class AdvParser
      */
     static function UPDATE($table, $data, $where)
     {
-        $sql        = 'UPDATE ' . self::table($table) . ' SET ';
-        $values     = array();
-        $insert     = array();
-        $i          = 0;
-        $b          = 0;
-        $indexes    = array();
-        $multi      = isset($data[0]);
-        $dt         = $multi ? $data[0] : $data;
+        $sql     = 'UPDATE ' . self::table($table) . ' SET ';
+        $values  = array();
+        $insert  = array();
+        $i       = 0;
+        $b       = 0;
+        $indexes = array();
+        $multi   = isset($data[0]);
+        $dt      = $multi ? $data[0] : $data;
         foreach ($dt as $key => &$val) {
             if ($key[0] === '#') {
                 $raw = true;
@@ -708,9 +713,9 @@ class AdvParser
      */
     static function DELETE($table, $where)
     {
-        $sql        = 'DELETE FROM ' . self::table($table);
-        $values     = array();
-        $insert     = array();
+        $sql    = 'DELETE FROM ' . self::table($table);
+        $values = array();
+        $insert = array();
         
         if (!empty($where)) {
             $sql .= ' WHERE ';
