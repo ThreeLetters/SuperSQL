@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <title>SuperSQL</title>
-    <style>
+   <style>
       .highlight table td { padding: 5px; }
 .highlight table pre { margin: 0; }
 .highlight .gh {
@@ -321,6 +321,9 @@
                   </li>
                   <li>
                     <a href="#select-2" class="toc-h2 toc-link" data-title="Helper Functions">SELECT</a>
+                  </li>
+                  <li>
+                    <a href="#selectmap" class="toc-h2 toc-link" data-title="Helper Functions">SELECTMAP</a>
                   </li>
                   <li>
                     <a href="#insert-2" class="toc-h2 toc-link" data-title="Helper Functions">INSERT</a>
@@ -1019,6 +1022,55 @@ If your using the built/compiled file, you must include `dist/SuperSQL_helper.ph
 <p><strong>$SQLHelper-&gt;SELECT($table,$columns,$where,$join,$limit/$append)</strong></p>
 
 <p>The SELECT query. The api is the same as normal SELECT or sSELECT. The helper will choose the most efficient way. (It will choose simple or advanced api based on certain conditions)</p>
+<h2 id='selectmap'>SELECTMAP</h2><pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$SQLHelper</span><span class="o">-&gt;</span><span class="na">SELECTMAP</span><span class="p">(</span><span class="s2">"test"</span><span class="p">,</span><span class="k">array</span><span class="p">(</span>
+    <span class="s2">"name[username]"</span><span class="p">,</span>
+    <span class="s2">"id"</span><span class="p">,</span>
+    <span class="s2">"data"</span> <span class="o">=&gt;</span> <span class="p">[</span>
+        <span class="s2">"admin[is_admin]"</span><span class="p">,</span>
+        <span class="s2">"user_posts[posts][json]"</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="p">));</span>
+
+<span class="cm">/*
+SELECT `name` AS `username`, `id`, `admin` AS `is_admin`, `user_posts` AS `posts` FROM `test`
+
+Output:
+
+[
+    {
+    "username": "admin",
+    "id": 1,
+    "data": [
+        "is_admin": 1,
+        "posts": [
+            {
+            "msg": "DA BAN HAMMER HAS SPOKEN!",
+            "timestamp": 1503011190
+            }
+        ]
+    ]
+    },
+    {
+    "username": "testuser",
+    "id": 2,
+    "data": [
+        "is_admin": 0,
+        "posts": [
+            {
+            "msg": "hello world",
+            "timestamp": 1503011186
+            }
+        ]
+    ]
+    }
+]
+*/</span>
+<span class="cp">?&gt;</span>
+</code></pre>
+<p><strong>$SQLHelper-&gt;SELECTMAP($table,$map,$where,$join,$limit/$append)</strong></p>
+
+<p>The SELECT query for source-mapping.</p>
 <h2 id='insert-2'>INSERT</h2>
 <p><strong>$SQLHelper-&gt;INSERT($table,$data)</strong></p>
 
