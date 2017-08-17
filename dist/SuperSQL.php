@@ -648,7 +648,7 @@ class AdvParser
                         if ($a) {
                             $type  = $alias; 
                             $alias = $a;
-                        } else if ($alias === "int" || $alias === "bool" || $alias === "string" || $alias === "json" || $alias === "obj") {
+                        } else if ($alias === 'int' || $alias === 'bool' || $alias === 'string' || $alias === 'json' || $alias === 'obj') {
                             $type  = $alias;
                             $alias = false;
                         }
