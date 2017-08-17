@@ -83,18 +83,14 @@ class AdvParser
     {
         function stripArgs(&$key)
         {
-            if (substr($key, -1) === ']') {
+            $len = strlen($key);
+            if ($key[$len - 1] === ']') { // remove type
                 $b   = strrpos($key, '[', -1);
                 $key = substr($key, 0, $b);
             }
-            $b = strrpos($key, ']', -1);
+            $b = strrpos($key, ']', -1); // remove cond
             if ($b !== false)
                 $key = substr($key, $b + 1);
-            
-            if ($key[0] === '#') {
-                $key = substr($key, 1);
-            }
-            
         }
         function escape($val, $dt)
         {
@@ -127,9 +123,9 @@ class AdvParser
         function recurse(&$holder, $val, $indexes, $par, $values)
         {
             foreach ($val as $k => &$v) {
+                if ($k[0] === "#") continue;
                 stripArgs($k);
                 $k1 = $k . '#' . $par;
-                
                 if (isset($indexes[$k1]))
                     $d = $indexes[$k1];
                 else
@@ -453,32 +449,8 @@ class AdvParser
         }
     }
     
-    /**
-     * Constructs SQL commands (SELECT)
-     *
-     * @param {String} table - SQL Table
-     * @param {Array} columns - Columns to return
-     * @param {Object|Array} where - Where clause
-     * @param {Object|null} join - Join clause 
-     * @param {Int} limit - Limit clause
-     * 
-     * @returns {Array}
-     */
-    static function SELECT($table, $columns, $where, $join, $limit)
-    {
-        $sql = 'SELECT ';
-        
-        
-        $values   = array();
-        $insert   = array();
-        $outTypes = null;
-        
-        if (!isset($columns[0])) { // none
-            $sql .= '*';
-        } else { // some
-            $req  = 0;
+    static function columns($columns,&$sql,&$outTypes) {
             $into = '';
-            
             $f = $columns[0][0];
             if ($f === 'D' || $f === 'I') {
                 if ($columns[0] === 'DISTINCT') {
@@ -496,7 +468,6 @@ class AdvParser
                 }
             }
             if (isset($columns[0])) { // has var
-                
                 foreach ($columns as $i => &$val) {
                     $alias = self::getType($val); // get type || alias
                     if ($alias) { // name[alias][type]
@@ -526,6 +497,30 @@ class AdvParser
                 $sql .= '*';
             
             $sql .= $into;
+    }
+    
+    /**
+     * Constructs SQL commands (SELECT)
+     *
+     * @param {String} table - SQL Table
+     * @param {Array} columns - Columns to return
+     * @param {Object|Array} where - Where clause
+     * @param {Object|null} join - Join clause 
+     * @param {Int} limit - Limit clause
+     * 
+     * @returns {Array}
+     */
+    static function SELECT($table, $columns, $where, $join, $limit)
+    {
+        $sql = 'SELECT ';
+        $values   = array();
+        $insert   = array();
+        $outTypes = null;
+        
+        if (!isset($columns[0])) { // none
+            $sql .= '*';
+        } else { // some
+            self::columns($columns,$sql,$outTypes);
         }
         $sql .= ' FROM ' . self::table($table);
         

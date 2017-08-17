@@ -21,7 +21,6 @@ SlickInject and Medoo on steroids - The most advanced and lightweight library of
 #### Missing features.
 * `GROUP` - prs welcome
 * `[<>] and [><]` shortcut operators
-* SourceMaps - Prs welcome (again)
 
 ## Usage
 You may either

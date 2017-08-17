@@ -310,16 +310,14 @@ class AdvParser
     {
         function stripArgs(&$key)
         {
-            if (substr($key, -1) === ']') {
+            $len = strlen($key);
+            if ($key[$len - 1] === ']') { 
                 $b   = strrpos($key, '[', -1);
                 $key = substr($key, 0, $b);
             }
-            $b = strrpos($key, ']', -1);
+            $b = strrpos($key, ']', -1); 
             if ($b !== false)
                 $key = substr($key, $b + 1);
-            if ($key[0] === '#') {
-                $key = substr($key, 1);
-            }
         }
         function escape($val, $dt)
         {
@@ -352,6 +350,7 @@ class AdvParser
         function recurse(&$holder, $val, $indexes, $par, $values)
         {
             foreach ($val as $k => &$v) {
+                if ($k[0] === "#") continue;
                 stripArgs($k);
                 $k1 = $k . '#' . $par;
                 if (isset($indexes[$k1]))
@@ -623,16 +622,7 @@ class AdvParser
             }
         }
     }
-    static function SELECT($table, $columns, $where, $join, $limit)
-    {
-        $sql = 'SELECT ';
-        $values   = array();
-        $insert   = array();
-        $outTypes = null;
-        if (!isset($columns[0])) { 
-            $sql .= '*';
-        } else { 
-            $req  = 0;
+    static function columns($columns,&$sql,&$outTypes) {
             $into = '';
             $f = $columns[0][0];
             if ($f === 'D' || $f === 'I') {
@@ -678,6 +668,17 @@ class AdvParser
             } else
                 $sql .= '*';
             $sql .= $into;
+    }
+    static function SELECT($table, $columns, $where, $join, $limit)
+    {
+        $sql = 'SELECT ';
+        $values   = array();
+        $insert   = array();
+        $outTypes = null;
+        if (!isset($columns[0])) { 
+            $sql .= '*';
+        } else { 
+            self::columns($columns,$sql,$outTypes);
         }
         $sql .= ' FROM ' . self::table($table);
         if ($join) {
