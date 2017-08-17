@@ -417,7 +417,16 @@ class SQLHelper
                             $alias = false;
                         }
                     }
-                    array_push($in, $alias ? $alias : $val);
+                    if ($alias) {
+                       array_push($in, $alias);
+                    } else {
+                        $out = $val;
+                        if (strpos($out,".") !== false) {
+                            $out = explode(".",$out);
+                            $out = $out[count($out) - 1];
+                        }
+                       array_push($in, $out);
+                    }
                 } else {
                     $in[$key] = array();
                     recurse($val, $in[$key], $columns, $filtered);
@@ -432,11 +441,11 @@ class SQLHelper
         {
             $out = array();
             foreach ($data as $key => $val) {
-                if (is_int($key)) {
-                    $out[$val] = $row[$val];
+              if (is_int($key)) {
+                   $out[$val] = $row[$val];
                 } else {
                     recurse2($val, $row, $out[$key]);
-                }
+                }   
             }
         }
         $r->result = array();
