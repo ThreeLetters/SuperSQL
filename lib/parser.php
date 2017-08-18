@@ -1,7 +1,5 @@
 <?php
-
 namespace SuperSQL;
-
 /*
 MIT License
 
@@ -26,14 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-/*
-Author: Andrews54757
-License: MIT
-Source: https://github.com/ThreeLetters/SuperSQL
-*/
-
 // BUILD BETWEEN
-class AdvParser
+class Parser
 {
     /**
      * Reads argument data from a string
@@ -52,7 +44,6 @@ class AdvParser
             return false;
         }
     }
-    
     /**
      * Appends value(s) to arguments
      *
@@ -70,7 +61,6 @@ class AdvParser
             }
         }
     }
-    
     /**
      * Appends values to arguments
      *
@@ -78,13 +68,12 @@ class AdvParser
      * @param {Object} indexes - Indexes of keys
      * @param {Array} dt - Values to append
      */
-    
     static function append2(&$insert, $indexes, $dt, $values)
     {
         function stripArgs(&$key)
         {
-          preg_match('/(?:\[.{2}\]){0,2}([^\[]*)/',$key,$matches); // 13 steps
-          return $matches[1];
+            preg_match('/(?:\[.{2}\]){0,2}([^\[]*)/', $key, $matches); // 13 steps
+            return $matches[1];
         }
         function escape($val, $dt)
         {
@@ -117,7 +106,8 @@ class AdvParser
         function recurse(&$holder, $val, $indexes, $par, $values)
         {
             foreach ($val as $k => &$v) {
-                if ($k[0] === "#") continue;
+                if ($k[0] === "#")
+                    continue;
                 stripArgs($k);
                 $k1 = $k . '#' . $par;
                 if (isset($indexes[$k1]))
@@ -130,30 +120,26 @@ class AdvParser
                         foreach ($v as $i => &$j) {
                             $a = $d + $i;
                             if (isset($holder[$a]))
-                                echo 'SUPERSQL WARN: Key collision: ' . $k;
+                                trigger_error('Key collision: ' . $k, E_USER_WARNING);
                             $holder[$a] = escape($j, $values[$a]);
                         }
                     } else {
                         recurse($holder, $v, $indexes, $par . '/' . $k, $values);
                     }
                 } else {
-                    
                     if (isset($holder[$d]))
-                        echo 'SUPERSQL WARN: Key collision: ' . $k;
+                        trigger_error('Key collision: ' . $k, E_USER_WARNING);
                     $holder[$d] = escape($v, $values[$d]);
                 }
             }
         }
-        
         $len = count($dt);
         for ($key = 1; $key < $len; $key++) {
             $val = $dt[$key];
             if (!isset($insert[$key - 1]))
                 $insert[$key - 1] = array();
-            
             recurse($insert[$key - 1], $val, $indexes, '', $values);
         }
-        
     }
     /**
      * Puts quotes around a string
@@ -164,14 +150,13 @@ class AdvParser
      */
     static function quote($str)
     {
-        preg_match('/([^.]*)\.?(.*)?/',$str,$matches); // 8 steps
+        preg_match('/([^.]*)\.?(.*)?/', $str, $matches); // 8 steps
         if ($matches[2] !== '') {
             return '`' . $matches[1] . '.' . $matches[2] . '`';
         } else {
             return '`' . $matches[1] . '`';
         }
     }
-    
     /**
      * Forms the table
      *
@@ -185,11 +170,9 @@ class AdvParser
             $sql = '';
             foreach ($table as $i => &$val) {
                 $t = self::getType($val);
-                
                 if ($i !== 0)
                     $sql .= ', ';
                 $sql .= '`' . $val . '`';
-                
                 if ($t)
                     $sql .= ' AS `' . $t . '`';
             }
@@ -198,14 +181,11 @@ class AdvParser
             return '`' . $table . '`';
         }
     }
-    
     static function value($type, $value)
     {
-        $var = $type ? $type : gettype($value);
-        
+        $var   = $type ? $type : gettype($value);
         $type  = \PDO::PARAM_STR;
         $dtype = 2;
-        
         if ($var === 'integer' || $var === 'int' || $var === 'double' || $var === 'doub') {
             $type  = \PDO::PARAM_INT;
             $dtype = 1;
@@ -232,21 +212,18 @@ class AdvParser
             $value = serialize($value);
         } else {
             $value = (string) $value;
-            echo 'SUPERSQL WARN: Invalid type ' . $var . ' Assumed STRING';
+            trigger_error('Invalid type ' . $var . ' Assumed STRING', E_USER_WARNING);
         }
-        
         return array(
             $value,
             $type,
             $dtype
         );
     }
-    
     static function getType(&$str)
     {
         if (isset($str[1]) && $str[strlen($str) - 1] === ']') {
             $start = strrpos($str, '[');
-            
             if ($start === false) {
                 return '';
             }
@@ -255,12 +232,10 @@ class AdvParser
             return $out;
         } else
             return '';
-        
     }
-    
     static function rmComments($str)
     {
-        preg_match('/([^#]*)/',$str,$matches);
+        preg_match('/([^#]*)/', $str, $matches);
         return $matches[1];
     }
     /**
@@ -277,7 +252,6 @@ class AdvParser
         {
             $num = 0;
             $sql = '';
-            
             foreach ($dt as $key => &$val) {
                 if ($key[0] === '#') {
                     $raw = true;
@@ -285,9 +259,8 @@ class AdvParser
                 } else {
                     $raw = false;
                 }
-                
-                preg_match('/^(?:\[(?<a>.{2})\])?(?:\[(?<b>.{2})\])?(?<out>.*)/',$key,$matches); // 14 steps
-                $key = $matches["out"];
+                preg_match('/^(?:\[(?<a>.{2})\])?(?:\[(?<b>.{2})\])?(?<out>.*)/', $key, $matches); // 14 steps
+                $key         = $matches["out"];
                 $arg         = isset($matches["a"]) ? $matches["a"] : false;
                 $arg2        = isset($matches["b"]) ? $matches["b"] : false;
                 $useBind     = !isset($val[0]);
@@ -295,7 +268,8 @@ class AdvParser
                 $newOperator = $operator;
                 $type        = $raw ? false : self::getType($key);
                 $column      = self::rmComments($key);
-                if (!$raw) $column = self::quote($column);
+                if (!$raw)
+                    $column = self::quote($column);
                 switch ($arg) {
                     case '||':
                         $arg     = $arg2;
@@ -306,39 +280,39 @@ class AdvParser
                         $newJoin = ' AND ';
                         break;
                 }
-                
-                switch ($arg) { // different conditionals
-                    case '!=':
-                        $newOperator = ' != ';
-                        break;
-                    case '>>':
-                        $newOperator = ' > ';
-                        break;
-                    case '<<':
-                        $newOperator = ' < ';
-                        break;
-                    case '>=':
-                        $newOperator = ' >= ';
-                        break;
-                    case '<=':
-                        $newOperator = ' <= ';
-                        break;
-                    case '~~':
-                        $newOperator = ' LIKE ';
-                        break;
-                    case '!~':
-                        $newOperator = ' NOT LIKE ';
-                        break;
-                    default:
-                        if (!$useBind || $arg === '==')
-                            $newOperator = ' = '; // reset
-                        break;
+                if ($arg && $arg !== "==") {
+                    switch ($arg) { // different conditionals
+                        case '!=':
+                            $newOperator = ' != ';
+                            break;
+                        case '>>':
+                            $newOperator = ' > ';
+                            break;
+                        case '<<':
+                            $newOperator = ' < ';
+                            break;
+                        case '>=':
+                            $newOperator = ' >= ';
+                            break;
+                        case '<=':
+                            $newOperator = ' <= ';
+                            break;
+                        case '~~':
+                            $newOperator = ' LIKE ';
+                            break;
+                        case '!~':
+                            $newOperator = ' NOT LIKE ';
+                            break;
+                        default:
+                            throw new \Exception("Invalid operator " . $arg . " Available: ==,!=,>>,<<,>=,<=,~~,!~");
+                            break;
+                    }
+                } else {
+                    if (!$useBind || $arg === '==')
+                        $newOperator = ' = '; // reset
                 }
-                
                 if ($num !== 0)
                     $sql .= $join;
-                
-                
                 if (is_array($val) && $type !== 'json' && $type !== 'obj') {
                     if ($useBind) {
                         $sql .= '(' . $build($build, $val, $map, $index, $values, $newJoin, $newOperator, $parent . '/' . $key) . ')';
@@ -391,10 +365,8 @@ class AdvParser
             }
             return $sql;
         };
-        
         return $build($build, $dt, $map, $index, $values);
     }
-    
     static function JOIN($join, &$sql)
     {
         foreach ($join as $key => &$val) {
@@ -404,29 +376,22 @@ class AdvParser
             } else {
                 $raw = false;
             }
-            
             $arg = self::getArg($key);
             switch ($arg) {
                 case '<<':
-                    
                     $sql .= ' RIGHT JOIN ';
                     break;
                 case '>>':
-                    
                     $sql .= ' LEFT JOIN ';
                     break;
                 case '<>':
-                    
                     $sql .= ' FULL JOIN ';
                     break;
                 default: // inner join
-                    
                     $sql .= ' JOIN ';
                     break;
             }
-            
             $sql .= '`' . $key . '` ON ';
-            
             if ($raw) {
                 $sql .= $val;
             } else {
@@ -434,63 +399,59 @@ class AdvParser
             }
         }
     }
-    
-    static function columns($columns,&$sql,&$outTypes) {
-            $into = '';
-            $f = $columns[0][0];
-            if ($f === 'D' || $f === 'I') {
-                if ($columns[0] === 'DISTINCT') {
-                    $req = 1;
-                    $sql .= 'DISTINCT ';
-                    array_splice($columns, 0, 1);
-                } else if (substr($columns[0], 0, 11) === 'INSERT INTO') {
-                    $req = 1;
-                    $sql = $columns[0] . ' ' . $sql;
-                    array_splice($columns, 0, 1);
-                } else if (substr($columns[0], 0, 4) === 'INTO') {
-                    $req  = 1;
-                    $into = ' ' . $columns[0] . ' ';
-                    array_splice($columns, 0, 1);
-                }
+    static function columns($columns, &$sql, &$outTypes)
+    {
+        $into = '';
+        $f    = $columns[0][0];
+        if ($f === 'D' || $f === 'I') {
+            if ($columns[0] === 'DISTINCT') {
+                $req = 1;
+                $sql .= 'DISTINCT ';
+                array_splice($columns, 0, 1);
+            } else if (substr($columns[0], 0, 11) === 'INSERT INTO') {
+                $req = 1;
+                $sql = $columns[0] . ' ' . $sql;
+                array_splice($columns, 0, 1);
+            } else if (substr($columns[0], 0, 4) === 'INTO') {
+                $req  = 1;
+                $into = ' ' . $columns[0] . ' ';
+                array_splice($columns, 0, 1);
             }
-            if (isset($columns[0])) { // has var
-                foreach ($columns as $i => &$val) {
-                    preg_match('/(?<column>[a-zA-Z0-9_\.]*)(?:\[(?<alias>[^\]]*)\])?(?:\[(?<type>.*)\])?/',$val,$match); // 8 steps
-              //     echo json_encode($match);
-                    $val = $match["column"];
-                    $alias = false;
-                    if (isset($match["alias"])) { // name[alias][type]
-                        $alias = $match["alias"];
-                        
-                        if (isset($match["type"])) {
-                            $type = $match["type"];
-                        } else {
+        }
+        if (isset($columns[0])) { // has var
+            foreach ($columns as $i => &$val) {
+                preg_match('/(?<column>[a-zA-Z0-9_\.]*)(?:\[(?<alias>[^\]]*)\])?(?:\[(?<type>.*)\])?/', $val, $match); // 8 steps
+                //     echo json_encode($match);
+                $val   = $match["column"];
+                $alias = false;
+                if (isset($match["alias"])) { // name[alias][type]
+                    $alias = $match["alias"];
+                    if (isset($match["type"])) {
+                        $type = $match["type"];
+                    } else {
                         if ($alias === "json" || $alias === "obj" || $alias === "int" || $alias === "string" || $alias === "bool") {
-                            $type = $alias;
+                            $type  = $alias;
                             $alias = false;
-                        } else $type = false; 
-                        }
-                        
-                        if ($type) {
-                            if (!$outTypes)
-                                $outTypes = array();
-                            $outTypes[$alias ? $alias : $val] = $type;
-                        }
+                        } else
+                            $type = false;
                     }
-                    if ($i != 0) {
-                        $sql .= ', ';
+                    if ($type) {
+                        if (!$outTypes)
+                            $outTypes = array();
+                        $outTypes[$alias ? $alias : $val] = $type;
                     }
-                    $sql .= self::quote($val);
-                    if ($alias)
-                        $sql .= ' AS `' . $alias . '`';
                 }
-                
-            } else
-                $sql .= '*';
-            
-            $sql .= $into;
+                if ($i != 0) {
+                    $sql .= ', ';
+                }
+                $sql .= self::quote($val);
+                if ($alias)
+                    $sql .= ' AS `' . $alias . '`';
+            }
+        } else
+            $sql .= '*';
+        $sql .= $into;
     }
-    
     /**
      * Constructs SQL commands (SELECT)
      *
@@ -504,18 +465,16 @@ class AdvParser
      */
     static function SELECT($table, $columns, $where, $join, $limit)
     {
-        $sql = 'SELECT ';
+        $sql      = 'SELECT ';
         $values   = array();
         $insert   = array();
         $outTypes = null;
-        
         if (!isset($columns[0])) { // none
             $sql .= '*';
         } else { // some
-            self::columns($columns,$sql,$outTypes);
+            self::columns($columns, $sql, $outTypes);
         }
         $sql .= ' FROM ' . self::table($table);
-        
         if ($join) {
             self::JOIN($join, $sql);
         }
@@ -529,7 +488,6 @@ class AdvParser
                 $sql .= self::conditions($where, $values, $index);
             }
         }
-        
         if ($limit) {
             if (is_int($limit)) {
                 $sql .= ' LIMIT ' . $limit;
@@ -537,17 +495,13 @@ class AdvParser
                 $sql .= ' ' . $limit;
             }
         }
-        
-        
         return array(
             $sql,
             $values,
             $insert,
             $outTypes
         );
-        
     }
-    
     /**
      * Constructs SQL commands (INSERT INTO)
      *
@@ -558,11 +512,10 @@ class AdvParser
      */
     static function INSERT($table, $data)
     {
-        $sql    = 'INSERT INTO ' . self::table($table) . ' (';
-        $values = array();
-        $insert = array();
-        $append = '';
-        
+        $sql     = 'INSERT INTO ' . self::table($table) . ' (';
+        $values  = array();
+        $insert  = array();
+        $append  = '';
         $i       = 0;
         $b       = 0;
         $indexes = array();
@@ -579,10 +532,9 @@ class AdvParser
                 $sql .= ', ';
                 $append .= ', ';
             }
-            preg_match('/(?<out>[^\#\[]*)(?:#[^[]*)?(?:\[(?<type>[^]]*)\])?/',$key,$matches);
-            $key = $matches["out"];
+            preg_match('/(?<out>[^\#\[]*)(?:#[^[]*)?(?:\[(?<type>[^]]*)\])?/', $key, $matches);
+            $key  = $matches["out"];
             $type = isset($matches["type"]) ? $matches["type"] : false;
-            
             $sql .= '`' . $key . '`';
             if ($raw) {
                 $append .= $val;
@@ -599,16 +551,13 @@ class AdvParser
         }
         if ($multi)
             self::append2($insert, $indexes, $data, $values);
-        
         $sql .= ') VALUES (' . $append . ')';
-        
         return array(
             $sql,
             $values,
             $insert
         );
     }
-    
     /**
      * Constructs SQL commands (UPDATE)
      *
@@ -641,43 +590,40 @@ class AdvParser
             if ($raw) {
                 $sql .= '`' . $key . '` = ' . $val;
             } else {
-                preg_match('/(?:\[(?<arg>.{2})\])?(?<out>[^\[]*)(?:\[(?<type>[^\]]*)\])?/',$key,$matches);
+                preg_match('/(?:\[(?<arg>.{2})\])?(?<out>[^\[]*)(?:\[(?<type>[^\]]*)\])?/', $key, $matches);
                 $key = $matches["out"];
-                $sql .= '`' . $key . '` = '; 
+                $sql .= '`' . $key . '` = ';
                 if (isset($matches["arg"])) {
-                switch ($matches["arg"]) {
-                    case '+=':
-                        $sql .= '`' . $key . '` + ?';
-                        break;
-                    case '-=':
-                        $sql .= '`' . $key . '` - ?';
-                        break;
-                    case '/=':
-                        $sql .= '`' . $key . '` / ?';
-                        break;
-                    case '*=':
-                        $sql .= '`' . $key . '` * ?';
-                        break;
-                    default:
-                        $sql .= '?';
-                        break;
-                }
+                    switch ($matches["arg"]) {
+                        case '+=':
+                            $sql .= '`' . $key . '` + ?';
+                            break;
+                        case '-=':
+                            $sql .= '`' . $key . '` - ?';
+                            break;
+                        case '/=':
+                            $sql .= '`' . $key . '` / ?';
+                            break;
+                        case '*=':
+                            $sql .= '`' . $key . '` * ?';
+                            break;
+                        default:
+                            $sql .= '?';
+                            break;
+                    }
                 }
                 $type = isset($matches["type"]) ? $matches["type"] : false;
-               
                 array_push($values, self::value($type, $val));
                 if ($multi) {
                     $indexes[$key] = $i++;
                 } else {
                     self::append($insert, $val, $i++, $values);
                 }
-                
             }
             $b++;
         }
         if ($multi)
             self::append2($insert, $indexes, $data, $values);
-        
         if (!empty($where)) {
             $sql .= ' WHERE ';
             $index = array();
@@ -694,7 +640,6 @@ class AdvParser
             $insert
         );
     }
-    
     /**
      * Constructs SQL commands (DELETE)
      *
@@ -708,7 +653,6 @@ class AdvParser
         $sql    = 'DELETE FROM ' . self::table($table);
         $values = array();
         $insert = array();
-        
         if (!empty($where)) {
             $sql .= ' WHERE ';
             $index = array();
@@ -719,15 +663,12 @@ class AdvParser
                 $sql .= self::conditions($where, $values, $index);
             }
         }
-        
         return array(
             $sql,
             $values,
             $insert
         );
     }
-    
 }
 // BUILD BETWEEN
-
 ?>

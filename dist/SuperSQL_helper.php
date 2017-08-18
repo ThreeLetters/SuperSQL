@@ -173,7 +173,7 @@ class SQLHelper
     {
         $newData = array();
         foreach ($data as $key => $val) {
-            $str = '`' . AdvParser::rmComments($key) . '`';
+            $str = '`' . Parser::rmComments($key) . '`';
             foreach ($val as $k => $v) {
                 $str = 'REPLACE(' . $str . ', ' . self::escape2($k) . ', ' . self::escape($v) . ')';
             }
@@ -183,29 +183,29 @@ class SQLHelper
     }
     function select($table, $columns = array(), $where = array(), $join = null, $limit = false)
     {
-            return $this->s->SELECT($table, $columns, $where, $join, $limit);
+        return $this->s->SELECT($table, $columns, $where, $join, $limit);
     }
     function insert($table, $data)
     {
-             return $this->s->INSERT($table, $data);
-         }
+        return $this->s->INSERT($table, $data);
+    }
     function update($table, $data, $where = array())
     {
-            return $this->s->UPDATE($table, $data, $where);
-         }
+        return $this->s->UPDATE($table, $data, $where);
+    }
     function delete($table, $where = array())
     {
-             return $this->s->DELETE($table, $where);
+        return $this->s->DELETE($table, $where);
     }
     function sqBase($sql, $where, $join)
     {
         $values = array();
         if ($join) {
-            AdvParser::JOIN($join, $sql);
+            Parser::JOIN($join, $sql);
         }
         if (count($where) != 0) {
             $sql .= ' WHERE ';
-            $sql .= AdvParser::conditions($where, $values);
+            $sql .= Parser::conditions($where, $values);
         }
         $res = $this->_query($sql, $values);
         return $res[0]->fetchColumn();
@@ -259,9 +259,9 @@ class SQLHelper
             foreach ($data as $key => $val) {
                 if (is_int($key)) {
                     array_push($columns, $val);
-                    $alias = AdvParser::getType($val); 
+                    $alias = Parser::getType($val); 
                     if ($alias) {
-                        $s = AdvParser::getType($val);
+                        $s = Parser::getType($val);
                         if ($s) {
                             $alias = $s;
                         } else if ($alias === "int" || $alias === "bool" || $alias === "string" || $alias === "json" || $alias === "obj") { 
@@ -269,10 +269,10 @@ class SQLHelper
                         }
                     }
                     if ($alias) {
-                       array_push($in, $alias);
+                        array_push($in, $alias);
                     } else {
-                       preg_match('/(?:[^\.]*\.)?(.*)/',$val,$m);
-                       array_push($in, $m[1]);
+                        preg_match('/(?:[^\.]*\.)?(.*)/', $val, $m);
+                        array_push($in, $m[1]);
                     }
                 } else {
                     $in[$key] = array();
@@ -287,11 +287,11 @@ class SQLHelper
         {
             $out = array();
             foreach ($data as $key => $val) {
-              if (is_int($key)) {
-                   $out[$val] = $row[$val];
+                if (is_int($key)) {
+                    $out[$val] = $row[$val];
                 } else {
                     recurse2($val, $row, $out[$key]);
-                }   
+                }
             }
         }
         $r->result = array();

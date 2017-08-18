@@ -21,7 +21,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
 */
 namespace SuperSQL;
 // BUILD BETWEEN
@@ -29,7 +28,6 @@ class SQLHelper
 {
     public $s;
     public $connections;
-    
     /**
      * Constructs helper
      *
@@ -38,12 +36,9 @@ class SQLHelper
     function __construct($dt, $db = null, $user = null, $pass = null, $options = array())
     {
         $this->connections = array();
-        
         if (is_array($dt)) {
-            
             if (is_array($dt[0])) {
                 foreach ($dt as $key => $v) {
-                    
                     $host = isset($v['host']) ? $v['host'] : '';
                     $db   = isset($v['db']) ? $v['db'] : '';
                     $user = isset($v['user']) ? $v['user'] : '';
@@ -66,7 +61,6 @@ class SQLHelper
             $this->s = $dt;
         }
     }
-    
     /**
      * Connects to a database
      *
@@ -80,10 +74,8 @@ class SQLHelper
      */
     static function connect($host, $db, $user, $pass, $options = array())
     {
-        
         $dbtype = 'mysql';
         $dsn    = false;
-        
         if (is_string($options)) {
             if (strpos($options, ':') !== false) {
                 $dsn = $options;
@@ -92,7 +84,6 @@ class SQLHelper
             }
         } else if (isset($options['dbtype']))
             $dbtype = strtolower($options['dbtype']);
-        
         if (!$dsn) {
             $driver = '';
             switch ($dbtype) {
@@ -102,7 +93,6 @@ class SQLHelper
                         'dbname' => $db,
                         'host' => $host
                     );
-                    
                     if (isset($options['port']))
                         $data['port'] = $options['port'];
                     break;
@@ -132,13 +122,10 @@ class SQLHelper
                         $data['host'] = $host;
                         if (isset($options['port']))
                             $data['port'] = $options['port'];
-                        
                     }
                     break;
-                    
             }
             $dsn = $driver . ':';
-            
             if (isset($options['charset'])) {
                 $data['charset'] = $options['charset'];
             }
@@ -154,8 +141,6 @@ class SQLHelper
         }
         return new SuperSQL($dsn, $user, $pass);
     }
-    
-    
     private static function escape($value)
     {
         $var = strtolower(gettype($value));
@@ -178,7 +163,6 @@ class SQLHelper
             return '\'' . $value . '\'';
         }
     }
-    
     function change($id)
     {
         $this->s = $this->connections[$id];
@@ -192,7 +176,6 @@ class SQLHelper
             return $this->s;
         }
     }
-    
     /**
      * Gets the first row
      *
@@ -208,7 +191,6 @@ class SQLHelper
         $d = $this->s->SELECT($table, $columns, $where, $join, 1)->getData();
         return ($d && $d[0]) ? $d[0] : false;
     }
-    
     /**
      * Creates a table
      *
@@ -217,7 +199,6 @@ class SQLHelper
      */
     function create($table, $data)
     {
-        
         $sql = 'CREATE TABLE `' . $table . '` (';
         $i   = 0;
         foreach ($data as $key => $val) {
@@ -228,10 +209,8 @@ class SQLHelper
             $i++;
         }
         $sql .= ')';
-        
         return $this->s->query($sql);
     }
-    
     /**
      * Deletes a table
      *
@@ -241,51 +220,43 @@ class SQLHelper
     {
         return $this->s->query('DROP TABLE `' . $table . '`');
     }
-    
     function replace($table, $data, $where = array())
     {
-        
         $newData = array();
-        
         foreach ($data as $key => $val) {
-            $str = '`' . AdvParser::rmComments($key) . '`';
-            
+            $str = '`' . Parser::rmComments($key) . '`';
             foreach ($val as $k => $v) {
                 $str = 'REPLACE(' . $str . ', ' . self::escape2($k) . ', ' . self::escape($v) . ')';
             }
-            
             $newData['#' . $key] = $str;
         }
         return $this->s->UPDATE($table, $newData, $where);
     }
-    
     function select($table, $columns = array(), $where = array(), $join = null, $limit = false)
     {
-            return $this->s->SELECT($table, $columns, $where, $join, $limit);
-      
+        return $this->s->SELECT($table, $columns, $where, $join, $limit);
     }
     function insert($table, $data)
     {
-             return $this->s->INSERT($table, $data);
-         }
+        return $this->s->INSERT($table, $data);
+    }
     function update($table, $data, $where = array())
     {
-            return $this->s->UPDATE($table, $data, $where);
-         }
+        return $this->s->UPDATE($table, $data, $where);
+    }
     function delete($table, $where = array())
     {
-             return $this->s->DELETE($table, $where);
-       
+        return $this->s->DELETE($table, $where);
     }
     function sqBase($sql, $where, $join)
     {
         $values = array();
         if ($join) {
-            AdvParser::JOIN($join, $sql);
+            Parser::JOIN($join, $sql);
         }
         if (count($where) != 0) {
             $sql .= ' WHERE ';
-            $sql .= AdvParser::conditions($where, $values);
+            $sql .= Parser::conditions($where, $values);
         }
         $res = $this->_query($sql, $values);
         return $res[0]->fetchColumn();
@@ -313,7 +284,6 @@ class SQLHelper
     function _query($sql, $obj)
     {
         $q = $this->s->con->db->prepare($sql);
-        
         foreach ($obj as $key => &$va) {
             $q->bindParam($key + 1, $va[0], $va[1]);
         }
@@ -340,9 +310,9 @@ class SQLHelper
             foreach ($data as $key => $val) {
                 if (is_int($key)) {
                     array_push($columns, $val);
-                    $alias = AdvParser::getType($val); // get type || alias
+                    $alias = Parser::getType($val); // get type || alias
                     if ($alias) {
-                        $s = AdvParser::getType($val);
+                        $s = Parser::getType($val);
                         if ($s) {
                             $alias = $s;
                         } else if ($alias === "int" || $alias === "bool" || $alias === "string" || $alias === "json" || $alias === "obj") { // name[alias][type]
@@ -350,10 +320,10 @@ class SQLHelper
                         }
                     }
                     if ($alias) {
-                       array_push($in, $alias);
+                        array_push($in, $alias);
                     } else {
-                       preg_match('/(?:[^\.]*\.)?(.*)/',$val,$m);
-                       array_push($in, $m[1]);
+                        preg_match('/(?:[^\.]*\.)?(.*)/', $val, $m);
+                        array_push($in, $m[1]);
                     }
                 } else {
                     $in[$key] = array();
@@ -364,16 +334,15 @@ class SQLHelper
         recurse($map, $filtered, $columns, $filtered);
         $r = $this->s->select($table, $columns, $where, $join, $limit);
         $d = $r->getData();
-        
         function recurse2($data, $row, &$out)
         {
             $out = array();
             foreach ($data as $key => $val) {
-              if (is_int($key)) {
-                   $out[$val] = $row[$val];
+                if (is_int($key)) {
+                    $out[$val] = $row[$val];
                 } else {
                     recurse2($val, $row, $out[$key]);
-                }   
+                }
             }
         }
         $r->result = array();

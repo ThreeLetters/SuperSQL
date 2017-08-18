@@ -21,26 +21,16 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-*/
-
-/*
-Author: Andrews54757
-License: MIT
-Source: https://github.com/ThreeLetters/SuperSQL
 */
 namespace SuperSQL;
-
 include "lib/parser.php";
 include "lib/connector.php";
 include "lib/helper.php";
-
 // BUILD BETWEEN
 class SuperSQL
 {
     public $con;
     public $lockMode = false;
-    
     /**
      * Creates a connection
      * @param {String} dsn - DSN of the connection
@@ -68,10 +58,9 @@ class SuperSQL
             $limit = $join;
             $join  = null;
         }
-        $d = AdvParser::SELECT($table, $columns, $where, $join, $limit);
+        $d = Parser::SELECT($table, $columns, $where, $join, $limit);
         return $this->con->_query($d[0], $d[1], $d[2], $d[3], $this->lockMode ? 0 : 1);
     }
-    
     /**
      * Inserts data into a SQL table
      *
@@ -82,10 +71,9 @@ class SuperSQL
      */
     function INSERT($table, $data)
     {
-        $d = AdvParser::INSERT($table, $data);
+        $d = Parser::INSERT($table, $data);
         return $this->con->_query($d[0], $d[1], $d[2]);
     }
-    
     /**
      * Updates a SQL table
      *
@@ -97,10 +85,9 @@ class SuperSQL
      */
     function UPDATE($table, $data, $where = array())
     {
-        $d = AdvParser::UPDATE($table, $data, $where);
+        $d = Parser::UPDATE($table, $data, $where);
         return $this->con->_query($d[0], $d[1], $d[2]);
     }
-    
     /**
      * Deletes from a SQL table
      *
@@ -111,14 +98,13 @@ class SuperSQL
      */
     function DELETE($table, $where = array())
     {
-        $d = AdvParser::DELETE($table, $where);
+        $d = Parser::DELETE($table, $where);
         return $this->con->_query($d[0], $d[1], $d[2]);
     }
-    
     /**
      * Query
      */
-    function query($query, $obj = null,$outtypes = null, $mode = 0)
+    function query($query, $obj = null, $outtypes = null, $mode = 0)
     {
         return $this->con->query($query, $obj, $outtypes, $mode);
     }
@@ -129,7 +115,6 @@ class SuperSQL
     {
         $this->con->close();
     }
-    
     /**
      * Turns on dev mode
      */
@@ -137,7 +122,6 @@ class SuperSQL
     {
         $this->con->dev = true;
     }
-    
     /**
      * Get log
      */
@@ -145,26 +129,23 @@ class SuperSQL
     {
         return $this->con->log;
     }
-    
     /**
      * Transaction
      */
-    function transact($func) {
+    function transact($func)
+    {
         $this->con->db->beginTransaction();
         $r = $func($this);
         if ($r === false)
             $this->con->db->rollBack();
-         else 
+        else
             $this->con->db->commit();
-        
         return $r;
     }
-    
-    function modeLock($val) {
+    function modeLock($val)
+    {
         $this->lockMode = $val;
     }
-    
 }
 // BUILD BETWEEN
-
 ?>
