@@ -66,7 +66,7 @@ It will build to /dist/SuperSQL.php
 
 Full documentation is here: http://supersql.tk/
 
-![screen shot 2017-08-09 at 9 46 00 pm](https://user-images.githubusercontent.com/13282284/29151001-35f1a9d6-7d4c-11e7-8fd6-f88f10356d98.png)
+![supersql.tk](https://user-images.githubusercontent.com/13282284/29477650-435ff87e-8437-11e7-9e0a-01eb8a508bdb.png)
 
 ## FAQ
 
