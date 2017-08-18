@@ -261,13 +261,13 @@ function minify(str,options) {
 
 var fs = require("fs");
 
-var adv = fs.readFileSync(__dirname + "/lib/parser/Advanced.php", "utf8");
+var adv = fs.readFileSync(__dirname + "/lib/parser.php", "utf8");
 
-var connector = fs.readFileSync(__dirname + "/lib/connector/index.php", "utf8");
+var connector = fs.readFileSync(__dirname + "/lib/connector.php", "utf8");
 
 var main = fs.readFileSync(__dirname + "/index.php", "utf8");
 
-var helper = fs.readFileSync(__dirname + "/lib/helper/index.php", "utf8");
+var helper = fs.readFileSync(__dirname + "/lib/helper.php", "utf8");
 
 var startstr = "// BUILD BETWEEN";
 
@@ -291,17 +291,17 @@ var out = `<?php\n\
 namespace SuperSQL;\n\
 \n`;
 
-var complete = `// lib/connector/index.php\
+var complete = `// lib/connector.php\
 ${connector}\n\
-// lib/parser/Advanced.php\
+// lib/parser.php\
 ${adv}\n\
 // index.php\
 ${main}\
 ?>`;
 
-var completeMin = `// lib/connector/index.php\n\
+var completeMin = `// lib/connector.php\n\
 ${minify(connector)}\n\
-// lib/parser/Advanced.php\n\
+// lib/parser.php\n\
 ${minify(adv)}\n\
 // index.php\n\
 ${minify(main)}\n\

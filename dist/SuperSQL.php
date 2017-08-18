@@ -9,7 +9,7 @@
 
 namespace SuperSQL;
 
-// lib/connector/index.php
+// lib/connector.php
 class Response
 {
     public $result;
@@ -190,7 +190,7 @@ class Connector
     }
 }
 
-// lib/parser/Advanced.php
+// lib/parser.php
 class AdvParser
 {
     static function getArg(&$str)
