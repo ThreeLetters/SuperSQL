@@ -719,8 +719,10 @@ class AdvParser
                 $sql .= ', ';
                 $append .= ', ';
             }
-            $type = self::getType($key);
-            $sql .= '`' . self::rmComments($key) . '`';
+            preg_match('/(?<out>[^#|[]*)(?:#[^[]*)?(?:\[(?<type>[^]]*)\])?/',$key,$matches);
+            $key = $matches["out"];
+            $type = isset($matches["type"]) ? $matches["type"] : false;
+            $sql .= '`' . $key . '`';
             if ($raw) {
                 $append .= $val;
             } else {
@@ -766,9 +768,11 @@ class AdvParser
             if ($raw) {
                 $sql .= '`' . $key . '` = ' . $val;
             } else {
-                $arg = self::getArg($key);
-                $sql .= '`' . $key . '` = ';
-                switch ($arg) {
+                preg_match('/(?:\[(?<arg>.{2})\])?(?<out>[^\[]*)(?:\[(?<type>[^\]]*)\])?/',$key,$matches);
+                $key = $matches["out"];
+                $sql .= '`' . $key . '` = '; 
+                if (isset($matches["arg"])) {
+                switch ($matches["arg"]) {
                     case '+=':
                         $sql .= '`' . $key . '` + ?';
                         break;
@@ -785,7 +789,8 @@ class AdvParser
                         $sql .= '?';
                         break;
                 }
-                $type = self::getType($key);
+                }
+                $type = isset($matches["type"]) ? $matches["type"] : false;
                 array_push($values, self::value($type, $val));
                 if ($multi) {
                     $indexes[$key] = $i++;
