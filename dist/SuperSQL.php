@@ -7,6 +7,8 @@
  Built on: 18/08/2017
 */
 
+namespace SuperSQL;
+
 // lib/connector/index.php
 class Response
 {

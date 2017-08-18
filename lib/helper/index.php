@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-use SuperSQL\AdvParser as AdvParser;
+namespace SuperSQL;
 // BUILD BETWEEN
 class SQLHelper
 {

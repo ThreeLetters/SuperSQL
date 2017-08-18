@@ -286,7 +286,10 @@ var out = `<?php\n\
  Source: https://github.com/ThreeLetters/SQL-Library\n\
  Build: v${version}\n\
  Built on: ${date}\n\
-*/\n\n`;
+*/\n\
+\n\
+namespace SuperSQL;\n\
+\n`;
 
 var complete = `// lib/connector/index.php\
 ${connector}\n\

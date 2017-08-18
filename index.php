@@ -29,16 +29,11 @@ Author: Andrews54757
 License: MIT
 Source: https://github.com/ThreeLetters/SuperSQL
 */
+namespace SuperSQL;
 
 include "lib/parser/Advanced.php";
-include "lib/parser/Simple.php";
 include "lib/connector/index.php";
 include "lib/helper/index.php";
-
-use SuperSQL\AdvParser as AdvParser;
-use SuperSQL\SimParser as SimParser;
-use SuperSQL\Connector as Connector;
-
 
 // BUILD BETWEEN
 class SuperSQL
