@@ -349,7 +349,7 @@ var sizes = `\
 * \`SuperSQL.php\` - ${a.length} Chars (${size(dir1)} MB)\n\
 * \`SuperSQL_min.php\` - ${b.length} Chars (${size(dir2)} MB)\n\
 * \`SuperSQL_helper.php\` - ${c.length} Chars (${size(dir3)} MB)\n\
-* \`SuperSQL.php\` - ${d.length} Chars (${size(dir4)} MB)\n\
+* \`SuperSQL_helper_min.php\` - ${d.length} Chars (${size(dir4)} MB)\n\
 \n\
 ## Hashes\n\
 \n\
