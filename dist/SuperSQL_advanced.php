@@ -4,7 +4,7 @@
  License: MIT (https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE)
  Source: https://github.com/ThreeLetters/SQL-Library
  Build: v1.0.2
- Built on: 17/08/2017
+ Built on: 18/08/2017
 */
 
 // lib/connector/index.php
@@ -388,7 +388,8 @@ class AdvParser
                 $newJoin     = $join;
                 $newOperator = $operator;
                 $type        = $raw ? false : self::getType($key);
-                $column      = self::quote(self::rmComments($key));
+                $column      = self::rmComments($key);
+                if (!$raw) $column = self::quote($column);
                 switch ($arg) {
                     case '||':
                         $arg     = $arg2;
@@ -508,7 +509,7 @@ class AdvParser
             }
             $sql .= '`' . $key . '` ON ';
             if ($raw) {
-                $sql .= 'val';
+                $sql .= $val;
             } else {
                 $sql .= self::conditions($val);
             }
@@ -625,7 +626,7 @@ class AdvParser
                 $sql .= ', ';
                 $append .= ', ';
             }
-            preg_match('/(?<out>[^#|[]*)(?:#[^[]*)?(?:\[(?<type>[^]]*)\])?/',$key,$matches);
+            preg_match('/(?<out>[^\#\[]*)(?:#[^[]*)?(?:\[(?<type>[^]]*)\])?/',$key,$matches);
             $key = $matches["out"];
             $type = isset($matches["type"]) ? $matches["type"] : false;
             $sql .= '`' . $key . '`';
