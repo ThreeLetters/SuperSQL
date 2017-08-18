@@ -31,6 +31,8 @@ You may either
 new SuperSQL($dsn,$user,$pass);
 ```
 ```php
+use SuperSQL\SuperSQL;
+
 // MySql setup
 $host = "localhost";
 $db = "test";
@@ -40,6 +42,19 @@ $pass = "1234";
 $dsn = "mysql:host=$host;port=3306;dbname=$db;charset=utf8";
 $SuperSQL = new SuperSQL($dsn,$user,$pass);
 ```
+
+```php
+use SuperSQL\SQLHelper;
+
+// MySql setup
+$host = "localhost";
+$db = "test";
+$user = "root";
+$pass = "1234";
+
+$SuperSQL = SQLHelper::connect($host, $db, $user,$pass);
+```
+
 ## Build
 To build this library, do 
 
