@@ -310,14 +310,8 @@ class AdvParser
     {
         function stripArgs(&$key)
         {
-            $len = strlen($key);
-            if ($key[$len - 1] === ']') { 
-                $b   = strrpos($key, '[', -1);
-                $key = substr($key, 0, $b);
-            }
-            $b = strrpos($key, ']', -1); 
-            if ($b !== false)
-                $key = substr($key, $b + 1);
+          preg_match('/(?:\[.{2}\]){0,2}([^\[]*)/',$key,$matches); 
+          return $matches[1];
         }
         function escape($val, $dt)
         {
@@ -386,18 +380,11 @@ class AdvParser
     }
     static function quote($str)
     {
-        if (strpos($str, '.') === false) {
-            return '`' . $str . '`';
+        preg_match('/([^.]*)\.?(.*)?/',$str,$matches); 
+        if ($matches[2] !== '') {
+            return '`' . $matches[1] . '.' . $matches[2] . '`';
         } else {
-            $str = explode('.', $str);
-            $out = '';
-            $c   = count($str);
-            for ($i = 0; $i < $c; $i++) {
-                if ($i !== 0)
-                    $out .= '.';
-                $out .= '`' . $str[$i] . '`';
-            }
-            return $out;
+            return '`' . $matches[1] . '`';
         }
     }
     static function table($table)
@@ -471,11 +458,8 @@ class AdvParser
     }
     static function rmComments($str)
     {
-        $i = strpos($str, '#');
-        if ($i !== false) {
-            $str = trim(substr($str, 0, $i));
-        }
-        return $str;
+        preg_match('/([^#]*)/',$str,$matches);
+        return $matches[1];
     }
     static function conditions($dt, &$values = false, &$map = false, &$index = 0)
     {
@@ -490,8 +474,10 @@ class AdvParser
                 } else {
                     $raw = false;
                 }
-                $arg         = self::getArg($key);
-                $arg2        = $arg ? self::getArg($key) : false;
+                preg_match('/^(?:\[(?<a>.{2})\])?(?:\[(?<b>.{2})\])?(?<out>.*)/',$key,$matches); 
+                $key = $matches["out"];
+                $arg         = isset($matches["a"]) ? $matches["a"] : false;
+                $arg2        = isset($matches["b"]) ? $matches["b"] : false;
                 $useBind     = !isset($val[0]);
                 $newJoin     = $join;
                 $newOperator = $operator;
@@ -642,16 +628,19 @@ class AdvParser
             }
             if (isset($columns[0])) { 
                 foreach ($columns as $i => &$val) {
-                    $alias = self::getType($val); 
-                    if ($alias) { 
-                        $a = self::getType($val); 
-                        if ($a) {
-                            $type  = $alias; 
-                            $alias = $a;
-                        } else if ($alias === 'int' || $alias === 'bool' || $alias === 'string' || $alias === 'json' || $alias === 'obj') {
-                            $type  = $alias;
+                    preg_match('/(?<column>[a-zA-Z0-9_\.]*)(?:\[(?<alias>[^\]]*)\])?(?:\[(?<type>.*)\])?/',$val,$match); 
+                    $val = $match["column"];
+                    $alias = false;
+                    if (isset($match["alias"])) { 
+                        $alias = $match["alias"];
+                        if (isset($match["type"])) {
+                            $type = $match["type"];
+                        } else {
+                        if ($alias === "json" || $alias === "obj" || $alias === "int" || $alias === "string" || $alias === "bool") {
+                            $type = $alias;
                             $alias = false;
-                        } else $type = false;
+                        } else $type = false; 
+                        }
                         if ($type) {
                             if (!$outTypes)
                                 $outTypes = array();
