@@ -188,100 +188,6 @@ class Connector
     }
 }
 
-// lib/parser/Simple.php
-class SimParser
-{
-    public static function WHERE($where, &$sql, &$insert)
-    {
-        if (!empty($where)) {
-            $sql .= ' WHERE ';
-            $i = 0;
-            foreach ($where as $key => $value) {
-                if ($i !== 0) {
-                    $sql .= ' AND ';
-                }
-                $sql .= '`' . $key . '` = ?';
-                array_push($insert,$value);
-                $i++;
-            }
-        }
-    }
-    public static function SELECT($table, $columns, $where, $append)
-    {
-        $sql    = 'SELECT ';
-        $insert = array();
-        if (!isset($columns[0])) { 
-            $sql .= '*';
-        } else { 
-            $len    = count($columns);
-            for ($i = 0; $i < $len; $i++) {
-                if ($i !== 0) {
-                    $sql .= ', ';
-                }
-                $sql .= '`' . $columns[$i] . '`';
-            }
-        }
-        $sql .= ' FROM `' . $table . '`';
-        self::WHERE($where, $sql, $insert);
-       if ($append) $sql .= ' ' . $append;
-        return array(
-            $sql,
-            $insert
-        );
-    }
-    public static function INSERT($table, $data)
-    {
-        $sql    = 'INSERT INTO `' . $table . '` (';
-        $add    = ') VALUES (';
-        $insert = array();
-        $i = 0;
-        foreach ($data as $key => $value) {
-            if ($i !== 0) {
-                $sql .= ', ';
-                $add .= ', ';
-            }
-            $sql .= '`' . $key . '`';
-            $add .= '?';
-            array_push($insert, $value);
-            $i++;
-        }
-        $sql .= $add . ')';
-        return array(
-            $sql,
-            $insert
-        );
-    }
-    public static function UPDATE($table, $data, $where)
-    {
-        $sql    = 'UPDATE `' . $table . '` SET ';
-        $insert = array();
-        $i = 0;
-        foreach ($data as $key => $value) {
-            if ($i !== 0) {
-                $sql .= ', ';
-            }
-            $sql .= '`' . $key . '` = ?';
-            array_push($insert, $value);
-            $i++;
-        }
-        self::WHERE($where, $sql, $insert);
-        return array(
-            $sql,
-            $insert
-        );
-    }
-    public static function DELETE($table, $where)
-    {
-        $sql    = 'DELETE FROM `' . $table . '`';
-        $insert = array();
-        self::WHERE($where, $sql, $insert);
-        return array(
-            $sql,
-            $insert
-        );
-    }
-}
-
 // lib/parser/Advanced.php
 class AdvParser
 {
@@ -874,26 +780,6 @@ class SuperSQL
     {
         $d = AdvParser::DELETE($table, $where);
         return $this->con->_query($d[0], $d[1], $d[2]);
-    }
-    function sSELECT($table, $columns = array(), $where = array(), $append = "")
-    {
-        $d = SimParser::SELECT($table, $columns, $where, $append);
-        return $this->con->query($d[0], $d[1],null,$this->lockMode ? 0 : 1);
-    }
-    function sINSERT($table, $data)
-    {
-        $d = SimParser::INSERT($table, $data);
-        return $this->con->query($d[0], $d[1]);
-    }
-    function sUPDATE($table, $data, $where = array())
-    {
-        $d = SimParser::UPDATE($table, $data, $where);
-        return $this->con->query($d[0], $d[1]);
-    }
-    function sDELETE($table, $where = array())
-    {
-        $d = SimParser::DELETE($table, $where);
-        return $this->con->query($d[0], $d[1]);
     }
     function query($query, $obj = null,$outtypes = null, $mode = 0)
     {

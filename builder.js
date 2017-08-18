@@ -261,8 +261,6 @@ function minify(str,options) {
 
 var fs = require("fs");
 
-var simple = fs.readFileSync(__dirname + "/lib/parser/Simple.php", "utf8");
-
 var adv = fs.readFileSync(__dirname + "/lib/parser/Advanced.php", "utf8");
 
 var connector = fs.readFileSync(__dirname + "/lib/connector/index.php", "utf8");
@@ -275,7 +273,6 @@ var startstr = "// BUILD BETWEEN";
 
 
 
-simple = removeComments(simple.split(startstr)[1]);
 adv = removeComments(adv.split(startstr)[1]);
 connector = removeComments(connector.split(startstr)[1]);
 var index = main.split(startstr)[1];
@@ -293,8 +290,6 @@ var out = `<?php\n\
 
 var complete = `// lib/connector/index.php\
 ${connector}\n\
-// lib/parser/Simple.php\
-${simple}\n\
 // lib/parser/Advanced.php\
 ${adv}\n\
 // index.php\
@@ -303,75 +298,26 @@ ${main}\
 
 var completeMin = `// lib/connector/index.php\n\
 ${minify(connector)}\n\
-// lib/parser/Simple.php\n\
-${minify(simple)}\n\
 // lib/parser/Advanced.php\n\
 ${minify(adv)}\n\
 // index.php\n\
 ${minify(main)}\n\
 ?>`;
 
-var smain = index.split("// BUILD ADVANCED BETWEEN");
-smain = (smain[0] + smain[2]);
-smain = removeComments(smain);
-var simpleOnly = `// lib/connector/index.php\
-${connector}\n\
-// lib/parser/Simple.php\
-${simple}\n\
-// index.php\
-${smain}\
-?>`;
-var simpleOnlyMin = `// lib/connector/index.php\n\
-${minify(connector)}\n\
-// lib/parser/Simple.php\n\
-${minify(simple)}\n\
-// index.php\n\
-${minify(smain)}\n\
-?>`;
 
-var amain = index.split("// BUILD SIMPLE BETWEEN");
-amain = (amain[0] + amain[2]);
-amain = removeComments(amain);
-var advancedOnly = `// lib/connector/index.php\
-${connector}\n\
-// lib/parser/Advanced.php\
-${adv}\n\
-// index.php\
-${amain}\
-?>`;
-
-var advancedOnlyMin = `// lib/connector/index.php\n\
-${minify(connector)}\n\
-// lib/parser/Advanced.php\n\
-${minify(adv)}\n\
-// index.php\n\
-${minify(amain)}\n\
-?>`;
 
 var a = out + complete,
     b = out + completeMin,
-    c = out + simpleOnly,
-    d = out + simpleOnlyMin,
-    e = out + advancedOnly,
-    f = out + advancedOnlyMin,
-    g = out + helper,
-    h = out + minify(helper) + "\n?>";
+    c = out + helper,
+    d = out + minify(helper) + "\n?>";
 
 
 fs.writeFileSync(__dirname + "/dist/SuperSQL.php", a);
 fs.writeFileSync(__dirname + "/dist/SuperSQL_min.php", b);
 
 
-fs.writeFileSync(__dirname + "/dist/SuperSQL_simple.php", c);
-fs.writeFileSync(__dirname + "/dist/SuperSQL_simple_min.php", d);
-
-
-fs.writeFileSync(__dirname + "/dist/SuperSQL_advanced.php", e);
-fs.writeFileSync(__dirname + "/dist/SuperSQL_advanced_min.php", f);
-
-
-fs.writeFileSync(__dirname + "/dist/SuperSQL_helper.php", g);
-fs.writeFileSync(__dirname + "/dist/SuperSQL_helper_min.php", h);
+fs.writeFileSync(__dirname + "/dist/SuperSQL_helper.php", c);
+fs.writeFileSync(__dirname + "/dist/SuperSQL_helper_min.php", d);
 
 
 console.log("Compiled files into dist. Stats:");
@@ -379,13 +325,10 @@ console.log("Compiled files into dist. Stats:");
 console.log("OUTPUT");
 
 console.log(`SuperSQL: ~${a.length} Lines: ~${a.split("\n").length} - Minified: ~${b.length} Lines: ~${b.split("\n").length}`);
-console.log(`Simple: ~${c.length} Lines: ~${c.split("\n").length} - Minified: ~${d.length} Lines: ~${d.split("\n").length}`);
-console.log(`Advanced: ~${e.length} Lines: ~${e.split("\n").length} - Minified: ~${f.length} Lines: ~${f.split("\n").length}`);
-console.log(`Helper: ~${g.length} Lines: ~${g.split("\n").length} - Minified: ~${h.length} Lines: ~${h.split("\n").length}`);
+console.log(`Helper: ~${c.length} Lines: ~${c.split("\n").length} - Minified: ~${d.length} Lines: ~${d.split("\n").length}`);
 
 console.log("FILES");
 
 console.log(`Index ${index.length} Lines: ~${index.split("\n").length}`);
 console.log(`Connector ${connector.length} Lines: ~${connector.split("\n").length}`);
-console.log(`SimpleParser ${simple.length} Lines: ~${simple.split("\n").length}`);
 console.log(`AdvancedParser ${adv.length} Lines: ~${adv.split("\n").length}`);

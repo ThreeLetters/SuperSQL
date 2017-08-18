@@ -155,14 +155,6 @@ class SQLHelper
         return new SuperSQL($dsn, $user, $pass);
     }
     
-    private static function rmComments($str)
-    {
-        $i = strpos($str, '#');
-        if ($i !== false) {
-            $str = substr($str, 0, $i);
-        }
-        return trim($str);
-    }
     
     private static function escape($value)
     {
@@ -186,50 +178,6 @@ class SQLHelper
             return '\'' . $value . '\'';
         }
     }
-    private static function includes($val, $arr)
-    {
-        foreach ($arr as $v) {
-            if (strpos($val, $v) !== false)
-                return true;
-        }
-        return false;
-    }
-    
-    private static function containsAdv($arr, $col = false)
-    {
-        if ($col) {
-            foreach ($arr as $key => &$val) {
-                if (is_array($val))
-                    return true;
-                
-                if (self::includes($val, array(
-                    '['
-                )))
-                    return true;
-                
-                if (self::includes($val, array(
-                    'DISTINCT',
-                    'INSERT INTO',
-                    'INTO'
-                )))
-                    return true;
-            }
-        } else {
-            foreach ($arr as $key => &$val) {
-                if (is_array($val))
-                    return true;
-                
-                if (self::includes($key, array(
-                    '[',
-                    '#'
-                )))
-                    return true;
-                
-            }
-        }
-        return false;
-    }
-    
     
     function change($id)
     {
@@ -300,7 +248,7 @@ class SQLHelper
         $newData = array();
         
         foreach ($data as $key => $val) {
-            $str = '`' . self::rmComments($key) . '`';
+            $str = '`' . AdvParser::rmComments($key) . '`';
             
             foreach ($val as $k => $v) {
                 $str = 'REPLACE(' . $str . ', ' . self::escape2($k) . ', ' . self::escape($v) . ')';
@@ -313,37 +261,21 @@ class SQLHelper
     
     function select($table, $columns = array(), $where = array(), $join = null, $limit = false)
     {
-        if (is_array($table) || self::containsAdv($columns, true) || self::containsAdv($where) || $join) {
             return $this->s->SELECT($table, $columns, $where, $join, $limit);
-        } else {
-            if (is_int($limit))
-                $limit = 'LIMIT ' . (int) $limit;
-            return $this->s->sSELECT($table, $columns, $where, $limit);
-        }
+      
     }
     function insert($table, $data)
     {
-        if (is_array($table) || self::containsAdv($data)) {
-            return $this->s->INSERT($table, $data);
-        } else {
-            return $this->s->sINSERT($table, $data);
-        }
-    }
+             return $this->s->INSERT($table, $data);
+         }
     function update($table, $data, $where = array())
     {
-        if (is_array($table) || self::containsAdv($data) || self::containsAdv($where)) {
             return $this->s->UPDATE($table, $data, $where);
-        } else {
-            return $this->s->sUPDATE($table, $data, $where);
-        }
-    }
+         }
     function delete($table, $where = array())
     {
-        if (is_array($table) || self::containsAdv($where)) {
-            return $this->s->DELETE($table, $where);
-        } else {
-            return $this->s->sDELETE($table, $where);
-        }
+             return $this->s->DELETE($table, $where);
+       
     }
     function sqBase($sql, $where, $join)
     {

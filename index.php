@@ -56,7 +56,6 @@ class SuperSQL
     {
         $this->con = new Connector($dsn, $user, $pass);
     }
-    // BUILD ADVANCED BETWEEN
     /**
      * Queries a SQL table (SELECT)
      *
@@ -120,69 +119,6 @@ class SuperSQL
         $d = AdvParser::DELETE($table, $where);
         return $this->con->_query($d[0], $d[1], $d[2]);
     }
-    // BUILD ADVANCED BETWEEN
-    
-    // BUILD SIMPLE BETWEEN
-    /**
-     * Queries a SQL table (SELECT) (Simple)
-     *
-     * @param {String} table - SQL Table
-     * @param {Array} columns - Columns to return
-     * @param {Object} where - Where clause
-     * @param {String} append - SQL append
-     *
-     * @returns {SQLResponse}
-     */
-    function sSELECT($table, $columns = array(), $where = array(), $append = "")
-    {
-        $d = SimParser::SELECT($table, $columns, $where, $append);
-        return $this->con->query($d[0], $d[1],null,$this->lockMode ? 0 : 1);
-    }
-    
-    /**
-     * Inserts data into a SQL table (Simple)
-     *
-     * @param {String} table - SQL Table
-     * @param {Object} data - Data to insert
-     *
-     * @returns {SQLResponse}
-     */
-    function sINSERT($table, $data)
-    {
-        $d = SimParser::INSERT($table, $data);
-        return $this->con->query($d[0], $d[1]);
-    }
-    
-    /**
-     * Updates a SQL table (Simple)
-     *
-     * @param {String} table - SQL Table
-     * @param {Object} data - Data to update
-     * @param {Object} where - Where clause
-     *
-     * @returns {SQLResponse}
-     */
-    function sUPDATE($table, $data, $where = array())
-    {
-        $d = SimParser::UPDATE($table, $data, $where);
-        return $this->con->query($d[0], $d[1]);
-    }
-    
-    /**
-     * Deletes from a SQL table (Simple)
-     *
-     * @param {String} table - SQL Table
-     * @param {Object} where - Where clause
-     *
-     * @returns {SQLResponse}
-     */
-    function sDELETE($table, $where = array())
-    {
-        $d = SimParser::DELETE($table, $where);
-        return $this->con->query($d[0], $d[1]);
-    }
-    
-    // BUILD SIMPLE BETWEEN
     
     /**
      * Query
