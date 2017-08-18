@@ -420,12 +420,8 @@ class SQLHelper
                     if ($alias) {
                        array_push($in, $alias);
                     } else {
-                        $out = $val;
-                        if (strpos($out,".") !== false) {
-                            $out = explode(".",$out);
-                            $out = $out[count($out) - 1];
-                        }
-                       array_push($in, $out);
+                       preg_match('/(?:[^\.]*\.)?(.*)/',$val,$m);
+                       array_push($in, $m[1]);
                     }
                 } else {
                     $in[$key] = array();
