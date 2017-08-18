@@ -31,9 +31,9 @@ Source: https://github.com/ThreeLetters/SuperSQL
 */
 namespace SuperSQL;
 
-include "lib/parser/Advanced.php";
-include "lib/connector/index.php";
-include "lib/helper/index.php";
+include "lib/parser.php";
+include "lib/connector.php";
+include "lib/helper.php";
 
 // BUILD BETWEEN
 class SuperSQL
