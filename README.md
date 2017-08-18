@@ -11,11 +11,10 @@ SlickInject and Medoo on steroids - The most advanced and lightweight library of
 1. Very small - 24.2KB one file (Unminified, `dist/SuperSQL.php`. Minified version: 10.2KB)
 2. Simple and easy - Very easy to lean. We also provide a simple and advanced API
 3. Compatability - Supports major SQL databases
-4. Customisability - We offer multiple files for your needs
-5. Efficiency - This module was built with speed in mind.
-6. Complexity - This module allows you to make all kinds of complex queries
-7. Security - This module prevents SQL injections.
-8. Availability - This module is FREE. Licensed under the MIT license.
+4. Efficiency - This module was built with speed in mind.
+5. Complexity - This module allows you to make all kinds of complex queries
+6. Security - This module prevents SQL injections.
+7. Availability - This module is FREE. Licensed under the MIT license.
 
 ## Notes
 #### Missing features.
@@ -32,6 +31,8 @@ You may either
 new SuperSQL($dsn,$user,$pass);
 ```
 ```php
+use SuperSQL\SuperSQL;
+
 // MySql setup
 $host = "localhost";
 $db = "test";
@@ -41,6 +42,19 @@ $pass = "1234";
 $dsn = "mysql:host=$host;port=3306;dbname=$db;charset=utf8";
 $SuperSQL = new SuperSQL($dsn,$user,$pass);
 ```
+
+```php
+use SuperSQL\SQLHelper;
+
+// MySql setup
+$host = "localhost";
+$db = "test";
+$user = "root";
+$pass = "1234";
+
+$SuperSQL = SQLHelper::connect($host, $db, $user,$pass);
+```
+
 ## Build
 To build this library, do 
 
@@ -62,7 +76,6 @@ Not much - they are basically the equivalant - However, SuperSQL is slightly mor
 
 * Response class - SuperSQL has a response class to access crucial information, such as errors
 * Helper - SuperSQL comes with a helper class, with helper functions, while meedoo has it built right in.
-* Simple API - SuperSQL comes with a simple api for simple queries to increase performance. No need to go overkill for something as simple as `SELECT * FROM table`
 * Smaller & lightweight - SuperSQL is smaller than medoo
 * Development - SuperSQL's code is well structured and it is commented - so you can understand it more
 * SuperSQL is faster - Using xdebug, we found that superSQL is faster than medoo. (x1000,6%)

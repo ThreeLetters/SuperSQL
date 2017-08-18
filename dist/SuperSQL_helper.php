@@ -3,9 +3,11 @@
  Author: Andrews54757
  License: MIT (https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE)
  Source: https://github.com/ThreeLetters/SQL-Library
- Build: v1.0.3
+ Build: v1.0.5
  Built on: 18/08/2017
 */
+
+namespace SuperSQL;
 
 
 class SQLHelper
@@ -109,14 +111,6 @@ class SQLHelper
         }
         return new SuperSQL($dsn, $user, $pass);
     }
-    private static function rmComments($str)
-    {
-        $i = strpos($str, '#');
-        if ($i !== false) {
-            $str = substr($str, 0, $i);
-        }
-        return trim($str);
-    }
     private static function escape($value)
     {
         $var = strtolower(gettype($value));
@@ -138,44 +132,6 @@ class SQLHelper
         } else {
             return '\'' . $value . '\'';
         }
-    }
-    private static function includes($val, $arr)
-    {
-        foreach ($arr as $v) {
-            if (strpos($val, $v) !== false)
-                return true;
-        }
-        return false;
-    }
-    private static function containsAdv($arr, $col = false)
-    {
-        if ($col) {
-            foreach ($arr as $key => &$val) {
-                if (is_array($val))
-                    return true;
-                if (self::includes($val, array(
-                    '['
-                )))
-                    return true;
-                if (self::includes($val, array(
-                    'DISTINCT',
-                    'INSERT INTO',
-                    'INTO'
-                )))
-                    return true;
-            }
-        } else {
-            foreach ($arr as $key => &$val) {
-                if (is_array($val))
-                    return true;
-                if (self::includes($key, array(
-                    '[',
-                    '#'
-                )))
-                    return true;
-            }
-        }
-        return false;
     }
     function change($id)
     {
@@ -217,7 +173,7 @@ class SQLHelper
     {
         $newData = array();
         foreach ($data as $key => $val) {
-            $str = '`' . self::rmComments($key) . '`';
+            $str = '`' . Parser::rmComments($key) . '`';
             foreach ($val as $k => $v) {
                 $str = 'REPLACE(' . $str . ', ' . self::escape2($k) . ', ' . self::escape($v) . ')';
             }
@@ -227,47 +183,29 @@ class SQLHelper
     }
     function select($table, $columns = array(), $where = array(), $join = null, $limit = false)
     {
-        if (is_array($table) || self::containsAdv($columns, true) || self::containsAdv($where) || $join) {
-            return $this->s->SELECT($table, $columns, $where, $join, $limit);
-        } else {
-            if (is_int($limit))
-                $limit = 'LIMIT ' . (int) $limit;
-            return $this->s->sSELECT($table, $columns, $where, $limit);
-        }
+        return $this->s->SELECT($table, $columns, $where, $join, $limit);
     }
     function insert($table, $data)
     {
-        if (is_array($table) || self::containsAdv($data)) {
-            return $this->s->INSERT($table, $data);
-        } else {
-            return $this->s->sINSERT($table, $data);
-        }
+        return $this->s->INSERT($table, $data);
     }
     function update($table, $data, $where = array())
     {
-        if (is_array($table) || self::containsAdv($data) || self::containsAdv($where)) {
-            return $this->s->UPDATE($table, $data, $where);
-        } else {
-            return $this->s->sUPDATE($table, $data, $where);
-        }
+        return $this->s->UPDATE($table, $data, $where);
     }
     function delete($table, $where = array())
     {
-        if (is_array($table) || self::containsAdv($where)) {
-            return $this->s->DELETE($table, $where);
-        } else {
-            return $this->s->sDELETE($table, $where);
-        }
+        return $this->s->DELETE($table, $where);
     }
     function sqBase($sql, $where, $join)
     {
         $values = array();
         if ($join) {
-            AdvParser::JOIN($join, $sql);
+            Parser::JOIN($join, $sql);
         }
         if (count($where) != 0) {
             $sql .= ' WHERE ';
-            $sql .= AdvParser::conditions($where, $values);
+            $sql .= Parser::conditions($where, $values);
         }
         $res = $this->_query($sql, $values);
         return $res[0]->fetchColumn();
@@ -321,9 +259,9 @@ class SQLHelper
             foreach ($data as $key => $val) {
                 if (is_int($key)) {
                     array_push($columns, $val);
-                    $alias = AdvParser::getType($val); 
+                    $alias = Parser::getType($val); 
                     if ($alias) {
-                        $s = AdvParser::getType($val);
+                        $s = Parser::getType($val);
                         if ($s) {
                             $alias = $s;
                         } else if ($alias === "int" || $alias === "bool" || $alias === "string" || $alias === "json" || $alias === "obj") { 
@@ -331,10 +269,10 @@ class SQLHelper
                         }
                     }
                     if ($alias) {
-                       array_push($in, $alias);
+                        array_push($in, $alias);
                     } else {
-                       preg_match('/(?:[^\.]*\.)?(.*)/',$val,$m);
-                       array_push($in, $m[1]);
+                        preg_match('/(?:[^\.]*\.)?(.*)/', $val, $m);
+                        array_push($in, $m[1]);
                     }
                 } else {
                     $in[$key] = array();
@@ -349,11 +287,11 @@ class SQLHelper
         {
             $out = array();
             foreach ($data as $key => $val) {
-              if (is_int($key)) {
-                   $out[$val] = $row[$val];
+                if (is_int($key)) {
+                    $out[$val] = $row[$val];
                 } else {
                     recurse2($val, $row, $out[$key]);
-                }   
+                }
             }
         }
         $r->result = array();

@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 
-var version = "1.0.3";
+var version = "1.0.5";
 
 var today = new Date();
 var dd = today.getDate();
@@ -261,21 +261,18 @@ function minify(str,options) {
 
 var fs = require("fs");
 
-var simple = fs.readFileSync(__dirname + "/lib/parser/Simple.php", "utf8");
+var adv = fs.readFileSync(__dirname + "/lib/parser.php", "utf8");
 
-var adv = fs.readFileSync(__dirname + "/lib/parser/Advanced.php", "utf8");
-
-var connector = fs.readFileSync(__dirname + "/lib/connector/index.php", "utf8");
+var connector = fs.readFileSync(__dirname + "/lib/connector.php", "utf8");
 
 var main = fs.readFileSync(__dirname + "/index.php", "utf8");
 
-var helper = fs.readFileSync(__dirname + "/lib/helper/index.php", "utf8");
+var helper = fs.readFileSync(__dirname + "/lib/helper.php", "utf8");
 
 var startstr = "// BUILD BETWEEN";
 
 
 
-simple = removeComments(simple.split(startstr)[1]);
 adv = removeComments(adv.split(startstr)[1]);
 connector = removeComments(connector.split(startstr)[1]);
 var index = main.split(startstr)[1];
@@ -289,103 +286,82 @@ var out = `<?php\n\
  Source: https://github.com/ThreeLetters/SQL-Library\n\
  Build: v${version}\n\
  Built on: ${date}\n\
-*/\n\n`;
+*/\n\
+\n\
+namespace SuperSQL;\n\
+\n`;
 
-var complete = `// lib/connector/index.php\
+var complete = `// lib/connector.php\
 ${connector}\n\
-// lib/parser/Simple.php\
-${simple}\n\
-// lib/parser/Advanced.php\
+// lib/parser.php\
 ${adv}\n\
 // index.php\
 ${main}\
 ?>`;
 
-var completeMin = `// lib/connector/index.php\n\
+var completeMin = `// lib/connector.php\n\
 ${minify(connector)}\n\
-// lib/parser/Simple.php\n\
-${minify(simple)}\n\
-// lib/parser/Advanced.php\n\
+// lib/parser.php\n\
 ${minify(adv)}\n\
 // index.php\n\
 ${minify(main)}\n\
 ?>`;
 
-var smain = index.split("// BUILD ADVANCED BETWEEN");
-smain = (smain[0] + smain[2]);
-smain = removeComments(smain);
-var simpleOnly = `// lib/connector/index.php\
-${connector}\n\
-// lib/parser/Simple.php\
-${simple}\n\
-// index.php\
-${smain}\
-?>`;
-var simpleOnlyMin = `// lib/connector/index.php\n\
-${minify(connector)}\n\
-// lib/parser/Simple.php\n\
-${minify(simple)}\n\
-// index.php\n\
-${minify(smain)}\n\
-?>`;
 
-var amain = index.split("// BUILD SIMPLE BETWEEN");
-amain = (amain[0] + amain[2]);
-amain = removeComments(amain);
-var advancedOnly = `// lib/connector/index.php\
-${connector}\n\
-// lib/parser/Advanced.php\
-${adv}\n\
-// index.php\
-${amain}\
-?>`;
-
-var advancedOnlyMin = `// lib/connector/index.php\n\
-${minify(connector)}\n\
-// lib/parser/Advanced.php\n\
-${minify(adv)}\n\
-// index.php\n\
-${minify(amain)}\n\
-?>`;
 
 var a = out + complete,
     b = out + completeMin,
-    c = out + simpleOnly,
-    d = out + simpleOnlyMin,
-    e = out + advancedOnly,
-    f = out + advancedOnlyMin,
-    g = out + helper,
-    h = out + minify(helper) + "\n?>";
+    c = out + helper,
+    d = out + minify(helper) + "\n?>";
+
+var dir1 = __dirname + "/dist/SuperSQL.php",
+    dir2 = __dirname + "/dist/SuperSQL_min.php",
+    dir3 = __dirname + "/dist/SuperSQL_helper.php",
+    dir4 = __dirname + "/dist/SuperSQL_helper_min.php";
+
+fs.writeFileSync(dir1, a);
+fs.writeFileSync(dir2, b);
 
 
-fs.writeFileSync(__dirname + "/dist/SuperSQL.php", a);
-fs.writeFileSync(__dirname + "/dist/SuperSQL_min.php", b);
+fs.writeFileSync(dir3, c);
+fs.writeFileSync(dir4, d);
+
+var readme = "## Files\n\
+\n\
+* `SuperSQL.php` - Main file\n\
+* `SuperSQL_min.php`\n\
+* `SuperSQL_helper.php` - Helper functions\n\
+* `SuperSQL_helper_min.php`\n\
+\n\
+### Sizes\n\
+\n";
+    var crypto = require('crypto');
+function size(filename) {
+    const stats = fs.statSync(filename);
+    const fileSizeInBytes = stats.size
+    return Math.round(fileSizeInBytes / 100) / 10;
+}
+function hash(data) {
+
+return crypto.createHash('md5').update(data).digest("hex");
+}
+var sizes = `\
+* \`SuperSQL.php\` - ${a.length} Chars (${size(dir1)} MB)\n\
+* \`SuperSQL_min.php\` - ${b.length} Chars (${size(dir2)} MB)\n\
+* \`SuperSQL_helper.php\` - ${c.length} Chars (${size(dir3)} MB)\n\
+* \`SuperSQL_helper_min.php\` - ${d.length} Chars (${size(dir4)} MB)\n\
+\n\
+## Hashes\n\
+\n\
+\`\`\`\n\
+* SuperSQL.php - ${hash(a)}\n\
+* SuperSQL_min.php - ${hash(b)}\n\
+* SuperSQL_helper.php - ${hash(c)}\n\
+* SuperSQL_helper_min.php - ${hash(d)}\n\
+\`\`\`\n`;
 
 
-fs.writeFileSync(__dirname + "/dist/SuperSQL_simple.php", c);
-fs.writeFileSync(__dirname + "/dist/SuperSQL_simple_min.php", d);
+readme += sizes;
 
-
-fs.writeFileSync(__dirname + "/dist/SuperSQL_advanced.php", e);
-fs.writeFileSync(__dirname + "/dist/SuperSQL_advanced_min.php", f);
-
-
-fs.writeFileSync(__dirname + "/dist/SuperSQL_helper.php", g);
-fs.writeFileSync(__dirname + "/dist/SuperSQL_helper_min.php", h);
-
-
-console.log("Compiled files into dist. Stats:");
-
-console.log("OUTPUT");
-
-console.log(`SuperSQL: ~${a.length} Lines: ~${a.split("\n").length} - Minified: ~${b.length} Lines: ~${b.split("\n").length}`);
-console.log(`Simple: ~${c.length} Lines: ~${c.split("\n").length} - Minified: ~${d.length} Lines: ~${d.split("\n").length}`);
-console.log(`Advanced: ~${e.length} Lines: ~${e.split("\n").length} - Minified: ~${f.length} Lines: ~${f.split("\n").length}`);
-console.log(`Helper: ~${g.length} Lines: ~${g.split("\n").length} - Minified: ~${h.length} Lines: ~${h.split("\n").length}`);
-
-console.log("FILES");
-
-console.log(`Index ${index.length} Lines: ~${index.split("\n").length}`);
-console.log(`Connector ${connector.length} Lines: ~${connector.split("\n").length}`);
-console.log(`SimpleParser ${simple.length} Lines: ~${simple.split("\n").length}`);
-console.log(`AdvancedParser ${adv.length} Lines: ~${adv.split("\n").length}`);
+fs.writeFileSync(__dirname + "/dist/README.md",readme);
+console.log("Compiled files into dist");
