@@ -3,7 +3,7 @@
  Author: Andrews54757
  License: MIT (https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE)
  Source: https://github.com/ThreeLetters/SQL-Library
- Build: v1.0.3
+ Build: v1.0.5
  Built on: 18/08/2017
 */
 

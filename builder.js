@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 
-var version = "1.0.3";
+var version = "1.0.5";
 
 var today = new Date();
 var dd = today.getDate();
@@ -314,24 +314,54 @@ var a = out + complete,
     c = out + helper,
     d = out + minify(helper) + "\n?>";
 
+var dir1 = __dirname + "/dist/SuperSQL.php",
+    dir2 = __dirname + "/dist/SuperSQL_min.php",
+    dir3 = __dirname + "/dist/SuperSQL_helper.php",
+    dir4 = __dirname + "/dist/SuperSQL_helper_min.php";
 
-fs.writeFileSync(__dirname + "/dist/SuperSQL.php", a);
-fs.writeFileSync(__dirname + "/dist/SuperSQL_min.php", b);
+fs.writeFileSync(dir1, a);
+fs.writeFileSync(dir2, b);
 
 
-fs.writeFileSync(__dirname + "/dist/SuperSQL_helper.php", c);
-fs.writeFileSync(__dirname + "/dist/SuperSQL_helper_min.php", d);
+fs.writeFileSync(dir3, c);
+fs.writeFileSync(dir4, d);
+
+var readme = "## Files\n\
+\n\
+* `SuperSQL.php` - Main file\n\
+* `SuperSQL_min.php`\n\
+* `SuperSQL_helper.php` - Helper functions\n\
+* `SuperSQL_helper_min.php`\n\
+\n\
+### Sizes\n\
+\n";
+    var crypto = require('crypto');
+function size(filename) {
+    const stats = fs.statSync(filename);
+    const fileSizeInBytes = stats.size
+    return Math.round(fileSizeInBytes / 100) / 10;
+}
+function hash(data) {
+
+return crypto.createHash('md5').update(data).digest("hex");
+}
+var sizes = `\
+* \`SuperSQL.php\` - ${a.length} Chars (${size(dir1)} MB)\n\
+* \`SuperSQL_min.php\` - ${b.length} Chars (${size(dir2)} MB)\n\
+* \`SuperSQL_helper.php\` - ${c.length} Chars (${size(dir3)} MB)\n\
+* \`SuperSQL.php\` - ${d.length} Chars (${size(dir4)} MB)\n\
+\n\
+## Hashes\n\
+\n\
+\`\`\`\n\
+* SuperSQL.php - ${hash(a)}\n\
+* SuperSQL_min.php - ${hash(b)}\n\
+* SuperSQL_helper.php - ${hash(c)}\n\
+* SuperSQL_helper_min.php - ${hash(d)}\n\
+\`\`\`\n`;
 
 
-console.log("Compiled files into dist. Stats:");
+readme += sizes;
 
-console.log("OUTPUT");
-
-console.log(`SuperSQL: ~${a.length} Lines: ~${a.split("\n").length} - Minified: ~${b.length} Lines: ~${b.split("\n").length}`);
-console.log(`Helper: ~${c.length} Lines: ~${c.split("\n").length} - Minified: ~${d.length} Lines: ~${d.split("\n").length}`);
-
-console.log("FILES");
-
-console.log(`Index ${index.length} Lines: ~${index.split("\n").length}`);
-console.log(`Connector ${connector.length} Lines: ~${connector.split("\n").length}`);
-console.log(`AdvancedParser ${adv.length} Lines: ~${adv.split("\n").length}`);
+fs.writeFileSync(__dirname + "/dist/README.md",readme);
+console.log("Compiled files into dist");
