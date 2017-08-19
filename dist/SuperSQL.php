@@ -204,7 +204,7 @@ class Parser
 {
     static function getArg(&$str)
     {
-        preg_match('/^(?:\[(?<a>.{2})\])(?<out>.*)/',$str,$m);
+        preg_match('/^(?:\[(?<a>.{2})\])(?<out>.*)/', $str, $m);
         if (isset($m["a"])) {
             $str = $m["out"];
             return $m["a"];
@@ -223,12 +223,13 @@ class Parser
             }
         }
     }
-    static function escape($val) {
-            if (is_int($val)) {
-                return (int)$val;
-            } else {
-                return self::quote($val);
-            }
+    static function escape($val)
+    {
+        if (is_int($val)) {
+            return (int) $val;
+        } else {
+            return self::quote($val);
+        }
     }
     static function append2(&$insert, $indexes, $dt, $values)
     {
@@ -401,11 +402,11 @@ class Parser
                 }
                 preg_match('/^(?:\[(?<a>.{2})\])(?:\[(?<b>.{2})\])?(?<out>.*)/', $key, $matches); 
                 if (isset($matches["a"])) {
-                     $arg         = $matches["a"];
-                     $key         = $matches["out"];
-                     $arg2        = isset($matches["b"]) ? $matches["b"] : false;
+                    $arg  = $matches["a"];
+                    $key  = $matches["out"];
+                    $arg2 = isset($matches["b"]) ? $matches["b"] : false;
                 } else {
-                     $arg = false;
+                    $arg = false;
                 }
                 $useBind     = !isset($val[0]);
                 $newJoin     = $join;
@@ -415,11 +416,11 @@ class Parser
                 if ($arg && ($arg === '||' || $arg === '&&')) {
                     $newJoin = ($arg === '||') ? ' OR ' : ' AND ';
                     $arg     = $arg2;
-                if ($arr && $arg && ($arg === '||' || $arg === '&&')) {
-                    $join = $newJoin;
-                    $newJoin = ($arg === '||') ? ' OR ' : ' AND ';
-                    $arg = self::getArg($key);
-                }
+                    if ($arr && $arg && ($arg === '||' || $arg === '&&')) {
+                        $join    = $newJoin;
+                        $newJoin = ($arg === '||') ? ' OR ' : ' AND ';
+                        $arg     = self::getArg($key);
+                    }
                 }
                 $between = false;
                 if ($arg && $arg !== "==") {
@@ -448,17 +449,19 @@ class Parser
                         default:
                             if ($arg !== '><' && $arg !== '<>')
                                 throw new \Exception("Invalid operator " . $arg . " Available: ==,!=,>>,<<,>=,<=,~~,!~,<>,><");
-                                else $between = true;
+                            else
+                                $between = true;
                             break;
                     }
                 } else {
                     if (!$useBind || $arg === '==')
                         $newOperator = ' = '; 
                 }
-                if (!$arr) $join = $newJoin;
+                if (!$arr)
+                    $join = $newJoin;
                 if ($num !== 0)
                     $sql .= $join;
-                $column      = self::rmComments($key);
+                $column = self::rmComments($key);
                 if (!$raw)
                     $column = self::quote($column);
                 if ($arr) {
@@ -469,38 +472,39 @@ class Parser
                             $map[$key]                 = $index;
                             $map[$key . '#' . $parent] = $index++;
                         }
-                       if ($between) {
-                           $index += 2;
-                           $sql .= $column;
-                           if ($arg === '<>') $sql .= ' NOT';
-                           $sql .= ' BETWEEN ';
-                           if ($raw) {
-                               $sql .= $val[0] . ' AND ' . $val[1];
-                           } else if ($values !== false) {
-                               $sql .= '? AND ?';
-                               array_push($values, self::value($type, $val[0]));
-                               array_push($values, self::value($type, $val[1]));
-                           } else {
-                               $sql .= self::escape($val[0]) . ' AND ' . self::escape($val[1]);   
-                           }
-                       } else {
-                        $sql .= '(';
-                        foreach ($val as $k => &$v) {
-                            if ($k !== 0)
-                                $sql .= $newJoin;
-                            $index++;
-                            $sql .= $column . $newOperator;
+                        if ($between) {
+                            $index += 2;
+                            $sql .= $column;
+                            if ($arg === '<>')
+                                $sql .= ' NOT';
+                            $sql .= ' BETWEEN ';
                             if ($raw) {
-                                $sql .= $v;
+                                $sql .= $val[0] . ' AND ' . $val[1];
                             } else if ($values !== false) {
-                                $sql .= '?';
-                                array_push($values, self::value($type, $v));
-                            } else {          
-                                    $sql .= self::escape($v);
+                                $sql .= '? AND ?';
+                                array_push($values, self::value($type, $val[0]));
+                                array_push($values, self::value($type, $val[1]));
+                            } else {
+                                $sql .= self::escape($val[0]) . ' AND ' . self::escape($val[1]);
                             }
+                        } else {
+                            $sql .= '(';
+                            foreach ($val as $k => &$v) {
+                                if ($k !== 0)
+                                    $sql .= $newJoin;
+                                $index++;
+                                $sql .= $column . $newOperator;
+                                if ($raw) {
+                                    $sql .= $v;
+                                } else if ($values !== false) {
+                                    $sql .= '?';
+                                    array_push($values, self::value($type, $v));
+                                } else {
+                                    $sql .= self::escape($v);
+                                }
+                            }
+                            $sql .= ')';
                         }
-                        $sql .= ')';
-                       }
                     }
                 } else {
                     $sql .= $column . $newOperator;
