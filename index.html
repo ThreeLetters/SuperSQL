@@ -484,7 +484,8 @@ Using Response->next is recommended as it is more efficient - It will fetch the 
 </span> <span class="s2">"[&gt;=]arg4"</span> <span class="o">=&gt;</span> <span class="s2">"val4"</span><span class="p">,</span> <span class="c1">// AND arg4 &gt;= val4
 </span> <span class="s2">"[&lt;=]arg5"</span> <span class="o">=&gt;</span> <span class="s2">"val5"</span><span class="p">,</span> <span class="c1">// AND arg5 &lt;= val5
 </span> <span class="s2">"[!=]arg6"</span> <span class="o">=&gt;</span> <span class="s2">"val6"</span><span class="p">,</span> <span class="c1">// AND arg6 != val6
-</span> <span class="s2">"[||]"</span> <span class="o">=&gt;</span> <span class="p">[</span> <span class="c1">// Bind ||.
+</span> <span class="s2">"[||]a"</span> <span class="o">=&gt;</span> <span class="s2">"v"</span><span class="p">,</span> <span class="c1">// OR a = v
+</span> <span class="s2">"[||]"</span> <span class="o">=&gt;</span> <span class="p">[</span> <span class="c1">// Bind OR.
 </span>     <span class="s2">"arg7"</span> <span class="o">=&gt;</span> <span class="s2">"val7"</span>
  <span class="p">],</span>
  <span class="s2">"[&amp;&amp;][&gt;&gt;]"</span> <span class="o">=&gt;</span> <span class="p">[</span> <span class="c1">// Bind &gt;.
@@ -493,14 +494,16 @@ Using Response->next is recommended as it is more efficient - It will fetch the 
  <span class="s2">"arg9"</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s2">"val9a"</span><span class="p">,</span><span class="s2">"val9b"</span><span class="p">],</span>
 
  <span class="s2">"arg10[~~]"</span> <span class="o">=&gt;</span> <span class="s2">"%arg10%"</span><span class="p">,</span>
- <span class="s2">"arg11[!~]"</span> <span class="o">=&gt;</span> <span class="s2">"%arg11%"</span>
-<span class="p">);</span>
+ <span class="s2">"arg11[!~]"</span> <span class="o">=&gt;</span> <span class="s2">"%arg11%"</span><span class="p">,</span>
+
+ <span class="s2">"arg12[&gt;&lt;]"</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="c1">// arg12 BETWEEN 1 AND 4
+</span><span class="p">);</span>
 <span class="cp">?&gt;</span>
 </code></pre>
 <p>Conditional statements are extremly customisable. WHERE and JOIN clauses are conditional statements. </p>
 
 <aside class="success">
-Available operators: `==`, `>>`, `<<`, `>=`, `<=`, `!=`, `~~`, `!~`
+Available operators: `==`, `>>`, `<<`, `>=`, `<=`, `!=`, `~~`, `!~`, `><`, `<>`
 </aside>
 
 <aside class="success">
