@@ -36,10 +36,10 @@ class Parser
      */
     static function getArg(&$str)
     {
-        if (isset($str[3]) && $str[0] === '[' && $str[3] === ']') {
-            $out = $str[1] . $str[2];
-            $str = substr($str, 4);
-            return $out;
+        preg_match('/^(?:\[(?<a>.{2})\])(?<out>.*)/',$str,$m);
+        if (isset($m["a"])) {
+            $str = $m["out"];
+            return $m["a"];
         } else {
             return false;
         }
@@ -60,6 +60,13 @@ class Parser
                 $args[$k - 1][$index] = $val[$k];
             }
         }
+    }
+    static function escape($val) {
+            if (is_int($val)) {
+                return (int)$val;
+            } else {
+                return self::quote($val);
+            }
     }
     /**
      * Appends values to arguments
@@ -259,27 +266,30 @@ class Parser
                 } else {
                     $raw = false;
                 }
-                preg_match('/^(?:\[(?<a>.{2})\])?(?:\[(?<b>.{2})\])?(?<out>.*)/', $key, $matches); // 14 steps
-                $key         = $matches["out"];
-                $arg         = isset($matches["a"]) ? $matches["a"] : false;
-                $arg2        = isset($matches["b"]) ? $matches["b"] : false;
+                preg_match('/^(?:\[(?<a>.{2})\])(?:\[(?<b>.{2})\])?(?<out>.*)/', $key, $matches); // 14 steps
+                if (isset($matches["a"])) {
+                     $arg         = $matches["a"];
+                     $key         = $matches["out"];
+                     $arg2        = isset($matches["b"]) ? $matches["b"] : false;
+                } else {
+                     $arg = false;
+                }
                 $useBind     = !isset($val[0]);
                 $newJoin     = $join;
                 $newOperator = $operator;
                 $type        = $raw ? false : self::getType($key);
-                $column      = self::rmComments($key);
-                if (!$raw)
-                    $column = self::quote($column);
-                switch ($arg) {
-                    case '||':
-                        $arg     = $arg2;
-                        $newJoin = ' OR ';
-                        break;
-                    case '&&':
-                        $arg     = $arg2;
-                        $newJoin = ' AND ';
-                        break;
+                $arr         = is_array($val) && $type !== 'json' && $type !== 'obj';
+ 
+                if ($arg && ($arg === '||' || $arg === '&&')) {
+                    $newJoin = ($arg === '||') ? ' OR ' : ' AND ';
+                    $arg     = $arg2;
+                if ($arr && $arg && ($arg === '||' || $arg === '&&')) {
+                    $join = $newJoin;
+                    $newJoin = ($arg === '||') ? ' OR ' : ' AND ';
+                    $arg = self::getArg($key);
                 }
+                }
+                $between = false;
                 if ($arg && $arg !== "==") {
                     switch ($arg) { // different conditionals
                         case '!=':
@@ -304,16 +314,25 @@ class Parser
                             $newOperator = ' NOT LIKE ';
                             break;
                         default:
-                            throw new \Exception("Invalid operator " . $arg . " Available: ==,!=,>>,<<,>=,<=,~~,!~");
+                            if ($arg !== '><' && $arg !== '<>')
+                                throw new \Exception("Invalid operator " . $arg . " Available: ==,!=,>>,<<,>=,<=,~~,!~,<>,><");
+                                else $between = true;
                             break;
                     }
                 } else {
                     if (!$useBind || $arg === '==')
                         $newOperator = ' = '; // reset
                 }
+                
+                if (!$arr) $join = $newJoin;
                 if ($num !== 0)
                     $sql .= $join;
-                if (is_array($val) && $type !== 'json' && $type !== 'obj') {
+                
+                $column      = self::rmComments($key);
+                if (!$raw)
+                    $column = self::quote($column);
+                
+                if ($arr) {
                     if ($useBind) {
                         $sql .= '(' . $build($build, $val, $map, $index, $values, $newJoin, $newOperator, $parent . '/' . $key) . ')';
                     } else {
@@ -321,7 +340,23 @@ class Parser
                             $map[$key]                 = $index;
                             $map[$key . '#' . $parent] = $index++;
                         }
-                        foreach ($value as $k => &$v) {
+                       if ($between) {
+                           $index += 2;
+                           $sql .= $column;
+                           if ($arg === '<>') $sql .= ' NOT';
+                           $sql .= ' BETWEEN ';
+                           if ($raw) {
+                               $sql .= $val[0] . ' AND ' . $val[1];
+                           } else if ($values !== false) {
+                               $sql .= '? AND ?';
+                               array_push($values, self::value($type, $val[0]));
+                               array_push($values, self::value($type, $val[1]));
+                           } else {
+                               $sql .= self::escape($val[0]) . ' AND ' . self::escape($val[1]);   
+                           }
+                       } else {
+                        $sql .= '(';
+                        foreach ($val as $k => &$v) {
                             if ($k !== 0)
                                 $sql .= $newJoin;
                             $index++;
@@ -331,14 +366,12 @@ class Parser
                             } else if ($values !== false) {
                                 $sql .= '?';
                                 array_push($values, self::value($type, $v));
-                            } else {
-                                if (is_int($v)) {
-                                    $sql .= $v;
-                                } else {
-                                    $sql .= self::quote($v);
-                                }
+                            } else {          
+                                    $sql .= self::escape($v);
                             }
                         }
+                        $sql .= ')';
+                       }
                     }
                 } else {
                     $sql .= $column . $newOperator;
@@ -349,11 +382,7 @@ class Parser
                             $sql .= '?';
                             array_push($values, self::value($type, $val));
                         } else {
-                            if (is_int($val)) {
-                                $sql .= $val;
-                            } else {
-                                $sql .= self::quote($val);
-                            }
+                            $sql .= self::escape($val);
                         }
                         if ($map !== false) {
                             $map[$key]                 = $index;

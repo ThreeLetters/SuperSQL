@@ -19,7 +19,6 @@ SlickInject and Medoo on steroids - The most advanced and lightweight library of
 ## Notes
 #### Missing features.
 * `GROUP` - prs welcome
-* `[<>] and [><]` shortcut operators
 
 ## Usage
 You may either
