@@ -340,10 +340,8 @@ class Parser
                         }
                         if ($between) {
                             $index += 2;
-                            $sql .= $column;
-                            if ($arg === '<>')
-                                $sql .= ' NOT';
-                            $sql .= ' BETWEEN ';
+                            $sql .= '(' . $column . ($arg === '<>' ? 'NOT' : '') . ' BETWEEN ';
+                 
                             if ($raw) {
                                 $sql .= $val[0] . ' AND ' . $val[1];
                             } else if ($values !== false) {
@@ -353,6 +351,7 @@ class Parser
                             } else {
                                 $sql .= self::escape($val[0]) . ' AND ' . self::escape($val[1]);
                             }
+                            $sql .= ')';
                         } else {
                             $sql .= '(';
                             foreach ($val as $k => &$v) {
