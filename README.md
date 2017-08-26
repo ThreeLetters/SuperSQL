@@ -25,6 +25,7 @@ You may either
 
 1. Use the built file (/dist/SuperSQL.php)
 2. Use the library (include index.php)
+3. Use composer (`composer require threeletters/supersql`) - Note, helper not available yet
 
 ```php
 new SuperSQL($dsn,$user,$pass);
@@ -59,7 +60,7 @@ To build this library, do
 
 > node builder.js
 
-It will build to /dist/SuperSQL.php
+It will build to `/dist/SuperSQL*.php`
 
 ## Documentation
 
@@ -77,7 +78,7 @@ Not much - they are basically the equivalant - However, SuperSQL is slightly mor
 * Helper - SuperSQL comes with a helper class, with helper functions, while meedoo has it built right in.
 * Smaller & lightweight - SuperSQL is smaller than medoo
 * Development - SuperSQL's code is well structured and it is commented - so you can understand it more
-* SuperSQL is faster - Using xdebug, we found that superSQL is faster than medoo. (x1000,6%)
+* SuperSQL is faster - Using xdebug, we found that superSQL's parser is faster than medoo's. (x1000,100%)
 
 ## Special thanks
 * @LegitSoulja - SlickInject
