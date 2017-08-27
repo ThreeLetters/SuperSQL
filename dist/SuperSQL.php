@@ -3,14 +3,14 @@
  Author: Andrews54757
  License: MIT (https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE)
  Source: https://github.com/ThreeLetters/SQL-Library
- Build: v1.0.5
- Built on: 25/08/2017
+ Build: v1.0.6
+ Built on: 27/08/2017
 */
 
 namespace SuperSQL;
 
 // lib/connector.php
-class Response
+class Response implements \ArrayAccess, \Iterator
 {
     public $result;
     public $affected;
@@ -74,7 +74,7 @@ class Response
     }
     private function fetchAll()
     {
-        while ($row = $this->fetchNextRow()) {
+        while ($this->fetchNextRow()) {
         }
     }
     function map(&$row, &$outtypes)
@@ -119,6 +119,30 @@ class Response
     {
         return count($this->result);
     }
+    function offsetSet($offset, $value) 
+    {
+    }
+    function offsetExists($offset)
+    {
+        return $this->offsetGet($offset) === null ? false : true;
+    }
+    function offsetUnset($offset)
+    {
+    }
+    function offsetGet($offset)
+    {
+        if (is_int($offset)) {
+            if (isset($this->result[$offset])) {
+                return $this->result[$offset];
+            } else if (!$this->complete) {
+                while ($this->fetchNextRow()) {
+                    if (isset($this->result[$offset]))
+                        return $this->result[$offset];
+                }
+            }
+        }
+        return null;
+    }
     function next()
     {
         if (isset($this->result[$this->ind])) {
@@ -131,9 +155,21 @@ class Response
             return false;
         }
     }
-    function reset()
+    function rewind()
     {
         $this->ind = 0;
+    }
+    function current()
+    {
+        return $this->result[$this->ind];
+    }
+    function key()
+    {
+        return $this->ind;
+    }
+    function valid()
+    {
+        return $this->offsetExists($this->ind);
     }
 }
 class Connector
@@ -465,8 +501,9 @@ class Parser
                 if (!$raw)
                     $column = self::quote($column);
                 if ($arr) {
+                    $sql .= '(';
                     if ($useBind) {
-                        $sql .= '(' . $build($build, $val, $map, $index, $values, $newJoin, $newOperator, $parent . '/' . $key) . ')';
+                        $sql .= $build($build, $val, $map, $index, $values, $newJoin, $newOperator, $parent . '/' . $key);
                     } else {
                         if ($map !== false && !$raw) {
                             $map[$key]                 = $index;
@@ -474,7 +511,7 @@ class Parser
                         }
                         if ($between) {
                             $index += 2;
-                            $sql .= '(' . $column . ($arg === '<>' ? 'NOT' : '') . ' BETWEEN ';
+                            $sql .= $column . ($arg === '<>' ? 'NOT' : '') . ' BETWEEN ';
                             if ($raw) {
                                 $sql .= $val[0] . ' AND ' . $val[1];
                             } else if ($values !== false) {
@@ -484,9 +521,7 @@ class Parser
                             } else {
                                 $sql .= self::escape($val[0]) . ' AND ' . self::escape($val[1]);
                             }
-                            $sql .= ')';
                         } else {
-                            $sql .= '(';
                             foreach ($val as $k => &$v) {
                                 if ($k !== 0)
                                     $sql .= $newJoin;
@@ -501,8 +536,8 @@ class Parser
                                     $sql .= self::escape($v);
                                 }
                             }
-                            $sql .= ')';
                         }
+                        $sql .= ')';
                     }
                 } else {
                     $sql .= $column . $newOperator;

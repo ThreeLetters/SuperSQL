@@ -54,6 +54,23 @@ $pass = "1234";
 
 $SuperSQL = SQLHelper::connect($host, $db, $user,$pass);
 ```
+```php
+$result = $SuperSQL->select("test",[],[
+    "condition" => 12345,
+    "[||][&&]" => [
+        "something" => "value",
+        "anotherthing" => "val"
+    ]
+]); // SELECT * FROM `test` WHERE `condition` = 12345 OR (`something` = 'value' AND `anotherthing` = 'val')
+
+if (!$result->error()) {
+foreach ($result as $val) { // NOTE, $result is NOT an array
+    echo $val;
+}
+} else {
+echo json_encode($result->error());
+}
+```
 
 ## Build
 To build this library, do 

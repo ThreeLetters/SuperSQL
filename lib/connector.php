@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 // BUILD BETWEEN
-class Response
+class Response implements \ArrayAccess, \Iterator
 {
     public $result;
     public $affected;
@@ -91,7 +91,7 @@ class Response
     }
     private function fetchAll()
     {
-        while ($row = $this->fetchNextRow()) {
+        while ($this->fetchNextRow()) {
         }
     }
     function map(&$row, &$outtypes)
@@ -149,6 +149,38 @@ class Response
     {
         return count($this->result);
     }
+    // BEGIN ARRAYACCESS
+    function offsetSet($offset, $value) // do nothing
+    {
+    }
+    /**
+     * Checks if a value exsists
+     */
+    function offsetExists($offset)
+    {
+        return $this->offsetGet($offset) === null ? false : true;
+    }
+    function offsetUnset($offset)
+    {
+    }
+    /**
+     * Gets a value
+     */
+    function offsetGet($offset)
+    {
+        if (is_int($offset)) {
+            if (isset($this->result[$offset])) {
+                return $this->result[$offset];
+            } else if (!$this->complete) {
+                while ($this->fetchNextRow()) {
+                    if (isset($this->result[$offset]))
+                        return $this->result[$offset];
+                }
+            }
+        }
+        return null;
+    }
+    // END ARRAYACCESS, BEGIN ITERATOR
     /**
      * Gets next row
      */
@@ -164,12 +196,21 @@ class Response
             return false;
         }
     }
-    /**
-     * Resets ititerator
-     */
-    function reset()
+    function rewind()
     {
         $this->ind = 0;
+    }
+    function current()
+    {
+        return $this->result[$this->ind];
+    }
+    function key()
+    {
+        return $this->ind;
+    }
+    function valid()
+    {
+        return $this->offsetExists($this->ind);
     }
 }
 class Connector

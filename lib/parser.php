@@ -331,8 +331,9 @@ class Parser
                 if (!$raw)
                     $column = self::quote($column);
                 if ($arr) {
+                    $sql .= '(';
                     if ($useBind) {
-                        $sql .= '(' . $build($build, $val, $map, $index, $values, $newJoin, $newOperator, $parent . '/' . $key) . ')';
+                        $sql .= $build($build, $val, $map, $index, $values, $newJoin, $newOperator, $parent . '/' . $key);
                     } else {
                         if ($map !== false && !$raw) {
                             $map[$key]                 = $index;
@@ -340,8 +341,8 @@ class Parser
                         }
                         if ($between) {
                             $index += 2;
-                            $sql .= '(' . $column . ($arg === '<>' ? 'NOT' : '') . ' BETWEEN ';
-                 
+                            $sql .= $column . ($arg === '<>' ? 'NOT' : '') . ' BETWEEN ';
+                            
                             if ($raw) {
                                 $sql .= $val[0] . ' AND ' . $val[1];
                             } else if ($values !== false) {
@@ -351,9 +352,7 @@ class Parser
                             } else {
                                 $sql .= self::escape($val[0]) . ' AND ' . self::escape($val[1]);
                             }
-                            $sql .= ')';
                         } else {
-                            $sql .= '(';
                             foreach ($val as $k => &$v) {
                                 if ($k !== 0)
                                     $sql .= $newJoin;
@@ -368,8 +367,8 @@ class Parser
                                     $sql .= self::escape($v);
                                 }
                             }
-                            $sql .= ')';
                         }
+                        $sql .= ')';
                     }
                 } else {
                     $sql .= $column . $newOperator;

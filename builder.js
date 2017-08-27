@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 
-var version = "1.0.5";
+var version = "1.0.6";
 
 var today = new Date();
 var dd = today.getDate();
@@ -103,17 +103,17 @@ function removeComments(str) {
 }
 
 // Minifier -> https://github.com/ThreeLetters/PHP-Minify-js
-function minify(str,options) {
+function minify(str, options) {
     if (!options) options = {};
     str = removeComments(str);
     var varReplace = options.varReplace === undefined ? true : options.varReplace;
     var extreme = options.extremeMinify === undefined ? true : options.extremeMinify;
     var removeLine = options.removeLine === undefined ? true : options.removeLine;
-    
+
     if (removeLine) {
-        str = str.replace(/\n/g, "").replace(/\t/g,"").split("");
+        str = str.replace(/\n/g, "").replace(/\t/g, "").split("");
     } else {
-       str = str.split("");
+        str = str.split("");
     }
     var len = str.length;
     var out = [];
@@ -166,13 +166,13 @@ function minify(str,options) {
     function includes(char) {
 
         var dt = [";", "{", "}", ",", "(", ")", "[", "]", "=", ">", "<", "."];
-        if (extreme) dt.push("&","|","+","-","*","/");
+        if (extreme) dt.push("&", "|", "+", "-", "*", "/");
         return dt.indexOf(char) != -1;
     }
 
     function includes2(char) {
         var dt = ["=", "{", "(", "}", ")", "]", ">", "<", "!", "."];
-        if (extreme) dt.push("$","&","|","+","-","*","/");
+        if (extreme) dt.push("$", "&", "|", "+", "-", "*", "/");
         return dt.indexOf(char) != -1;
     }
 
@@ -335,15 +335,17 @@ var readme = "## Files\n\
 \n\
 ### Sizes\n\
 \n";
-    var crypto = require('crypto');
+var crypto = require('crypto');
+
 function size(filename) {
     const stats = fs.statSync(filename);
     const fileSizeInBytes = stats.size
     return Math.round(fileSizeInBytes / 100) / 10;
 }
+
 function hash(data) {
 
-return crypto.createHash('md5').update(data).digest("hex");
+    return crypto.createHash('md5').update(data).digest("hex");
 }
 var sizes = `\
 * \`SuperSQL.php\` - ${a.length} Chars (${size(dir1)} MB)\n\
@@ -363,5 +365,5 @@ var sizes = `\
 
 readme += sizes;
 
-fs.writeFileSync(__dirname + "/dist/README.md",readme);
+fs.writeFileSync(__dirname + "/dist/README.md", readme);
 console.log("Compiled files into dist");
