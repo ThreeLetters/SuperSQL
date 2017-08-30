@@ -24,8 +24,8 @@ SOFTWARE.
 */
 namespace SuperSQL;
 
-use lib\Parser as Parser;
-use lib\Connector as Connector;
+use SuperSQL\lib\Parser as Parser;
+use SuperSQL\lib\Connector as Connector;
 
 class SuperSQL
 {
