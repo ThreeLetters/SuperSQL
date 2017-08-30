@@ -156,14 +156,6 @@ class SQLHelper
         }
         return $value;
     }
-    private static function escape2($value)
-    {
-        if (is_numeric($value)) {
-            return (int) $value;
-        } else {
-            return '\'' . $value . '\'';
-        }
-    }
     function change($id)
     {
         $this->s = $this->connections[$id];
@@ -227,7 +219,7 @@ class SQLHelper
         foreach ($data as $key => $val) {
             $str = '`' . Parser::rmComments($key) . '`';
             foreach ($val as $k => $v) {
-                $str = 'REPLACE(' . $str . ', ' . self::escape2($k) . ', ' . self::escape($v) . ')';
+                $str = 'REPLACE(' . $str . ', ' . Parser::escape($k) . ', ' . self::escape($v) . ')';
             }
             $newData['#' . $key] = $str;
         }
