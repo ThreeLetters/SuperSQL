@@ -265,7 +265,7 @@ var adv = fs.readFileSync(__dirname + "/SuperSQL/lib/parser.php", "utf8");
 
 var connector = fs.readFileSync(__dirname + "/SuperSQL/lib/connector.php", "utf8");
 
-var main = fs.readFileSync(__dirname + "/SuperSQL/index.php", "utf8");
+var main = fs.readFileSync(__dirname + "/SuperSQL/SuperSQL.php", "utf8");
 
 var helper = fs.readFileSync(__dirname + "/SuperSQL/helper.php", "utf8");
 
