@@ -250,9 +250,10 @@ class SQLHelper
     }
     function sqBase($sql, $where, $join)
     {
+        $i = 0;
         $values = array();
         if ($join) {
-            Parser::JOIN($join, $sql);
+            Parser::JOIN($join, $sql, $values, $i);
         }
         if (count($where) != 0) {
             $sql .= ' WHERE ';
@@ -313,9 +314,7 @@ class SQLHelper
                     $alias = Parser::getType($val); // get type || alias
                     if ($alias) {
                         $s = Parser::getType($val);
-                        if ($s) {
-                            $alias = $s;
-                        } else if ($alias === "int" || $alias === "bool" || $alias === "string" || $alias === "json" || $alias === "obj") { // name[alias][type]
+                        if ($s && ($s === "int" || $s === "bool" || $s === "string" || $s === "json" || $s === "obj")) { // name[alias][type]
                             $alias = false;
                         }
                     }
