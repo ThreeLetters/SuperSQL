@@ -1,12 +1,12 @@
 <?php
 
-include "../index.php";
+include "../autoload.php";
 
 /*
 include "../dist/SuperSQL.php";
 include "../dist/SuperSQL_helper.php";
 */
-$Helper = new $SQLHelper("localhost","mydb","root","1234");
+$Helper = new SuperSQL\SQLHelper("localhost","mydb","root","1234");
 
 $Helper->SELECT();
 
