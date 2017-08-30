@@ -23,7 +23,7 @@ SlickInject and Medoo on steroids - The most advanced and lightweight library of
 You may either
 
 1. Use the built file (/dist/SuperSQL.php)
-2. Use the library (include SuperSQL/index.php)
+2. Use the library (Autoload all in `SuperSQL/`)
 3. Use composer (`composer require threeletters/supersql`)
 
 ```php

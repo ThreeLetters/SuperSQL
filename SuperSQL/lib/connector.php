@@ -1,5 +1,5 @@
 <?php
-namespace SuperSQL;
+namespace SuperSQL\lib;
 /*
 MIT License
 

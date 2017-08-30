@@ -23,10 +23,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 namespace SuperSQL;
-include "lib/parser.php";
-include "lib/connector.php";
-include "lib/helper.php";
-// BUILD BETWEEN
+
+use lib\Parser as Parser;
+use lib\Connector as Connector;
+
 class SuperSQL
 {
     public $con;
