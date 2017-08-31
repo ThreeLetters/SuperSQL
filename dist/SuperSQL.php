@@ -19,7 +19,6 @@ class Response implements \ArrayAccess, \Iterator
     public $errorData;
     public $outTypes;
     public $complete = false;
-    public $stmt;
     function __construct($data, $error, &$outtypes, $mode)
     {
         $this->error = !$error;

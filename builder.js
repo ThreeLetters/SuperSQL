@@ -165,13 +165,13 @@ function minify(str, options) {
 
     function includes(char) {
 
-        var dt = [";", "{", "}", ",", "(", ")", "[", "]", "=", ">", "<", "."];
+        var dt = [";", "{", "}", ",", "(", ")", "[", "]", "=", ">", "<", ".", "?", ":"];
         if (extreme) dt.push("&", "|", "+", "-", "*", "/");
         return dt.indexOf(char) != -1;
     }
 
     function includes2(char) {
-        var dt = ["=", "{", "(", "}", ")", "]", ">", "<", "!", "."];
+        var dt = ["=", "{", "(", "}", ")", "]", ">", "<", "!", ".", "?", ":"];
         if (extreme) dt.push("$", "&", "|", "+", "-", "*", "/");
         return dt.indexOf(char) != -1;
     }

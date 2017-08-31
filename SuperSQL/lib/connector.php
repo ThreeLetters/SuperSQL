@@ -33,7 +33,6 @@ class Response implements \ArrayAccess, \Iterator
     public $errorData;
     public $outTypes;
     public $complete = false;
-    public $stmt;
     /**
      * Gets data from a query
      */
