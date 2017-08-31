@@ -856,5 +856,67 @@ class Parser
 }
 
 // index.php
-?>
+class SuperSQL
+{
+    public $con;
+    public $lockMode = false;
+    function __construct($dsn, $user, $pass)
+    {
+        $this->con = new Connector($dsn, $user, $pass);
+    }
+    function SELECT($table, $columns = array(), $where = array(), $join = null, $limit = false)
+    {
+        if ((is_int($join) || is_string($join) || isset($join[0])) && !$limit) {
+            $limit = $join;
+            $join  = null;
+        }
+        $d = Parser::SELECT($table, $columns, $where, $join, $limit);
+        return $this->con->_query($d[0], $d[1], $d[2], $d[3], $this->lockMode ? 0 : 1);
+    }
+    function INSERT($table, $data, $append = null)
+    {
+        $d = Parser::INSERT($table, $data, $append);
+        return $this->con->_query($d[0], $d[1], $d[2]);
+    }
+    function UPDATE($table, $data, $where = array())
+    {
+        $d = Parser::UPDATE($table, $data, $where);
+        return $this->con->_query($d[0], $d[1], $d[2]);
+    }
+    function DELETE($table, $where = array())
+    {
+        $d = Parser::DELETE($table, $where);
+        return $this->con->_query($d[0], $d[1], $d[2]);
+    }
+    function query($query, $obj = null, $outtypes = null, $mode = 0)
+    {
+        return $this->con->query($query, $obj, $outtypes, $mode);
+    }
+    function close()
+    {
+        $this->con->close();
+    }
+    function dev()
+    {
+        $this->con->dev = true;
+    }
+    function getLog()
+    {
+        return $this->con->log;
+    }
+    function transact($func)
+    {
+        $this->con->db->beginTransaction();
+        $r = $func($this);
+        if ($r === false)
+            $this->con->db->rollBack();
+        else
+            $this->con->db->commit();
+        return $r;
+    }
+    function modeLock($val)
+    {
+        $this->lockMode = $val;
+    }
+}
 ?>
