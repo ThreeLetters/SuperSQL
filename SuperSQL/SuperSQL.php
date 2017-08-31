@@ -69,9 +69,9 @@ class SuperSQL
      *
      * @returns {SQLResponse|SQLResponse[]}
      */
-    function INSERT($table, $data)
+    function INSERT($table, $data, $append = null)
     {
-        $d = Parser::INSERT($table, $data);
+        $d = Parser::INSERT($table, $data, $append);
         return $this->con->_query($d[0], $d[1], $d[2]);
     }
     /**

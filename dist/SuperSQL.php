@@ -3,8 +3,8 @@
  Author: Andrews54757
  License: MIT (https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE)
  Source: https://github.com/ThreeLetters/SQL-Library
- Build: v1.0.7
- Built on: 30/08/2017
+ Build: v1.0.8
+ Built on: 31/08/2017
 */
 
 namespace SuperSQL;
@@ -652,8 +652,7 @@ class Parser
     static function SELECT($table, $columns, $where, $join, $limit)
     {
         $sql      = 'SELECT ';
-        $values   = array();
-        $insert   = array();
+        $values   = $insert = array();
         $outTypes = null;
         $i        = 0;
         if (!isset($columns[0])) { 
@@ -715,22 +714,19 @@ class Parser
             $outTypes
         );
     }
-    static function INSERT($table, $data)
+    static function INSERT($table, $data, $append)
     {
-        $sql     = 'INSERT INTO ' . self::table($table) . ' (';
-        $values  = array();
-        $insert  = array();
-        $append  = '';
-        $i       = 0;
-        $b       = 0;
-        $indexes = array();
-        $multi   = isset($data[0]);
-        $dt      = $multi ? $data[0] : $data;
-        foreach ($dt as $key => &$val) {
+        $sql      = 'INSERT INTO ' . self::table($table) . ' (';
+        $values   = $insert = $index = array();
+        $valuestr = '';
+        $b        = 0;
+        $multi    = isset($data[0]);
+        $dt       = $multi ? $data[0] : $data;
+        foreach ($dt as $key => $val) {
             $raw = self::isRaw($key);
             if ($b !== 0) {
                 $sql .= ', ';
-                $append .= ', ';
+                $valuestr .= ', ';
             }
             if (!$raw) {
                 preg_match('/(?<out>[^\[]*)(?:\[(?<type>[^]]*)\])?/', $key, $matches);
@@ -738,23 +734,34 @@ class Parser
             }
             $sql .= '`' . $key . '`';
             if ($raw) {
-                $append .= $val;
+                $valuestr .= $val;
             } else {
                 $type = isset($matches['type']) ? $matches['type'] : false;
-                $append .= '?';
-                $m2 = (!$type || ($type !== 'json' && $type !== 'obj')) && is_array($val);
+                $valuestr .= '?';
+                $m2 = !$multi && (!$type || ($type !== 'json' && $type !== 'obj')) && is_array($val);
                 array_push($values, self::value($type, $m2 ? $val[0] : $val));
                 if ($multi) {
-                    $indexes[$key] = $i++;
+                    $index[$key] = array(
+                        $val,
+                        $type
+                    );
                 } else if ($m2) {
                     self::append($insert, $val, $i++, $values);
                 }
             }
             ++$b;
         }
-        if ($multi)
-            self::append2($insert, $indexes, $data, $values);
-        $sql .= ') VALUES (' . $append . ')';
+        $sql .= ') VALUES (' . $valuestr . ')';
+        if ($multi) {
+            unset($data[0]);
+            foreach ($data as $query) {
+                $sql .= ', (' . $valuestr . ')';
+                foreach ($index as $key => $val) {
+                    array_push($values, self::value($val[1], isset($query[$key]) ? $query[$key] : $val[0]));
+                }
+            }
+        }
+        if ($append !== null) $sql .= ' ' . $append;
         return array(
             $sql,
             $values,
@@ -763,14 +770,11 @@ class Parser
     }
     static function UPDATE($table, $data, $where)
     {
-        $sql     = 'UPDATE ' . self::table($table) . ' SET ';
-        $values  = array();
-        $insert  = array();
-        $i       = 0;
-        $b       = 0;
-        $indexes = array();
-        $multi   = isset($data[0]);
-        $dt      = $multi ? $data[0] : $data;
+        $sql    = 'UPDATE ' . self::table($table) . ' SET ';
+        $values = $insert = $indexes = array();
+        $i      = $b = 0;
+        $multi  = isset($data[0]);
+        $dt     = $multi ? $data[0] : $data;
         foreach ($dt as $key => &$val) {
             $raw = self::isRaw($key);
             if ($b !== 0) {
@@ -833,8 +837,7 @@ class Parser
     static function DELETE($table, $where)
     {
         $sql    = 'DELETE FROM ' . self::table($table);
-        $values = array();
-        $insert = array();
+        $values = $insert = array();
         if (!empty($where)) {
             $sql .= ' WHERE ';
             $index = array();
