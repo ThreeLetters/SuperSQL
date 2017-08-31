@@ -37,7 +37,7 @@ $SuperSQL = SQLHelper::connect($host,$db,$user,$pass);
 ```
 
 
-SlickInject and Medoo on steroids - The most advanced and lightweight library of it's kind. Develop using PHP & SQL quickly and securely.
+SlickInject and Medoo on steroids - The most advanced and lightweight library of it's kind.
 
 ### Purpose
 
@@ -46,7 +46,7 @@ SlickInject and Medoo on steroids - The most advanced and lightweight library of
 
 ### Main Features
 
-1. Very small - 28.3KB one file (Unminified, `dist/SuperSQL.php`. Minified version: 12.5KB)
+1. Very small - 28.5KB one file (Unminified, `dist/SuperSQL.php`. Minified version: 12KB)
 2. Simple and easy - Very easy to lean. We also provide a simple and advanced API
 3. Compatability - Supports major SQL databases
 4. Customisability - We offer multiple files for your needs
@@ -65,9 +65,8 @@ new SuperSQL($dsn,$user,$pass);
 
 You may either
 
-1. Use the built file (/dist/SuperSQL.php - preferred)
-2. Use the library (Autoload all in SuperSQL/)
-3. Use composer (`composer require threeletters/supersql`)
+1. Use the built file (`/dist/SuperSQL*.php`)
+2. Use the library (include index.php)
 
 ### Build
 To build this library, do 
@@ -378,20 +377,6 @@ $SuperSQL->SELECT("table", [
     "col3[alias2]", // alias
     "col4[json]" // type casting
 ]); // SELECT DISTINCT `col1`, `col2` AS `alias`, `col3` AS `alias2`, `col4` FROM `table`
-
-$SuperSQL->SELECT("table", [
-    'DISTINCT',
-    '*', // select all
-    'data[json]' // data is converted from json
-],[5,2]); // SELECT DISTINCT * FROM `table` LIMIT 5 OFFSET 2
-
-$SuperSQL->SELECT("users", [], null, [
-    'GROUP' => 'user_group',
-    'HAVING' => 'COUNT(`users`) > 10',
-    'LIMIT' => 5,
-    'OFFSET' => 2,
-    'ORDER' => 'column'
-]); // SELECT * FROM `users` GROUP BY `user_group` LIMIT 5 OFFSET 2 ORDER BY `column`
 ?>
 ```
 
@@ -401,7 +386,7 @@ $SuperSQL->SELECT("users", [], null, [
 * `(Array)columns` - Array of columns to return. `[]` will query using the `*` selector.
 * `(Array)where` - Array of conditions for WHERE (See above for documentation on WHERE)
 * `(Array|Null)join` - Array of conditions for JOIN. Usage below
-* `(Int|String|Array)limit` - Number of rows to retrieve. if string, will be treated as an append - it will be appended to the sql query.
+* `(Int|String)limit` - Number of rows to retrieve. if string, will be treated as an append - it will be appended to the sql query.
 
 <aside class="notice">
 You may also put `DISTINCT`, in the top of the columns array to use the DISTINCT keyword. Other available keywords include: `INSERT INTO table` and `INTO table` (replace table with table name)
