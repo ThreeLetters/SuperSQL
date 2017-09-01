@@ -32,7 +32,7 @@ class Response implements \ArrayAccess, \Iterator
     public $error;
     public $errorData;
     public $outTypes;
-    public $complete = false;
+    public $complete = true;
     /**
      * Gets data from a query
      */
@@ -40,7 +40,6 @@ class Response implements \ArrayAccess, \Iterator
     {
         $this->error = !$error;
         if (!$error) {
-            $this->complete = true;
             $this->errorData = $data->errorInfo();
         } else {
             $this->outTypes = $outtypes;
@@ -59,9 +58,9 @@ class Response implements \ArrayAccess, \Iterator
                 }
             }
             $this->result   = $d;
-            $this->complete = true;
         } else if ($mode === 1) { // fetch row-by-row
             $this->stmt   = $data;
+            $this->complete = false;
             $this->result = array();
         }
     }
@@ -83,9 +82,7 @@ class Response implements \ArrayAccess, \Iterator
             array_push($this->result, $row);
             return $row;
         } else {
-            $this->complete = true;
-            $this->stmt->closeCursor();
-            $this->stmt = null;
+            $this->close();
             return false;
         }
     }

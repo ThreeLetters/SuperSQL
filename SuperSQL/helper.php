@@ -219,7 +219,7 @@ class SQLHelper
         foreach ($data as $key => $val) {
             $str = '`' . Parser::rmComments($key) . '`';
             foreach ($val as $k => $v) {
-                $str = 'REPLACE(' . $str . ', ' . Parser::escape($k) . ', ' . self::escape($v) . ')';
+                $str = 'REPLACE(' . $str . ', ' . self::escape($k) . ', ' . self::escape($v) . ')';
             }
             $newData['#' . $key] = $str;
         }

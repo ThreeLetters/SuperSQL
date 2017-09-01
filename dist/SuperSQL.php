@@ -18,12 +18,11 @@ class Response implements \ArrayAccess, \Iterator
     public $error;
     public $errorData;
     public $outTypes;
-    public $complete = false;
+    public $complete = true;
     function __construct($data, $error, &$outtypes, $mode)
     {
         $this->error = !$error;
         if (!$error) {
-            $this->complete = true;
             $this->errorData = $data->errorInfo();
         } else {
             $this->outTypes = $outtypes;
@@ -42,9 +41,9 @@ class Response implements \ArrayAccess, \Iterator
                 }
             }
             $this->result   = $d;
-            $this->complete = true;
         } else if ($mode === 1) { 
             $this->stmt   = $data;
+            $this->complete = false;
             $this->result = array();
         }
     }
@@ -66,9 +65,7 @@ class Response implements \ArrayAccess, \Iterator
             array_push($this->result, $row);
             return $row;
         } else {
-            $this->complete = true;
-            $this->stmt->closeCursor();
-            $this->stmt = null;
+            $this->close();
             return false;
         }
     }
@@ -267,15 +264,7 @@ class Parser
             }
         }
     }
-    static function escape($val)
-    {
-        if (is_int($val)) {
-            return (int) $val;
-        } else {
-            return '\'' . $val . '\''; 
-        }
-    }
-    static function escape2($val, $dt)
+    static function escape($val, $dt)
     {
         switch ($dt[2]) {
             case 0: 
@@ -334,7 +323,7 @@ class Parser
                         $a = $d + $i;
                         if (isset($holder[$a]))
                             trigger_error('Key collision: ' . $k, E_USER_WARNING);
-                        $holder[$a] = self::escape2($j, $values[$a]);
+                        $holder[$a] = self::escape($j, $values[$a]);
                     }
                 } else {
                     self::recurse($holder, $v, $indexes, $par . '/' . $k, $values);
@@ -342,7 +331,7 @@ class Parser
             } else {
                 if (isset($holder[$d]))
                     trigger_error('Key collision: ' . $k, E_USER_WARNING);
-                $holder[$d] = self::escape2($v, $values[$d]);
+                $holder[$d] = self::escape($v, $values[$d]);
             }
         }
     }
@@ -428,7 +417,7 @@ class Parser
         preg_match('/([^#]*)/', $str, $matches);
         return $matches[1];
     }
-    static function conditions($dt, &$values = false, &$map = false, &$index = 0, $join = ' AND ', $operator = ' = ', $parent = '')
+    static function conditions($dt, &$values, &$map = false, &$index = 0, $join = ' AND ', $operator = ' = ', $parent = '')
     {
         $num = 0;
         $sql = '';
@@ -512,12 +501,10 @@ class Parser
                         $sql .= $column . ($arg === '<>' ? 'NOT' : '') . ' BETWEEN ';
                         if ($raw) {
                             $sql .= $val[0] . ' AND ' . $val[1];
-                        } else if ($values !== false) {
+                        } else {
                             $sql .= '? AND ?';
                             array_push($values, self::value($type, $val[0]));
                             array_push($values, self::value($type, $val[1]));
-                        } else {
-                            $sql .= self::escape($val[0]) . ' AND ' . self::escape($val[1]);
                         }
                     } else {
                         foreach ($val as $k => &$v) {
@@ -527,11 +514,9 @@ class Parser
                             $sql .= $column . $newOperator;
                             if ($raw) {
                                 $sql .= $v;
-                            } else if ($values !== false) {
+                            } else {
                                 $sql .= '?';
                                 array_push($values, self::value($type, $v));
-                            } else {
-                                $sql .= self::escape($v);
                             }
                         }
                     }
@@ -542,12 +527,8 @@ class Parser
                 if ($raw) {
                     $sql .= $val;
                 } else {
-                    if ($values !== false) {
-                        $sql .= '?';
-                        array_push($values, self::value($type, $val));
-                    } else {
-                        $sql .= self::escape($val);
-                    }
+                    $sql .= '?';
+                    array_push($values, self::value($type, $val));
                     if ($map !== false) {
                         $map[$key]                 = $index;
                         $map[$key . '#' . $parent] = $index++;

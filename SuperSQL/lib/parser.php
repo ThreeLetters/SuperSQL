@@ -68,15 +68,7 @@ class Parser
             }
         }
     }
-    static function escape($val)
-    {
-        if (is_int($val)) {
-            return (int) $val;
-        } else {
-            return '\'' . $val . '\''; // NOT SAFE!! Use PDO->Quote in future
-        }
-    }
-    static function escape2($val, $dt)
+    static function escape($val, $dt)
     {
         switch ($dt[2]) {
             case 0: //Bool
@@ -142,7 +134,7 @@ class Parser
                         $a = $d + $i;
                         if (isset($holder[$a]))
                             trigger_error('Key collision: ' . $k, E_USER_WARNING);
-                        $holder[$a] = self::escape2($j, $values[$a]);
+                        $holder[$a] = self::escape($j, $values[$a]);
                     }
                 } else {
                     self::recurse($holder, $v, $indexes, $par . '/' . $k, $values);
@@ -150,7 +142,7 @@ class Parser
             } else {
                 if (isset($holder[$d]))
                     trigger_error('Key collision: ' . $k, E_USER_WARNING);
-                $holder[$d] = self::escape2($v, $values[$d]);
+                $holder[$d] = self::escape($v, $values[$d]);
             }
         }
     }
@@ -254,11 +246,11 @@ class Parser
      * Constructs logical conditional statements
      *
      * @param {Object|Array} arr - Conditions
-     * @param {Array} args
+     * @param {Array} values - Output values
      *
      * @returns {String}
      */
-    static function conditions($dt, &$values = false, &$map = false, &$index = 0, $join = ' AND ', $operator = ' = ', $parent = '')
+    static function conditions($dt, &$values, &$map = false, &$index = 0, $join = ' AND ', $operator = ' = ', $parent = '')
     {
         $num = 0;
         $sql = '';
@@ -342,12 +334,10 @@ class Parser
                         $sql .= $column . ($arg === '<>' ? 'NOT' : '') . ' BETWEEN ';
                         if ($raw) {
                             $sql .= $val[0] . ' AND ' . $val[1];
-                        } else if ($values !== false) {
+                        } else {
                             $sql .= '? AND ?';
                             array_push($values, self::value($type, $val[0]));
                             array_push($values, self::value($type, $val[1]));
-                        } else {
-                            $sql .= self::escape($val[0]) . ' AND ' . self::escape($val[1]);
                         }
                     } else {
                         foreach ($val as $k => &$v) {
@@ -357,11 +347,9 @@ class Parser
                             $sql .= $column . $newOperator;
                             if ($raw) {
                                 $sql .= $v;
-                            } else if ($values !== false) {
+                            } else {
                                 $sql .= '?';
                                 array_push($values, self::value($type, $v));
-                            } else {
-                                $sql .= self::escape($v);
                             }
                         }
                     }
@@ -372,12 +360,8 @@ class Parser
                 if ($raw) {
                     $sql .= $val;
                 } else {
-                    if ($values !== false) {
-                        $sql .= '?';
-                        array_push($values, self::value($type, $val));
-                    } else {
-                        $sql .= self::escape($val);
-                    }
+                    $sql .= '?';
+                    array_push($values, self::value($type, $val));
                     if ($map !== false) {
                         $map[$key]                 = $index;
                         $map[$key . '#' . $parent] = $index++;
