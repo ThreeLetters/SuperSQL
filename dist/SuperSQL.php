@@ -23,6 +23,7 @@ class Response implements \ArrayAccess, \Iterator
     {
         $this->error = !$error;
         if (!$error) {
+            $this->complete = true;
             $this->errorData = $data->errorInfo();
         } else {
             $this->outTypes = $outtypes;
