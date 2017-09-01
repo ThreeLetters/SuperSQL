@@ -7,16 +7,16 @@
 
 ### Sizes
 
-* `SuperSQL.php` - 27896 Chars (27.9 MB)
-* `SuperSQL_min.php` - 12719 Chars (12.7 MB)
+* `SuperSQL.php` - 27791 Chars (27.8 MB)
+* `SuperSQL_min.php` - 12629 Chars (12.6 MB)
 * `SuperSQL_helper.php` - 9840 Chars (9.8 MB)
 * `SuperSQL_helper_min.php` - 4839 Chars (4.8 MB)
 
 ## Hashes
 
 ```
-* SuperSQL.php - b374a3b1bb8c2940b1d262ae53522891
-* SuperSQL_min.php - 13d239263343ea5cbb16b95a0cd330a5
+* SuperSQL.php - 2f9d678efaccae188e69e4bc43f012e3
+* SuperSQL_min.php - c481668794671742676c85ef44bafcd9
 * SuperSQL_helper.php - b27210a46f68ff5fb3a6ee9921e508b5
 * SuperSQL_helper_min.php - 5503a0433d06c5aba2cd2bc2f1949496
 ```

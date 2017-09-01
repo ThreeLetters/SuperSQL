@@ -43,25 +43,20 @@ class Response implements \ArrayAccess, \Iterator
             $this->errorData = $data->errorInfo();
         } else {
             $this->outTypes = $outtypes;
-            $this->init($data, $mode);
-            $this->affected = $data->rowCount();
-        }
-    }
-    private function init(&$data, &$mode)
-    {
-        if ($mode === 0) { // fetch all
-            $outtypes = $this->outTypes;
-            $d        = $data->fetchAll(\PDO::FETCH_ASSOC);
-            if ($outtypes) {
-                foreach ($d as $i => &$row) {
-                    $this->map($row, $outtypes);
+            if ($mode === 0) { // fetch all
+                $d        = $data->fetchAll(\PDO::FETCH_ASSOC);
+                if ($outtypes) {
+                    foreach ($d as $i => &$row) {
+                        $this->map($row, $outtypes);
+                    }
                 }
+                $this->result = $d;
+            } else if ($mode === 1) { // fetch row-by-row
+                $this->stmt     = $data;
+                $this->complete = false;
+                $this->result   = array();
             }
-            $this->result   = $d;
-        } else if ($mode === 1) { // fetch row-by-row
-            $this->stmt   = $data;
-            $this->complete = false;
-            $this->result = array();
+            $this->affected = $data->rowCount();
         }
     }
     function close()
@@ -227,8 +222,9 @@ class Connector
     function __construct($dsn, $user, $pass)
     {
         try {
-        $this->db  = new \PDO($dsn, $user, $pass);
-        } catch (\PDOException $e) {
+            $this->db = new \PDO($dsn, $user, $pass);
+        }
+        catch (\PDOException $e) {
             throw new \Exception($e->getMessage());
         }
     }
@@ -298,8 +294,7 @@ class Connector
      */
     function close()
     {
-        $this->db      = null;
-        $this->queries = null;
+        $this->db = null;
     }
 }
 // BUILD BETWEEN
