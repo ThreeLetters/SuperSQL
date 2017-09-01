@@ -462,7 +462,14 @@
 <span class="nv">$SuperSQL</span> <span class="o">=</span> <span class="nx">SQLHelper</span><span class="o">::</span><span class="na">connect</span><span class="p">(</span><span class="nv">$host</span><span class="p">,</span><span class="nv">$db</span><span class="p">,</span><span class="nv">$user</span><span class="p">,</span><span class="nv">$pass</span><span class="p">);</span>
 <span class="cp">?&gt;</span>
 </code></pre>
-            <p>SlickInject and Medoo on steroids - The most advanced and lightweight library of it&#39;s kind. Develop using PHP &amp; SQL quickly and securely.</p>
+            <p><img src="https://img.shields.io/badge/SuperSQL-v1.1.0-brightgreen.svg" alt="SuperSQL" />
+                <a href="https://raw.githubusercontent.com/ThreeLetters/SuperSQL/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="GitHub license" /></a>
+                <a href="http://supersql.tk"><img src="https://img.shields.io/badge/Docs-supersql.tk-blue.svg" alt="Docs" /></a>
+                <a href="https://github.com/ThreeLetters/SuperSQL/stargazers"><img src="https://img.shields.io/github/stars/ThreeLetters/SuperSQL.svg" alt="GitHub stars" /></a>
+                <a href="https://github.com/ThreeLetters/SuperSQL/network"><img src="https://img.shields.io/github/forks/ThreeLetters/SuperSQL.svg" alt="GitHub forks" /></a>
+            </p>
+
+            <p>The most lightest, efficient and most powerful php sql database framework. Allows you to quickly and securely develop anything using sql databases.</p>
             <h3 id='purpose'>Purpose</h3>
             <ol>
                 <li>To provide a very fast and efficient way to edit sql databases</li>
@@ -470,14 +477,13 @@
             </ol>
             <h3 id='main-features'>Main Features</h3>
             <ol>
-                <li>Very small - 28.3KB one file (Unminified, <code>dist/SuperSQL.php</code>. Minified version: 12.5KB)</li>
-                <li>Simple and easy - Very easy to lean. We also provide a simple and advanced API</li>
-                <li>Compatability - Supports major SQL databases</li>
-                <li>Customisability - We offer multiple files for your needs</li>
-                <li>Efficiency - This module was built with speed in mind.</li>
-                <li>Complexity - This module allows you to make all kinds of complex queries</li>
-                <li>Security - This module prevents SQL injections.</li>
-                <li>Availability - This module is FREE. Licensed under the MIT license.</li>
+                <li>Very small - 27.8KB one file (Unminified, <code>dist/SuperSQL.php</code>. Minified version: 12.6KB)</li>
+                <li>Simple and easy - Very easy to learn. SuperSQL was designed to be easy and simple, to the ability that a noob can use it.</li>
+                <li>Compatability - Supports all major SQL databases</li>
+                <li>Efficiency - This module was built with speed and efficiency in mind.</li>
+                <li>Complexity - This module allows you to make all kinds of complex queries.</li>
+                <li>Security - This module prevents SQL injections, so hackers bye bye!</li>
+                <li>Availability - This module is FREE. Licensed under the <a href="https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE">MIT license</a>.</li>
             </ol>
             <h3 id='usage'>Usage</h3>
             <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
@@ -487,14 +493,16 @@
             <p>You may either</p>
 
             <ol>
-                <li>Use the built file (/dist/SuperSQL.php - preferred)</li>
-                <li>Use the library (Autoload all in SuperSQL/)</li>
-                <li>Use composer (<code>composer require threeletters/supersql</code>)</li>
+                <li>Use the built file (<a href="https://github.com/ThreeLetters/SuperSQL/blob/master/dist/SuperSQL.php">/dist/SuperSQL.php</a> - preferred)</li>
+                <li>Use the library (Autoload all in <code>SuperSQL/</code>, we also provide a <a href="https://github.com/ThreeLetters/SuperSQL/blob/master/autoload.php">simple loader</a>)</li>
+                <li>Use the <a href="https://packagist.org/packages/threeletters/supersql">composer package</a> (<code>composer require threeletters/supersql</code>)</li>
             </ol>
             <h3 id='build'>Build</h3>
-            <p>To build this library, do </p>
+            <p>To build this library, you need <a href="https://nodejs.org/en/">NodeJS</a>. Then execute <code>builder.js</code></p>
 
-            <p><code>node builder.js</code></p>
+            <blockquote>
+                <p>node builder.js</p>
+            </blockquote>
 
             <p>It will build to <code>/dist/SuperSQL*.php</code></p>
             <h1 id='basics'>Basics</h1>
@@ -698,7 +706,7 @@
                         <p>If you want to set the type of the input, you can set it by adding <code>[type] (replace type with type)</code>.</p>
 
                         <aside class="success">
-                            Available types: `int`, `bool`, `lob`, `null`, `json`, `obj`
+                            Available types: `int`, `bool`, `lob`, `null`, `json`, `object`, `double`
                         </aside>
                         <h2 id='sql-functions-raw'>SQL Functions/raw</h2>
                         <blockquote>
@@ -776,7 +784,7 @@
     <span class="s1">'LIMIT'</span> <span class="o">=&gt;</span> <span class="mi">5</span><span class="p">,</span>
     <span class="s1">'OFFSET'</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span>
     <span class="s1">'ORDER'</span> <span class="o">=&gt;</span> <span class="s1">'column'</span>
-<span class="p">]);</span> <span class="c1">// SELECT * FROM `users` GROUP BY `user_group` HAVING COUNT(`users`) > 10 LIMIT 5 OFFSET 2 ORDER BY `column`
+<span class="p">]);</span> <span class="c1">// SELECT * FROM `users` GROUP BY `user_group` HAVING COUNT(`users`) &gt; 10 LIMIT 5 OFFSET 2 ORDER BY `column`
 </span><span class="cp">?&gt;</span>
 </code></pre>
                         <p><strong>SuperSQL-&gt;SELECT($table, $columns, $where[,$join[, $limit/$append);</strong></p>
@@ -817,6 +825,7 @@
                         <ul>
                             <li><code>(String|Array)table</code> - Table(s) to insert to</li>
                             <li><code>(Array)data</code> - Data to insert</li>
+                            <li><code>(String|Null)append</code> - String to append to query (optional).</li>
                         </ul>
                         <h2 id='update'>UPDATE</h2>
                         <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>

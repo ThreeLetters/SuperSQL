@@ -36,8 +36,14 @@ $SuperSQL = SQLHelper::connect($host,$db,$user,$pass);
 ?>
 ```
 
+![SuperSQL](https://img.shields.io/badge/SuperSQL-v1.1.0-brightgreen.svg)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/ThreeLetters/SuperSQL/master/LICENSE)
+[![Docs](https://img.shields.io/badge/Docs-supersql.tk-blue.svg)](http://supersql.tk)
+[![GitHub stars](https://img.shields.io/github/stars/ThreeLetters/SuperSQL.svg)](https://github.com/ThreeLetters/SuperSQL/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/ThreeLetters/SuperSQL.svg)](https://github.com/ThreeLetters/SuperSQL/network)
 
-SlickInject and Medoo on steroids - The most advanced and lightweight library of it's kind. Develop using PHP & SQL quickly and securely.
+
+The most lightest, efficient and most powerful php sql database framework. Allows you to quickly and securely develop anything using sql databases.
 
 ### Purpose
 
@@ -46,14 +52,13 @@ SlickInject and Medoo on steroids - The most advanced and lightweight library of
 
 ### Main Features
 
-1. Very small - 28.3KB one file (Unminified, `dist/SuperSQL.php`. Minified version: 12.5KB)
-2. Simple and easy - Very easy to lean. We also provide a simple and advanced API
-3. Compatability - Supports major SQL databases
-4. Customisability - We offer multiple files for your needs
-5. Efficiency - This module was built with speed in mind.
-6. Complexity - This module allows you to make all kinds of complex queries
-7. Security - This module prevents SQL injections.
-8. Availability - This module is FREE. Licensed under the MIT license.
+1. Very small - 27.8KB one file (Unminified, `dist/SuperSQL.php`. Minified version: 12.6KB)
+2. Simple and easy - Very easy to learn. SuperSQL was designed to be easy and simple, to the ability that a noob can use it.
+3. Compatability - Supports all major SQL databases
+4. Efficiency - This module was built with speed and efficiency in mind.
+5. Complexity - This module allows you to make all kinds of complex queries.
+6. Security - This module prevents SQL injections, so hackers bye bye!
+7. Availability - This module is FREE. Licensed under the [MIT license](https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE).
 
 ### Usage
 
@@ -65,14 +70,14 @@ new SuperSQL($dsn,$user,$pass);
 
 You may either
 
-1. Use the built file (/dist/SuperSQL.php - preferred)
-2. Use the library (Autoload all in SuperSQL/)
-3. Use composer (`composer require threeletters/supersql`)
+1. Use the built file ([/dist/SuperSQL.php](https://github.com/ThreeLetters/SuperSQL/blob/master/dist/SuperSQL.php) - preferred)
+2. Use the library (Autoload all in `SuperSQL/`, we also provide a [simple loader](https://github.com/ThreeLetters/SuperSQL/blob/master/autoload.php))
+3. Use the [composer package](https://packagist.org/packages/threeletters/supersql) (`composer require threeletters/supersql`)
 
 ### Build
-To build this library, do 
+To build this library, you need [NodeJS](https://nodejs.org/en/). Then execute `builder.js`
 
-`node builder.js`
+> node builder.js
 
 It will build to `/dist/SuperSQL*.php`
 
@@ -299,7 +304,7 @@ $SuperSQL->INSERT("sensitive_data",[ // NOTE: Also works with any other query. A
 If you want to set the type of the input, you can set it by adding `[type] (replace type with type)`.
 
 <aside class="success">
-Available types: `int`, `bool`, `lob`, `null`, `json`, `obj`
+Available types: `int`, `bool`, `lob`, `null`, `json`, `object`, `double`
 </aside>
 
 ## SQL Functions/raw
@@ -433,6 +438,7 @@ $SuperSQL->INSERT("table",array(
 
 * `(String|Array)table` - Table(s) to insert to
 * `(Array)data` - Data to insert
+* `(String|Null)append` - String to append to query (optional).
 
 ## UPDATE
 ```php
