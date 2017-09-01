@@ -255,7 +255,7 @@ class SQLHelper
                     $alias = Parser::getType($val); 
                     if ($alias) {
                         $s = Parser::getType($val);
-                        if ($s && ($s === "int" || $s === "bool" || $s === "string" || $s === "json" || $s === "obj")) { 
+                        if ($s && ($s === 'int' || $s === 'bool' || $s === 'string' || $s === 'json' || $s === 'object' || $s === 'double')) { 
                             $alias = false;
                         }
                     }

@@ -51,6 +51,9 @@ class Parser
         }
         return false;
     }
+    static function isSpecial($type) {
+        return $type === 'json' || $type === 'object';
+    }
     /**
      * Appends value(s) to arguments
      *
@@ -66,32 +69,6 @@ class Parser
                     $args[$k - 1] = array();
                 $args[$k - 1][$index] = $val[$k];
             }
-        }
-    }
-    static function escape($val, $type)
-    {
-        switch ($type) {
-            case 0: //Bool
-                return $val ? '1' : '0';
-                break;
-            case 1: // int
-                return (int) $val;
-                break;
-            case 2: // string
-                return (string) $val;
-                break;
-            case 3: // lob
-                return $val;
-                break;
-            case 4: // null
-                return null;
-                break;
-            case 5: // json
-                return json_encode($val);
-                break;
-            case 6: // seriealise
-                return serialize($val);
-                break;
         }
     }
     static function stripArgs(&$key)
@@ -127,14 +104,13 @@ class Parser
                 $d = $indexes[$k1];
             else
                 $d = $indexes[$k];
-            $isArr = is_array($v) && (!isset($values[$d][2]) || $values[$d][2] < 5);
-            if ($isArr) {
+            if (is_array($v) && !self::isSpecial($values[$d][2])) {
                 if (isset($v[0])) {
                     foreach ($v as $i => &$j) {
                         $a = $d + $i;
                         if (isset($holder[$a]))
                             trigger_error('Key collision: ' . $k, E_USER_WARNING);
-                        $holder[$a] = self::escape($j, $values[$a][2]);
+                        $holder[$a] = self::value($values[$a][2],$j)[0];
                     }
                 } else {
                     self::recurse($holder, $v, $indexes, $par . '/' . $k, $values);
@@ -142,7 +118,7 @@ class Parser
             } else {
                 if (isset($holder[$d]))
                     trigger_error('Key collision: ' . $k, E_USER_WARNING);
-                $holder[$d] = self::escape($v, $values[$d][2]);
+                $holder[$d] = self::value($values[$d][2],$j)[0];
             }
         }
     }
@@ -194,41 +170,33 @@ class Parser
     }
     static function value($type, $value)
     {
-        $var   = $type ? $type : gettype($value);
-        $type  = \PDO::PARAM_STR;
-        $dtype = 2;
-        if ($var === 'integer' || $var === 'int' || $var === 'double' || $var === 'doub') {
-            $type  = \PDO::PARAM_INT;
-            $dtype = 1;
+        if (!$type) $type = gettype($value);
+        $code  = \PDO::PARAM_STR;
+        if ($type === 'integer' || $type === 'int') {
+            $code  = \PDO::PARAM_INT;
             $value = (int) $value;
-        } else if ($var === 'string' || $var === 'str') {
+        } else if ($type === 'string' || $type === 'str' || $type === 'double') {
             $value = (string) $value;
-            $dtype = 2;
-        } else if ($var === 'boolean' || $var === 'bool') {
-            $type  = \PDO::PARAM_BOOL;
+        } else if ($type === 'boolean' || $type === 'bool') {
+            $code  = \PDO::PARAM_BOOL;
             $value = $value ? '1' : '0';
-            $dtype = 0;
-        } else if ($var === 'null' || $var === 'NULL') {
-            $dtype = 4;
-            $type  = \PDO::PARAM_NULL;
+        } else if ($type === 'null' || $type === 'NULL') {
+            $code  = \PDO::PARAM_NULL;
             $value = null;
-        } else if ($var === 'resource' || $var === 'lob') {
-            $type  = \PDO::PARAM_LOB;
-            $dtype = 3;
-        } else if ($var === 'json') {
-            $dtype = 5;
+        } else if ($type === 'resource' || $type === 'lob') {
+            $code  = \PDO::PARAM_LOB;
+        } else if ($type === 'json') {
             $value = json_encode($value);
-        } else if ($var === 'obj' || $var === 'object') {
-            $dtype = 6;
+        } else if ($type === 'object') {
             $value = serialize($value);
         } else {
             $value = (string) $value;
-            trigger_error('Invalid type ' . $var . ' Assumed STRING', E_USER_WARNING);
+            trigger_error('Invalid type ' . $type . ' Assumed STRING', E_USER_WARNING);
         }
         return array(
             $value,
-            $type,
-            $dtype
+            $code,
+            $type
         );
     }
     static function getType(&$str)
@@ -263,7 +231,7 @@ class Parser
             $newJoin     = $join;
             $newOperator = $operator;
             $type        = $raw ? false : self::getType($key);
-            $arr         = is_array($val) && $type !== 'json' && $type !== 'obj';
+            $arr         = is_array($val) && !self::isSpecial($type);
             $useBind     = $arr && !isset($val[0]);
             if ($arg && ($arg === '||' || $arg === '&&')) {
                 $newJoin = ($arg === '||') ? ' OR ' : ' AND ';
@@ -419,7 +387,7 @@ class Parser
                         if (isset($match['type'])) {
                             $type = $match['type'];
                         } else {
-                            if ($alias === 'json' || $alias === 'obj' || $alias === 'int' || $alias === 'string' || $alias === 'bool') {
+                            if ($alias === 'json' || $alias === 'object' || $alias === 'int' || $alias === 'string' || $alias === 'bool' || $alias === 'double') {
                                 $type  = $alias;
                                 $alias = false;
                             } else
@@ -548,7 +516,7 @@ class Parser
                 $valuestr .= $val;
             } else {
                 $valuestr .= '?';
-                $m2 = !$multi && (!$type || ($type !== 'json' && $type !== 'obj')) && is_array($val);
+                $m2 = !$multi && (!$type || !self::isSpecial($type)) && is_array($val);
                 array_push($values, self::value($type, $m2 ? $val[0] : $val));
                 if ($multi) {
                     $index[$key] = array(
@@ -621,7 +589,7 @@ class Parser
                             break;
                     }
                 } else $sql .= '?';
-                $m2   = (!$type || ($type !== 'json' && $type !== 'obj')) && is_array($val);
+                $m2   = (!$type || !self::isSpecial($type)) && is_array($val);
                 array_push($values, self::value($type, $m2 ? $val[0] : $val));
                 if ($multi) {
                     $indexes[$key] = $i++;

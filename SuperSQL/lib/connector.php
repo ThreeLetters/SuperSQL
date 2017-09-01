@@ -99,6 +99,9 @@ class Response implements \ArrayAccess, \Iterator
                     case 'int':
                         $row[$col] = (int) $row[$col];
                         break;
+                    case 'double':
+                        $row[$col] = (double) $row[$col];
+                        break;
                     case 'string':
                         $row[$col] = (string) $row[$col];
                         break;
@@ -108,7 +111,7 @@ class Response implements \ArrayAccess, \Iterator
                     case 'json':
                         $row[$col] = json_decode($row[$col]);
                         break;
-                    case 'obj':
+                    case 'object':
                         $row[$col] = unserialize($row[$col]);
                         break;
                 }
