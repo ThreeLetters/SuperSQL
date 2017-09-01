@@ -422,20 +422,16 @@ class Parser
         $num = 0;
         $sql = '';
         foreach ($dt as $key => &$val) {
-            preg_match('/^(?<r>\#)?(?:\[(?<a>.{2})\])(?:\[(?<b>.{2})\])?(?<out>.*)/', $key, $matches); 
-            $raw = isset($matches['r']);
-            if (isset($matches['a'])) {
-                $arg  = $matches['a'];
-                $key  = $matches['out'];
-                $arg2 = isset($matches['b']) ? $matches['b'] : false;
-            } else {
-                $arg = false;
-            }
-            $useBind     = !isset($val[0]);
+            preg_match('/^(?<r>\#)?(?:(?:\[(?<a>.{2})\])?(?:\[(?<b>.{2})\])?)?(?<out>.*)/', $key, $matches); 
+            $raw  = ($matches['r'] === '#');
+            $arg  = $matches['a'];
+            $key  = $matches['out'];
+            $arg2 = $matches['b'];
             $newJoin     = $join;
             $newOperator = $operator;
             $type        = $raw ? false : self::getType($key);
             $arr         = is_array($val) && $type !== 'json' && $type !== 'obj';
+            $useBind     = $arr && !isset($val[0]);
             if ($arg && ($arg === '||' || $arg === '&&')) {
                 $newJoin = ($arg === '||') ? ' OR ' : ' AND ';
                 $arg     = $arg2;
@@ -447,37 +443,23 @@ class Parser
             }
             $between = false;
             if ($arg && $arg !== '==') {
-                switch ($arg) { 
-                    case '!=':
-                        $newOperator = ' != ';
-                        break;
-                    case '>>':
-                        $newOperator = ' > ';
-                        break;
-                    case '<<':
-                        $newOperator = ' < ';
-                        break;
-                    case '>=':
-                        $newOperator = ' >= ';
-                        break;
-                    case '<=':
-                        $newOperator = ' <= ';
-                        break;
-                    case '~~':
-                        $newOperator = ' LIKE ';
-                        break;
-                    case '!~':
-                        $newOperator = ' NOT LIKE ';
-                        break;
-                    default:
-                        if ($arg !== '><' && $arg !== '<>')
-                            throw new \Exception('Invalid operator ' . $arg . ' Available: ==,!=,>>,<<,>=,<=,~~,!~,<>,><');
-                        else
-                            $between = true;
-                        break;
+                if ($arg === '!=' || $arg === '>=' || $arg === '<=') {
+                    $newOperator = ' ' . $arg . ' ';
+                } else if ($arg === '>>') {
+                    $newOperator = ' > ';
+                } else if ($arg === '<<') {
+                    $newOperator = ' < ';
+                } else if ($arg === '~~') {
+                    $newOperator = ' LIKE ';
+                } else if ($arg === '!~') {
+                    $newOperator = ' NOT LIKE ';
+                } else if ($arg === '><' || $arg === '<>') {
+                    $between = true;
+                } else {
+                    throw new \Exception('Invalid operator ' . $arg . ' Available: ==,!=,>>,<<,>=,<=,~~,!~,<>,><');
                 }
             } else {
-                if (!$useBind || $arg === '==')
+                if ($useBind || $arg === '==')
                     $newOperator = ' = '; 
             }
             if (!$arr)
@@ -706,15 +688,12 @@ class Parser
                 $sql .= ', ';
                 $valuestr .= ', ';
             } else $b = 1;
-            if (!$raw) {
-                preg_match('/(?<out>[^\[]*)(?:\[(?<type>[^]]*)\])?/', $key, $matches);
-                $key = $matches['out'];
-            }
+            if (!$raw)
+                $type = self::getType($key);
             $sql .= '`' . $key . '`';
             if ($raw) {
                 $valuestr .= $val;
             } else {
-                $type = isset($matches['type']) ? $matches['type'] : false;
                 $valuestr .= '?';
                 $m2 = !$multi && (!$type || ($type !== 'json' && $type !== 'obj')) && is_array($val);
                 array_push($values, self::value($type, $m2 ? $val[0] : $val));
@@ -760,29 +739,26 @@ class Parser
             if ($raw) {
                 $sql .= '`' . $key . '` = ' . $val;
             } else {
-                preg_match('/(?:\[(?<arg>.{2})\])?(?<out>[^\[]*)(?:\[(?<type>[^\]]*)\])?/', $key, $matches);
-                $key = $matches['out'];
+                $arg = self::getArg($key);
+                $type = self::getType($key);
                 $sql .= '`' . $key . '` = ';
-                if (isset($matches['arg'])) {
-                    switch ($matches['arg']) {
+                if ($arg) {
+                    $sql .= '`' . $key . '` ';
+                    switch ($arg) {
                         case '+=':
-                            $sql .= '`' . $key . '` + ?';
+                            $sql .= '+ ?';
                             break;
                         case '-=':
-                            $sql .= '`' . $key . '` - ?';
+                            $sql .= '- ?';
                             break;
                         case '/=':
-                            $sql .= '`' . $key . '` / ?';
+                            $sql .= '/ ?';
                             break;
                         case '*=':
-                            $sql .= '`' . $key . '` * ?';
-                            break;
-                        default:
-                            $sql .= '?';
+                            $sql .= '* ?';
                             break;
                     }
-                }
-                $type = isset($matches['type']) ? $matches['type'] : false;
+                } else $sql .= '?';
                 $m2   = (!$type || ($type !== 'json' && $type !== 'obj')) && is_array($val);
                 array_push($values, self::value($type, $m2 ? $val[0] : $val));
                 if ($multi) {
