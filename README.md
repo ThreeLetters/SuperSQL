@@ -1,9 +1,11 @@
 # SuperSQL
-![SuperSQL](https://img.shields.io/badge/SuperSQL-v1.0.8-brightgreen.svg)
+![SuperSQL](https://img.shields.io/badge/SuperSQL-v1.1.0-brightgreen.svg)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/ThreeLetters/SuperSQL/master/LICENSE)
 [![Docs](https://img.shields.io/badge/Docs-supersql.tk-blue.svg)](http://supersql.tk)
 [![GitHub stars](https://img.shields.io/github/stars/ThreeLetters/SuperSQL.svg)](https://github.com/ThreeLetters/SuperSQL/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ThreeLetters/SuperSQL.svg)](https://github.com/ThreeLetters/SuperSQL/network)
+
+
 The most lightest, efficient and most powerful php sql database framework. Allows you to quickly and securely develop anything using sql databases.
 
 ## Purpose
