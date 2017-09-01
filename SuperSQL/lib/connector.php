@@ -226,8 +226,11 @@ class Connector
      */
     function __construct($dsn, $user, $pass)
     {
+        try {
         $this->db  = new \PDO($dsn, $user, $pass);
-        $this->log = array();
+        } catch (\PDOException $e) {
+            throw new \Exception($e->getMessage());
+        }
     }
     /**
      * Queries database
