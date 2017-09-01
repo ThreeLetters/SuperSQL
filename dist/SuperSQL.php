@@ -4,7 +4,7 @@
  License: MIT (https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE)
  Source: https://github.com/ThreeLetters/SQL-Library
  Build: v1.0.8
- Built on: 31/08/2017
+ Built on: 01/09/2017
 */
 
 namespace SuperSQL;
@@ -593,15 +593,12 @@ class Parser
         $f    = $columns[0][0];
         if ($f === 'D' || $f === 'I') {
             if ($columns[0] === 'DISTINCT') {
-                $req = 1;
                 $sql .= 'DISTINCT ';
                 array_splice($columns, 0, 1);
             } else if (substr($columns[0], 0, 11) === 'INSERT INTO') {
-                $req = 1;
                 $sql = $columns[0] . ' ' . $sql;
                 array_splice($columns, 0, 1);
             } else if (substr($columns[0], 0, 4) === 'INTO') {
-                $req  = 1;
                 $into = ' ' . $columns[0] . ' ';
                 array_splice($columns, 0, 1);
             }
@@ -636,7 +633,7 @@ class Parser
                             $outTypes[$alias ? $alias : $val] = $type;
                         }
                     }
-                    if ($i != 0) {
+                    if ($i !== 0) {
                         $sql .= ', ';
                     }
                     $sql .= self::quote($val);
@@ -723,10 +720,10 @@ class Parser
         $dt       = $multi ? $data[0] : $data;
         foreach ($dt as $key => $val) {
             $raw = self::isRaw($key);
-            if ($b !== 0) {
+            if ($b) {
                 $sql .= ', ';
                 $valuestr .= ', ';
-            }
+            } else $b = 1;
             if (!$raw) {
                 preg_match('/(?<out>[^\[]*)(?:\[(?<type>[^]]*)\])?/', $key, $matches);
                 $key = $matches['out'];
@@ -747,8 +744,6 @@ class Parser
                 } else if ($m2) {
                     self::append($insert, $val, $i++, $values);
                 }
-            }
-            ++$b;
         }
         $sql .= ') VALUES (' . $valuestr . ')';
         if ($multi) {
@@ -760,7 +755,7 @@ class Parser
                 }
             }
         }
-        if ($append !== null) $sql .= ' ' . $append;
+        if ($append) $sql .= ' ' . $append;
         return array(
             $sql,
             $values,
@@ -776,9 +771,9 @@ class Parser
         $dt     = $multi ? $data[0] : $data;
         foreach ($dt as $key => &$val) {
             $raw = self::isRaw($key);
-            if ($b !== 0) {
+            if ($b) {
                 $sql .= ', ';
-            }
+            } else $b = 1;
             if ($raw) {
                 $sql .= '`' . $key . '` = ' . $val;
             } else {
@@ -813,7 +808,6 @@ class Parser
                     self::append($insert, $val, $i++, $values);
                 }
             }
-            ++$b;
         }
         if ($multi)
             self::append2($insert, $indexes, $data, $values);
