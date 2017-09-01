@@ -15,8 +15,8 @@
 ## Hashes
 
 ```
-* SuperSQL.php - 2f9d678efaccae188e69e4bc43f012e3
-* SuperSQL_min.php - c481668794671742676c85ef44bafcd9
-* SuperSQL_helper.php - b27210a46f68ff5fb3a6ee9921e508b5
-* SuperSQL_helper_min.php - 5503a0433d06c5aba2cd2bc2f1949496
+* SuperSQL.php - 745d4b012542a4acd51528d4508359bd
+* SuperSQL_min.php - b0e66123b7358e918714ca48f194cf5c
+* SuperSQL_helper.php - 9ebcf90bb8f917fe6a08476d7ce196ef
+* SuperSQL_helper_min.php - 1b34be550a9ad148dec486c63e4e2322
 ```

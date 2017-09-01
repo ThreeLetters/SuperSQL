@@ -1,30 +1,32 @@
 # SuperSQL
-SlickInject and Medoo on steroids - The most advanced and lightweight library of its kind. Develop using PHP & SQL quickly and securly.
+![SuperSQL](https://img.shields.io/badge/SuperSQL-v1.0.8-brightgreen.svg)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/ThreeLetters/SuperSQL/master/LICENSE)
+[![Docs](https://img.shields.io/badge/Docs-supersql.tk-blue.svg)](http://supersql.tk)
+[![GitHub stars](https://img.shields.io/github/stars/ThreeLetters/SuperSQL.svg)](https://github.com/ThreeLetters/SuperSQL/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/ThreeLetters/SuperSQL.svg)](https://github.com/ThreeLetters/SuperSQL/network)
+The most lightest, efficient and most powerful php sql database framework. Allows you to quickly and securely develop anything using sql databases.
+
 ## Purpose
 
-1. To provide a very fast and efficient way to edit sql databases
-2. To provide a easy method of access
+1. To provide a very fast and efficient way to edit sql databases.
+2. To provide an easy method of access.
 
 ### Main Features
 
-1. Very small - 24.2KB one file (Unminified, `dist/SuperSQL.php`. Minified version: 10.2KB)
-2. Simple and easy - Very easy to lean. We also provide a simple and advanced API
-3. Compatability - Supports major SQL databases
-4. Efficiency - This module was built with speed in mind.
-5. Complexity - This module allows you to make all kinds of complex queries
-6. Security - This module prevents SQL injections.
-7. Availability - This module is FREE. Licensed under the MIT license.
-
-## Notes
-#### Missing features.
-* `GROUP` - prs welcome
+1. Very small - 27.8KB one file (Unminified, `dist/SuperSQL.php`. Minified version: 12.6KB)
+2. Simple and easy - Very easy to learn. SuperSQL was designed to be easy and simple, to the ability that a noob can use it.
+3. Compatability - Supports all major SQL databases
+4. Efficiency - This module was built with speed and efficiency in mind.
+5. Complexity - This module allows you to make all kinds of complex queries.
+6. Security - This module prevents SQL injections, so hackers bye bye!
+7. Availability - This module is FREE. Licensed under the [MIT license](https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE).
 
 ## Usage
 You may either
 
-1. Use the built file (/dist/SuperSQL.php - preferred)
-2. Use the library (Autoload all in `SuperSQL/`)
-3. Use composer (`composer require threeletters/supersql`)
+1. Use the built file ([/dist/SuperSQL.php](https://github.com/ThreeLetters/SuperSQL/blob/master/dist/SuperSQL.php) - preferred)
+2. Use the library (Autoload all in `SuperSQL/`, we also provide a [simple loader](https://github.com/ThreeLetters/SuperSQL/blob/master/autoload.php))
+3. Use the [composer package](https://packagist.org/packages/threeletters/supersql) (`composer require threeletters/supersql`)
 
 ```php
 new SuperSQL($dsn,$user,$pass);
@@ -72,7 +74,7 @@ echo json_encode($result->error());
 ```
 
 ## Build
-To build this library, do 
+To build this library, you need [NodeJS](https://nodejs.org/en/). Then execute `builder.js`
 
 > node builder.js
 
@@ -111,9 +113,15 @@ PDO is much better than mysqli. Main reason because it supports so many differen
 The nice documentation was created using [Slate - Check it out](https://github.com/lord/slate).
 
 ## Special thanks
-* @LegitSoulja - SlickInject
-* @catfan - Medoo
-* Slate (Documentation)
+* [@LegitSoulja](https://github.com/LegitSoulja) - [SlickInject](https://github.com/LegitSoulja/SlickInject), 
+* [@catfan](https://github.com/catfan) - [Medoo](https://github.com/catfan/Medoo)
+* [Slate](https://github.com/lord/slate) (Documentation)
+
+## Contributing
+Contributing is open. If you want to contribute, make a pull request. Please use the [PEAR format](https://pear.php.net/manual/en/standards.php).
+
+> NOTE: 
+> please do not do [] for array. Please use array() instead
 
 ## License
 
