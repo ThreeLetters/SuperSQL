@@ -68,9 +68,9 @@ class Parser
             }
         }
     }
-    static function escape($val, $dt)
+    static function escape($val, $type)
     {
-        switch ($dt[2]) {
+        switch ($type) {
             case 0: //Bool
                 return $val ? '1' : '0';
                 break;
@@ -134,7 +134,7 @@ class Parser
                         $a = $d + $i;
                         if (isset($holder[$a]))
                             trigger_error('Key collision: ' . $k, E_USER_WARNING);
-                        $holder[$a] = self::escape($j, $values[$a]);
+                        $holder[$a] = self::escape($j, $values[$a][2]);
                     }
                 } else {
                     self::recurse($holder, $v, $indexes, $par . '/' . $k, $values);
@@ -142,7 +142,7 @@ class Parser
             } else {
                 if (isset($holder[$d]))
                     trigger_error('Key collision: ' . $k, E_USER_WARNING);
-                $holder[$d] = self::escape($v, $values[$d]);
+                $holder[$d] = self::escape($v, $values[$d][2]);
             }
         }
     }
