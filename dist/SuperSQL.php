@@ -744,6 +744,7 @@ class Parser
                 } else if ($m2) {
                     self::append($insert, $val, $i++, $values);
                 }
+            }
         }
         $sql .= ') VALUES (' . $valuestr . ')';
         if ($multi) {
