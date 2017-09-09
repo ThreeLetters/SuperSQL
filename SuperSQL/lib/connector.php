@@ -263,6 +263,7 @@ class Connector
      */
     function _query(&$sql, $values, &$insert, &$outtypes = null, $mode = 0)
     {
+        return;
         $q = $this->db->prepare($sql);
         if ($this->dev)
             array_push($this->log, array(

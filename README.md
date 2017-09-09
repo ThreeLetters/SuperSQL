@@ -15,7 +15,7 @@ The most lightest, efficient and most powerful php sql database framework. Allow
 
 ### Main Features
 
-1. Very small - 27.8KB one file (Unminified, `dist/SuperSQL.php`. Minified version: 12.6KB)
+1. Very small - 27.4KB one file (Unminified, `dist/SuperSQL.php`. Minified version: 12.4KB)
 2. Simple and easy - Very easy to learn. SuperSQL was designed to be easy and simple, to the ability that a noob can use it.
 3. Compatability - Supports all major SQL databases
 4. Efficiency - This module was built with speed and efficiency in mind.
@@ -101,6 +101,10 @@ While on the most basic level, SuperSQL and Medoo are the same, they are quite d
 * SuperSQL is faster - Using xdebug, we found that superSQL's parser is faster than medoo's. (x1000,100%)
 * SuperSQL is less confusing. (EG, ``SELECT * FROM `table` `` is just `$SuperSQL->select('table');`)
 * SuperSQL has more features - (EG, multi-querying, dynamic responses)
+
+**How fast is superSQL compared to Medoo?**
+
+[speed](https://user-images.githubusercontent.com/13282284/30243699-b4c76e32-957d-11e7-9bdb-ec96f53816b1.png)
 
 **Whats the difference between this an SlickInject?**
 
