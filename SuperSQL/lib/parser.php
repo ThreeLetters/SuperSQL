@@ -35,17 +35,17 @@ class Parser
      */
     static function getArg(&$str)
     {
-        preg_match('/^(?:\[(?<a>.{2})\])(?<out>.*)/', $str, $m);
-        if (isset($m['a'])) {
-            $str = $m['out'];
-            return $m['a'];
+        preg_match('/^(?:\[(.{2})\])(.*)/', $str, $m);
+        if (isset($m[1])) {
+            $str = $m[2];
+            return $m[1];
         } else {
             return false;
         }
     }
     static function isRaw(&$key)
-    {
-        if ($key[0] === '#') {
+    {        
+        if ($key[0] === '#') { // 71
             $key = substr($key, 1);
             return true;
         }
@@ -131,9 +131,9 @@ class Parser
      */
     static function quote($str)
     {
-        preg_match('/([^.]*)\.?(.*)?/', $str, $matches); // 8 steps
+        preg_match('/([a-zA-Z0-9_]*)\.?([a-zA-Z0-9_]*)?/', $str, $matches); // 8 steps
         if ($matches[2] !== '') {
-            return '`' . $matches[1] . '.' . $matches[2] . '`';
+            return '`' . $matches[1] . '`.`' . $matches[2] . '`';
         } else {
             return '`' . $matches[1] . '`';
         }
@@ -201,9 +201,9 @@ class Parser
     }
     static function getType(&$str)
     {
-        preg_match('/(?<out>[^\[]*)(?:\[(?<a>[^\]]*)\])?/', $str, $m);
-        $str = $m['out'];
-        return isset($m['a']) ? $m['a'] : false;
+        preg_match('/([^\[]*)(?:\[([^\]]*)\])?/', $str, $m);
+        $str = $m[1];
+        return isset($m[2]) ? $m[2] : false;
     }
     static function rmComments($str)
     {
@@ -259,10 +259,9 @@ class Parser
                 } else {
                     throw new \Exception('Invalid operator ' . $arg . ' Available: ==,!=,>>,<<,>=,<=,~~,!~,<>,><');
                 }
-            } else {
-                if ($useBind || $arg === '==')
-                    $newOperator = ' = '; // reset
-            }
+            } else if ($useBind || $arg === '==')
+                $newOperator = ' = '; // reset
+            
             if (!$arr)
                 $join = $newJoin;
             if ($num !== 0)
@@ -329,22 +328,20 @@ class Parser
             $arg = self::getArg($key);
             switch ($arg) {
                 case '<<':
-                    $sql .= ' RIGHT JOIN ';
+                    $sql .= ' RIGHT';
                     break;
                 case '>>':
-                    $sql .= ' LEFT JOIN ';
+                    $sql .= ' LEFT';
                     break;
                 case '<>':
-                    $sql .= ' FULL JOIN ';
+                    $sql .= ' FULL';
                     break;
                 case '>~':
-                    $sql .= ' LEFT OUTER JOIN ';
-                    break;
-                default: // inner join
-                    $sql .= ' JOIN ';
+                    $sql .= ' LEFT OUTER';
                     break;
             }
-            $sql .= '`' . $key . '` ON ';
+            
+            $sql .= ' JOIN `' . $key . '` ON ';
             if ($raw) {
                 $sql .= $val;
             } else {
@@ -372,20 +369,19 @@ class Parser
             if ($columns[0] === '*') {
                 array_splice($columns, 0, 1);
                 $sql .= '*';
-                foreach ($columns as $i => &$val) {
-                    preg_match('/(?<column>[a-zA-Z0-9_\.]*)(?:\[(?<type>[^\]]*)\])?/', $val, $match);
-                    $outTypes[$match['column']] = $match['type'];
+                foreach ($columns as $i => $val) {
+                    $t = self::getType($val);
+                    $outTypes[$val] = $t;
                 }
             } else {
-                foreach ($columns as $i => &$val) {
-                    preg_match('/(?<column>[a-zA-Z0-9_\.]*)(?:\[(?<alias>[^\]]*)\])?(?:\[(?<type>[^\]]*)\])?/', $val, $match); // 8 steps
-                    //     echo json_encode($match);
-                    $val   = $match['column'];
+                foreach ($columns as $i => $val) {
+                    $a = self::getType($val);
                     $alias = false;
-                    if (isset($match['alias'])) { // name[alias][type]
-                        $alias = $match['alias'];
-                        if (isset($match['type'])) {
-                            $type = $match['type'];
+                    if ($a) { // name[alias][type]
+                        $alias = $a;
+                        $b = self::getType($val);
+                        if ($b) {
+                            $type = $b;
                         } else {
                             if ($alias === 'json' || $alias === 'object' || $alias === 'int' || $alias === 'string' || $alias === 'bool' || $alias === 'double') {
                                 $type  = $alias;

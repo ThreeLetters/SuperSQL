@@ -4,7 +4,7 @@
  License: MIT (https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE)
  Source: https://github.com/ThreeLetters/SQL-Library
  Build: v1.1.0
- Built on: 01/09/2017
+ Built on: 09/09/2017
 */
 
 namespace SuperSQL;
