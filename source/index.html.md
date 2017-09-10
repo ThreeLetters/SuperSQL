@@ -116,11 +116,25 @@ while ($row = $response->next()) { // Use the iterator to iterate through rows e
 
 }
 
-$response->reset(); // Reset iterator so you can do the above code again
+$response->rewind(); // Reset iterator so you can do the above code again
+
+foreach ($response as $row) {
+// this works too
+}
 ?>
 ```
 
-When you make a query, SuperSQL will return a SQLResponse object.
+> Array access
+
+```php
+<?php
+$first = $response[0]; // get first row
+
+$response[0] = 'something' // INVALID.
+?>
+```
+
+Responses are returned whenever a query is executed. Multiple responses may be returned for some multi-queries. Responses use the [ArrayAccess](http://php.net/manual/en/class.arrayaccess.php) interface as well as the [Iterator](http://php.net/manual/en/class.iterator.php) interface. This means that SQLResponses will act like a immutable array.
 
 ### Response->getData($dontFetch = false)
 Get all rows. If dontfetch is true, then it will only return the results that have already been fetched
@@ -134,11 +148,11 @@ Get number of rows affected by the query
 ### Response->next()
 Get next row
 
-### Response->reset()
+### Response->rewind()
 Reset iterator.
 
 <aside class="notice">
-Using Response->next is recommended as it is more efficient - It will fetch the row from db when it gets there, rather than fetching all at start
+Using Response->next or arrayaccess is recommended as it is more efficient - It will fetch the row from db when it gets there, rather than fetching all at start
 </aside>
 
 ## Conditionals

@@ -537,10 +537,23 @@
 </span>
 <span class="p">}</span>
 
-<span class="nv">$response</span><span class="o">-&gt;</span><span class="na">reset</span><span class="p">();</span> <span class="c1">// Reset iterator so you can do the above code again
+<span class="nv">$response</span><span class="o">-&gt;</span><span class="na">rewind</span><span class="p">();</span> <span class="c1">// Reset iterator so you can do the above code again
+</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$response</span> <span class="k">as</span> <span class="nv">$row</span><span class="p">)</span> <span class="p">{</span>
+<span class="c1">// this works too
+</span><span class="p">}</span>
+<span class="cp">?&gt;</span>
+</code></pre>
+            <blockquote>
+                <p>Array access</p>
+            </blockquote>
+            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$first</span> <span class="o">=</span> <span class="nv">$response</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span> <span class="c1">// get first row
+</span>
+<span class="nv">$response</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'something'</span> <span class="c1">// INVALID.
 </span><span class="cp">?&gt;</span>
 </code></pre>
-            <p>When you make a query, SuperSQL will return a SQLResponse object.</p>
+            <p>Responses are returned whenever a query is executed. Multiple responses may be returned for some multi-queries. Responses use the <a href="http://php.net/manual/en/class.arrayaccess.php">ArrayAccess</a> interface as well as the <a href="http://php.net/manual/en/class.iterator.php">Iterator</a> interface. This means that SQLResponses will act like a immutable array.</p>
             <h3 id='response-gt-getdata-dontfetch-false'>Response-&gt;getData($dontFetch = false)</h3>
             <p>Get all rows. If dontfetch is true, then it will only return the results that have already been fetched</p>
             <h3 id='response-gt-error'>Response-&gt;error()</h3>
@@ -549,11 +562,11 @@
             <p>Get number of rows affected by the query</p>
             <h3 id='response-gt-next'>Response-&gt;next()</h3>
             <p>Get next row</p>
-            <h3 id='response-gt-reset'>Response-&gt;reset()</h3>
+            <h3 id='response-gt-rewind'>Response-&gt;rewind()</h3>
             <p>Reset iterator.</p>
 
             <aside class="notice">
-                Using Response->next is recommended as it is more efficient - It will fetch the row from db when it gets there, rather than fetching all at start
+                Using Response->next or arrayaccess is recommended as it is more efficient - It will fetch the row from db when it gets there, rather than fetching all at start
             </aside>
             <h2 id='conditionals'>Conditionals</h2>
             <blockquote>
