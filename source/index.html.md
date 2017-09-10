@@ -168,16 +168,21 @@ $where = array(
  "[>=]arg4" => "val4", // AND arg4 >= val4
  "[<=]arg5" => "val5", // AND arg5 <= val5
  "[!=]arg6" => "val6", // AND arg6 != val6
- "[||]" => [ // Bind ||.
-     "arg7" => "val7"
+ "[||]" => [ // Bind ||. (AND (arg7 = val7 OR arg7b = val7b))
+     "arg7" => "val7",
+     "arg7b" => "val7b"
  ],
- "[&&][>>]" => [ // Bind >.
-     "arg8" => "val8"
+ "[||][>>]" => [ // Bind >. (AND arg8 > 3 OR arg8b > 5)
+     "arg8" => 3,
+     "arg8b" => 5
  ],
- "arg9" => ["val9a","val9b"],
+ "[||]arg9" => ["val9a","val9b"], // arg9 = val9a OR arg9 = val9b
  
- "arg10[~~]" => "%arg10%",
- "arg11[!~]" => "%arg11%"
+ "[~~]arg10" => "%arg10%",
+ "[!~]arg11" => "%arg11%",
+ "[><]arg12" => [1,5], // arg12 (BETWEEN 1 AND 5)
+ 
+ "[||]arg13" => "val13" // you can also bind like this (OR arg12 = val12)
 );
 ?>
 ```
@@ -185,7 +190,7 @@ $where = array(
 Conditional statements are extremly customisable. WHERE and JOIN clauses are conditional statements. 
 
 <aside class="success">
-Available operators: `==`, `>>`, `<<`, `>=`, `<=`, `!=`, `~~`, `!~`
+Available operators: `==`, `>>`, `<<`, `>=`, `<=`, `!=`, `~~`, `!~`, `<>`, `><`
 </aside>
 
 <aside class="success">

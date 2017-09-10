@@ -580,17 +580,22 @@
 </span> <span class="s2">"[&gt;=]arg4"</span> <span class="o">=&gt;</span> <span class="s2">"val4"</span><span class="p">,</span> <span class="c1">// AND arg4 &gt;= val4
 </span> <span class="s2">"[&lt;=]arg5"</span> <span class="o">=&gt;</span> <span class="s2">"val5"</span><span class="p">,</span> <span class="c1">// AND arg5 &lt;= val5
 </span> <span class="s2">"[!=]arg6"</span> <span class="o">=&gt;</span> <span class="s2">"val6"</span><span class="p">,</span> <span class="c1">// AND arg6 != val6
-</span> <span class="s2">"[||]"</span> <span class="o">=&gt;</span> <span class="p">[</span> <span class="c1">// Bind ||.
-</span>     <span class="s2">"arg7"</span> <span class="o">=&gt;</span> <span class="s2">"val7"</span>
+</span> <span class="s2">"[||]"</span> <span class="o">=&gt;</span> <span class="p">[</span> <span class="c1">// Bind ||. (AND (arg7 = val7 OR arg7b = val7b))
+</span>     <span class="s2">"arg7"</span> <span class="o">=&gt;</span> <span class="s2">"val7"</span><span class="p">,</span>
+     <span class="s2">"arg7b"</span> <span class="o">=&gt;</span> <span class="s2">"val7b"</span>
  <span class="p">],</span>
- <span class="s2">"[&amp;&amp;][&gt;&gt;]"</span> <span class="o">=&gt;</span> <span class="p">[</span> <span class="c1">// Bind &gt;.
-</span>     <span class="s2">"arg8"</span> <span class="o">=&gt;</span> <span class="s2">"val8"</span>
+ <span class="s2">"[||][&gt;&gt;]"</span> <span class="o">=&gt;</span> <span class="p">[</span> <span class="c1">// Bind &gt;. (AND arg8 &gt; 3 OR arg8b &gt; 5)
+</span>     <span class="s2">"arg8"</span> <span class="o">=&gt;</span> <span class="mi">3</span><span class="p">,</span>
+     <span class="s2">"arg8b"</span> <span class="o">=&gt;</span> <span class="mi">5</span>
  <span class="p">],</span>
- <span class="s2">"arg9"</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s2">"val9a"</span><span class="p">,</span><span class="s2">"val9b"</span><span class="p">],</span>
-
- <span class="s2">"arg10[~~]"</span> <span class="o">=&gt;</span> <span class="s2">"%arg10%"</span><span class="p">,</span>
- <span class="s2">"arg11[!~]"</span> <span class="o">=&gt;</span> <span class="s2">"%arg11%"</span>
-<span class="p">);</span>
+ <span class="s2">"[||]arg9"</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s2">"val9a"</span><span class="p">,</span><span class="s2">"val9b"</span><span class="p">],</span> <span class="c1">// arg9 = val9a OR arg9 = val9b
+</span>
+ <span class="s2">"[~~]arg10"</span> <span class="o">=&gt;</span> <span class="s2">"%arg10%"</span><span class="p">,</span>
+ <span class="s2">"[!~]arg11"</span> <span class="o">=&gt;</span> <span class="s2">"%arg11%"</span><span class="p">,</span>
+ <span class="s2">"[&gt;&lt;]arg12"</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> <span class="c1">// arg12 (BETWEEN 1 AND 5)
+</span>
+ <span class="s2">"[||]arg13"</span> <span class="o">=&gt;</span> <span class="s2">"val13"</span> <span class="c1">// you can also bind like this (OR arg12 = val12)
+</span><span class="p">);</span>
 <span class="cp">?&gt;</span>
 </code></pre>
             <p>Conditional statements are extremly customisable. WHERE and JOIN clauses are conditional statements. </p>
@@ -598,24 +603,25 @@
             <aside class="success">
                 Available operators: `==`, `>>`, `
                 <<`, `>=`, `
-                    <=`, `!=`, `~~`, `!~` </aside>
+                    <=`, `!=`, `~~`, `!~`, `<>`, `>
+                        <` </aside>
 
-                        <aside class="success">
-                            Available joins: `&&`(AND), `||`(OR)
-                        </aside>
+                            <aside class="success">
+                                Available joins: `&&`(AND), `||`(OR)
+                            </aside>
 
-                        <aside class="notice">
-                            To make duplicate keys work for binds, you can add a name to the bind. Ex: `[&&]name`
-                        </aside>
+                            <aside class="notice">
+                                To make duplicate keys work for binds, you can add a name to the bind. Ex: `[&&]name`
+                            </aside>
 
-                        <aside class="notice">
-                            You can also bind operators. Not just `&&`(AND) or `||`(OR). However, the join (&& or ||), must come first
-                        </aside>
-                        <h2 id='multi-queries'>Multi-queries</h2>
-                        <blockquote>
-                            <p>Multi-Querying</p>
-                        </blockquote>
-                        <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+                            <aside class="notice">
+                                You can also bind operators. Not just `&&`(AND) or `||`(OR). However, the join (&& or ||), must come first
+                            </aside>
+                            <h2 id='multi-queries'>Multi-queries</h2>
+                            <blockquote>
+                                <p>Multi-Querying</p>
+                            </blockquote>
+                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="c1">// Way 1
 </span>
 <span class="k">array</span><span class="p">(</span>
@@ -671,43 +677,43 @@
 <span class="p">);</span>
 <span class="cp">?&gt;</span>
 </code></pre>
-                        <p>Multiqueries can be done too. This allows for highly efficient repetative queries. Note: Only the values of WHERE and INSERT work with this. VALUES, not KEYS.</p>
+                            <p>Multiqueries can be done too. This allows for highly efficient repetative queries. Note: Only the values of WHERE and INSERT work with this. VALUES, not KEYS.</p>
 
-                        <aside class="success">
-                            The keys for the second or later multi-query arrays do not have to be exact. For example, the first array might have `[>>]test[int]` as a key, but the second one can have just `test`. Anything within brakets in the key will be discarded
-                        </aside>
+                            <aside class="success">
+                                The keys for the second or later multi-query arrays do not have to be exact. For example, the first array might have `[>>]test[int]` as a key, but the second one can have just `test`. Anything within brakets in the key will be discarded
+                            </aside>
 
-                        <aside class="success">
-                            The keys do not have to be in order - SuperSQL will do that for you.
-                        </aside>
+                            <aside class="success">
+                                The keys do not have to be in order - SuperSQL will do that for you.
+                            </aside>
 
-                        <aside class="success">
-                            Binds dont have to be reproduced in the second or more arrays. You can put it in global scope if you like.
-                        </aside>
+                            <aside class="success">
+                                Binds dont have to be reproduced in the second or more arrays. You can put it in global scope if you like.
+                            </aside>
 
-                        <aside class="notice">
-                            If there are key collisions with binds - no problem! You can reproduce the bind in the second or more arrays too.
-                        </aside>
-                        <h2 id='key-collisions'>Key-collisions</h2>
-                        <p>Since SuperSQL uses associative arrays, key collisions can occur. To solve this problem, add &quot;#id (replace id with something)&quot; to the key.</p>
+                            <aside class="notice">
+                                If there are key collisions with binds - no problem! You can reproduce the bind in the second or more arrays too.
+                            </aside>
+                            <h2 id='key-collisions'>Key-collisions</h2>
+                            <p>Since SuperSQL uses associative arrays, key collisions can occur. To solve this problem, add &quot;#id (replace id with something)&quot; to the key.</p>
 
-                        <aside class="notice">
-                            This is wrong: `[>>]somecolumn[int]#someid`, this is right: `[>>]somecolumn#someid[int]`
-                        </aside>
-                        <h2 id='multi-table-support'>Multi-Table support</h2>
-                        <blockquote>
-                            <p>Multi-Table queries</p>
-                        </blockquote>
-                        <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+                            <aside class="notice">
+                                This is wrong: `[>>]somecolumn[int]#someid`, this is right: `[>>]somecolumn#someid[int]`
+                            </aside>
+                            <h2 id='multi-table-support'>Multi-Table support</h2>
+                            <blockquote>
+                                <p>Multi-Table queries</p>
+                            </blockquote>
+                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">SELECT</span><span class="p">([</span><span class="s2">"table1"</span><span class="p">,</span><span class="s2">"table2"</span><span class="p">],[],[]);</span>
 <span class="cp">?&gt;</span>
 </code></pre>
-                        <p>If you want to query multiple tables at once, put the tables in as an array</p>
-                        <h2 id='type-casting'>Type Casting</h2>
-                        <blockquote>
-                            <p>Type Casting</p>
-                        </blockquote>
-                        <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+                            <p>If you want to query multiple tables at once, put the tables in as an array</p>
+                            <h2 id='type-casting'>Type Casting</h2>
+                            <blockquote>
+                                <p>Type Casting</p>
+                            </blockquote>
+                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">INSERT</span><span class="p">(</span><span class="s2">"sensitive_data"</span><span class="p">,[</span> <span class="c1">// NOTE: Also works with any other query. ALSO NOTE: Types are case-insensitive
 </span>   <span class="s2">"nuclear_codes[int]"</span> <span class="o">=&gt;</span> <span class="mi">138148347734</span><span class="p">,</span> <span class="c1">// Integer (Use [int] or [integer]
 </span>   <span class="s2">"in_state_of_emergency[bool]"</span> <span class="o">=&gt;</span> <span class="kc">false</span><span class="p">,</span> <span class="c1">// Boolean (Use [bool] or [boolean]
@@ -716,47 +722,47 @@
 </span><span class="p">]);</span>
 <span class="cp">?&gt;</span>
 </code></pre>
-                        <p>If you want to set the type of the input, you can set it by adding <code>[type] (replace type with type)</code>.</p>
+                            <p>If you want to set the type of the input, you can set it by adding <code>[type] (replace type with type)</code>.</p>
 
-                        <aside class="success">
-                            Available types: `int`, `bool`, `lob`, `null`, `json`, `object`, `double`
-                        </aside>
-                        <h2 id='sql-functions-raw'>SQL Functions/raw</h2>
-                        <blockquote>
-                            <p>SQL functions/Raw</p>
-                        </blockquote>
-                        <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+                            <aside class="success">
+                                Available types: `int`, `bool`, `lob`, `null`, `json`, `object`, `double`
+                            </aside>
+                            <h2 id='sql-functions-raw'>SQL Functions/raw</h2>
+                            <blockquote>
+                                <p>SQL functions/Raw</p>
+                            </blockquote>
+                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">INSERT</span><span class="p">(</span><span class="s2">"times"</span><span class="p">,[</span>
     <span class="s2">"#time"</span> <span class="o">=&gt;</span> <span class="s2">"NOW()"</span>
 <span class="p">]);</span>
 <span class="cp">?&gt;</span>
 </code></pre>
-                        <p>If you want to use SQL functions such as <code>NOW()</code> or want use insert raw, unescaped data, add <code>#</code> at the beginning of the key</p>
+                            <p>If you want to use SQL functions such as <code>NOW()</code> or want use insert raw, unescaped data, add <code>#</code> at the beginning of the key</p>
 
-                        <aside class="notice">
-                            Programming guide: Please try to avoid SQL functions. If you can, use php. (EX:, replace `NOW()` with `date('Y-m-d H:i:s')`)
-                        </aside>
-                        <h2 id='alias'>Alias</h2>
-                        <blockquote>
-                            <p>Alias</p>
-                        </blockquote>
-                        <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+                            <aside class="notice">
+                                Programming guide: Please try to avoid SQL functions. If you can, use php. (EX:, replace `NOW()` with `date('Y-m-d H:i:s')`)
+                            </aside>
+                            <h2 id='alias'>Alias</h2>
+                            <blockquote>
+                                <p>Alias</p>
+                            </blockquote>
+                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">SELECT</span><span class="p">(</span><span class="s2">"users"</span><span class="p">,[</span><span class="s2">"user_id[id]"</span><span class="p">]);</span>
 <span class="cp">?&gt;</span>
 </code></pre>
-                        <p>You can use an alias for columns and/or tables by adding <code>[aliasname]</code>.</p>
+                            <p>You can use an alias for columns and/or tables by adding <code>[aliasname]</code>.</p>
 
-                        <aside class="notice">
-                            Aliases go after the key, not before ex: `[alias]key` is WRONG, `key[alias]` is RIGHT
-                        </aside>
-                        <h2 id='custom-queries'>Custom Queries</h2>
-                        <p>Custom queries can be made using <code>$SuperSQL-&gt;query($query)</code>.</p>
+                            <aside class="notice">
+                                Aliases go after the key, not before ex: `[alias]key` is WRONG, `key[alias]` is RIGHT
+                            </aside>
+                            <h2 id='custom-queries'>Custom Queries</h2>
+                            <p>Custom queries can be made using <code>$SuperSQL-&gt;query($query)</code>.</p>
 
-                        <aside class="notice">
-                            Programming guide: If you can, use raw queries. For example, theres nothing sensitive in `SELECT * FROM `table`, just do that instead of `$SuperSQL->SELECT("table");`
-                        </aside>
-                        <h1 id='queries'>Queries</h1>
-                        <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+                            <aside class="notice">
+                                Programming guide: If you can, use raw queries. For example, theres nothing sensitive in `SELECT * FROM `table`, just do that instead of `$SuperSQL->SELECT("table");`
+                            </aside>
+                            <h1 id='queries'>Queries</h1>
+                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">SELECT</span><span class="p">(</span><span class="nv">$table</span><span class="p">,</span> <span class="nv">$columns</span><span class="p">,</span> <span class="nv">$where</span><span class="p">[,</span><span class="nv">$join</span><span class="p">[,</span> <span class="nv">$limit</span><span class="o">/</span><span class="nv">$append</span><span class="p">);</span>
 
 <span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">INSERT</span><span class="p">(</span><span class="nv">$table</span><span class="p">,</span> <span class="nv">$data</span><span class="p">);</span>
@@ -767,8 +773,8 @@
 
 <span class="cp">?&gt;</span>
 </code></pre>
-                        <h2 id='select'>SELECT</h2>
-                        <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+                            <h2 id='select'>SELECT</h2>
+                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">SELECT</span><span class="p">(</span><span class="s2">"horizon"</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[],</span> <span class="k">array</span><span class="p">(</span>
     <span class="c1">// [&gt;&gt;] - Right join
 </span>    <span class="c1">// [&lt;&lt;] - Left join
@@ -800,48 +806,48 @@
 <span class="p">]);</span> <span class="c1">// SELECT * FROM `users` GROUP BY `user_group` HAVING COUNT(`users`) &gt; 10 LIMIT 5 OFFSET 2 ORDER BY `column`
 </span><span class="cp">?&gt;</span>
 </code></pre>
-                        <p><strong>SuperSQL-&gt;SELECT($table, $columns, $where[,$join[, $limit/$append);</strong></p>
+                            <p><strong>SuperSQL-&gt;SELECT($table, $columns, $where[,$join[, $limit/$append);</strong></p>
 
-                        <ul>
-                            <li><code>(String|Array)table</code> - Table(s) to query</li>
-                            <li><code>(Array)columns</code> - Array of columns to return. <code>[]</code> will query using the <code>*</code> selector.</li>
-                            <li><code>(Array)where</code> - Array of conditions for WHERE (See above for documentation on WHERE)</li>
-                            <li><code>(Array|Null)join</code> - Array of conditions for JOIN. Usage below</li>
-                            <li><code>(Int|String|Array)limit</code> - Number of rows to retrieve. if string, will be treated as an append - it will be appended to the sql query.</li>
-                        </ul>
+                            <ul>
+                                <li><code>(String|Array)table</code> - Table(s) to query</li>
+                                <li><code>(Array)columns</code> - Array of columns to return. <code>[]</code> will query using the <code>*</code> selector.</li>
+                                <li><code>(Array)where</code> - Array of conditions for WHERE (See above for documentation on WHERE)</li>
+                                <li><code>(Array|Null)join</code> - Array of conditions for JOIN. Usage below</li>
+                                <li><code>(Int|String|Array)limit</code> - Number of rows to retrieve. if string, will be treated as an append - it will be appended to the sql query.</li>
+                            </ul>
 
-                        <aside class="notice">
-                            You may also put `DISTINCT`, in the top of the columns array to use the DISTINCT keyword. Other available keywords include: `INSERT INTO table` and `INTO table` (replace table with table name)
-                        </aside>
+                            <aside class="notice">
+                                You may also put `DISTINCT`, in the top of the columns array to use the DISTINCT keyword. Other available keywords include: `INSERT INTO table` and `INTO table` (replace table with table name)
+                            </aside>
 
-                        <aside class="notice">
-                            You may also do `SuperSQL->SELECT($table, $columns, $where, $limit)`
-                        </aside>
+                            <aside class="notice">
+                                You may also do `SuperSQL->SELECT($table, $columns, $where, $limit)`
+                            </aside>
 
-                        <aside class="notice">
-                            You can order tables by setting limit/append to "ORDER BY column"
-                        </aside>
+                            <aside class="notice">
+                                You can order tables by setting limit/append to "ORDER BY column"
+                            </aside>
 
-                        <aside class="notice">
-                            You can also have SuperSQL cast the output. To do so, add `[type]` at the end of the column name. Available types: `json`, `obj`, `int`, `bool`, `string`
-                        </aside>
-                        <h2 id='insert'>INSERT</h2>
-                        <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+                            <aside class="notice">
+                                You can also have SuperSQL cast the output. To do so, add `[type]` at the end of the column name. Available types: `json`, `obj`, `int`, `bool`, `string`
+                            </aside>
+                            <h2 id='insert'>INSERT</h2>
+                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">INSERT</span><span class="p">(</span><span class="s2">"table"</span><span class="p">,</span><span class="k">array</span><span class="p">(</span>
 <span class="s2">"hello"</span> <span class="o">=&gt;</span> <span class="s2">"world"</span><span class="p">,</span>
 <span class="s2">"SuperSQL"</span> <span class="o">=&gt;</span> <span class="s2">"rocks"</span>
 <span class="p">));</span>
 <span class="cp">?&gt;</span>
 </code></pre>
-                        <p><strong>SuperSQL-&gt;INSERT($table, $data);</strong></p>
+                            <p><strong>SuperSQL-&gt;INSERT($table, $data);</strong></p>
 
-                        <ul>
-                            <li><code>(String|Array)table</code> - Table(s) to insert to</li>
-                            <li><code>(Array)data</code> - Data to insert</li>
-                            <li><code>(String|Null)append</code> - String to append to query (optional).</li>
-                        </ul>
-                        <h2 id='update'>UPDATE</h2>
-                        <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+                            <ul>
+                                <li><code>(String|Array)table</code> - Table(s) to insert to</li>
+                                <li><code>(Array)data</code> - Data to insert</li>
+                                <li><code>(String|Null)append</code> - String to append to query (optional).</li>
+                            </ul>
+                            <h2 id='update'>UPDATE</h2>
+                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">UPDATE</span><span class="p">(</span><span class="s2">"citizens"</span><span class="p">,</span><span class="k">array</span><span class="p">(</span>
 <span class="s2">"SuperSQL"</span> <span class="o">=&gt;</span> <span class="s2">"To the rescue!"</span>
 <span class="p">),</span><span class="k">array</span><span class="p">(</span>
@@ -849,82 +855,82 @@
 <span class="p">));</span>
 <span class="cp">?&gt;</span>
 </code></pre>
-                        <p><strong>SuperSQL-&gt;UPDATE($table, $data, $where);</strong></p>
+                            <p><strong>SuperSQL-&gt;UPDATE($table, $data, $where);</strong></p>
 
-                        <ul>
-                            <li><code>(String|Array)table</code> - Table(s) to insert to</li>
-                            <li><code>(Array)data</code> - Data to update</li>
-                            <li><code>(Array)where</code> - Conditional statements</li>
-                        </ul>
+                            <ul>
+                                <li><code>(String|Array)table</code> - Table(s) to insert to</li>
+                                <li><code>(Array)data</code> - Data to update</li>
+                                <li><code>(Array)where</code> - Conditional statements</li>
+                            </ul>
 
-                        <aside class="notice">
-                            You can also use some special operators on the data argument. Example: `$SuperSQL->UPDATE("test", ["increment[+=]" => 1]);`. Available: `+=`, `-=`, `/=`, `*=`.
-                        </aside>
-                        <h2 id='delete'>DELETE</h2>
-                        <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+                            <aside class="notice">
+                                You can also use some special operators on the data argument. Example: `$SuperSQL->UPDATE("test", ["increment[+=]" => 1]);`. Available: `+=`, `-=`, `/=`, `*=`.
+                            </aside>
+                            <h2 id='delete'>DELETE</h2>
+                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">DELETE</span><span class="p">(</span><span class="s2">"persons"</span><span class="p">,</span>
 <span class="s2">"is_villain"</span> <span class="o">=&gt;</span> <span class="mi">1</span>
 <span class="p">));</span>
 <span class="cp">?&gt;</span>
 </code></pre>
-                        <p><strong>SuperSQL-&gt;DELETE($table, $where);</strong></p>
+                            <p><strong>SuperSQL-&gt;DELETE($table, $where);</strong></p>
 
-                        <ul>
-                            <li><code>(String|Array)table</code> - Table(s) to insert to</li>
-                            <li><code>(Array)where</code> - Conditional statements</li>
-                        </ul>
-                        <h1 id='helper-functions-queries'>Helper Functions/Queries</h1>
-                        <p>SuperSQL provides some helper functions to allow for easier access. The helper functions allow you to:</p>
+                            <ul>
+                                <li><code>(String|Array)table</code> - Table(s) to insert to</li>
+                                <li><code>(Array)where</code> - Conditional statements</li>
+                            </ul>
+                            <h1 id='helper-functions-queries'>Helper Functions/Queries</h1>
+                            <p>SuperSQL provides some helper functions to allow for easier access. The helper functions allow you to:</p>
 
-                        <ul>
-                            <li>Connect easily</li>
-                            <li>Manage multiple database connections</li>
-                            <li>Other queries</li>
-                        </ul>
+                            <ul>
+                                <li>Connect easily</li>
+                                <li>Manage multiple database connections</li>
+                                <li>Other queries</li>
+                            </ul>
 
-                        <aside class="notice">
-                            If your using the built/compiled file, you must include `dist/SuperSQL_helper.php` too
-                        </aside>
-                        <h2 id='sqlhelper-connect'>SQLHelper::connect</h2>
-                        <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+                            <aside class="notice">
+                                If your using the built/compiled file, you must include `dist/SuperSQL_helper.php` too
+                            </aside>
+                            <h2 id='sqlhelper-connect'>SQLHelper::connect</h2>
+                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="nv">$SuperSQL</span> <span class="o">=</span> <span class="nx">SQLHelper</span><span class="o">::</span><span class="na">connect</span><span class="p">(</span><span class="s2">"localhost"</span><span class="p">,</span><span class="s2">"mydb"</span><span class="p">,</span><span class="s2">"root"</span><span class="p">,</span><span class="s2">"1234"</span><span class="p">);</span> <span class="c1">// mysql
 </span>
 <span class="nv">$SuperSQL</span> <span class="o">=</span> <span class="nx">SQLHelper</span><span class="o">::</span><span class="na">connect</span><span class="p">(</span><span class="s2">"localhost"</span><span class="p">,</span><span class="s2">"mydb"</span><span class="p">,</span><span class="s2">"root"</span><span class="p">,</span><span class="s2">"1234"</span><span class="p">,</span> <span class="nv">$dbtype</span><span class="p">);</span> <span class="c1">// others
 </span><span class="cp">?&gt;</span>
 </code></pre>
-                        <p>Connect easily to any database.</p>
+                            <p>Connect easily to any database.</p>
 
-                        <p><strong>connect($host,$db,$user,$pass,$options)</strong></p>
+                            <p><strong>connect($host,$db,$user,$pass,$options)</strong></p>
 
-                        <ul>
-                            <li><code>(String)host</code> - Host to connect to</li>
-                            <li><code>(String)db</code> - DB name</li>
-                            <li><code>(String)user</code> - Username</li>
-                            <li><code>(String)pass</code> - Password</li>
-                            <li><code>(Array)options</code> - Options (Optional)</li>
-                        </ul>
+                            <ul>
+                                <li><code>(String)host</code> - Host to connect to</li>
+                                <li><code>(String)db</code> - DB name</li>
+                                <li><code>(String)user</code> - Username</li>
+                                <li><code>(String)pass</code> - Password</li>
+                                <li><code>(Array)options</code> - Options (Optional)</li>
+                            </ul>
 
-                        <p><strong>connect($host,$db,$user,$pass,$dbtype)</strong></p>
+                            <p><strong>connect($host,$db,$user,$pass,$dbtype)</strong></p>
 
-                        <ul>
-                            <li><code>(String)host</code> - Host to connect to</li>
-                            <li><code>(String)db</code> - DB name</li>
-                            <li><code>(String)user</code> - Username</li>
-                            <li><code>(String)pass</code> - Password</li>
-                            <li><code>(String)dbtype</code> - Database type (<code>mysql</code>,<code>pgsql</code>,<code>sybase</code>,<code>oracle</code>)</li>
-                        </ul>
+                            <ul>
+                                <li><code>(String)host</code> - Host to connect to</li>
+                                <li><code>(String)db</code> - DB name</li>
+                                <li><code>(String)user</code> - Username</li>
+                                <li><code>(String)pass</code> - Password</li>
+                                <li><code>(String)dbtype</code> - Database type (<code>mysql</code>,<code>pgsql</code>,<code>sybase</code>,<code>oracle</code>)</li>
+                            </ul>
 
-                        <p><strong>connect($host,$db,$user,$pass,$dsn)</strong></p>
+                            <p><strong>connect($host,$db,$user,$pass,$dsn)</strong></p>
 
-                        <ul>
-                            <li><code>(String)host</code> - Host to connect to</li>
-                            <li><code>(String)db</code> - DB name</li>
-                            <li><code>(String)user</code> - Username</li>
-                            <li><code>(String)pass</code> - Password</li>
-                            <li><code>(String)dbtype</code> - DSN string</li>
-                        </ul>
-                        <h2 id='new-sqlhelper'>new SQLHelper()</h2>
-                        <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+                            <ul>
+                                <li><code>(String)host</code> - Host to connect to</li>
+                                <li><code>(String)db</code> - DB name</li>
+                                <li><code>(String)user</code> - Username</li>
+                                <li><code>(String)pass</code> - Password</li>
+                                <li><code>(String)dbtype</code> - DSN string</li>
+                            </ul>
+                            <h2 id='new-sqlhelper'>new SQLHelper()</h2>
+                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="nv">$Helper</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SQLHelper</span><span class="p">(</span><span class="s2">"localhost"</span><span class="p">,</span><span class="s2">"test"</span><span class="p">,</span><span class="s2">"root"</span><span class="p">,</span><span class="s2">"1234"</span><span class="p">);</span> <span class="c1">// mysql
 </span>
 <span class="nv">$Helper</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SQLHelper</span><span class="p">(</span><span class="s2">"localhost"</span><span class="p">,</span><span class="s2">"test"</span><span class="p">,</span><span class="s2">"root"</span><span class="p">,</span><span class="s2">"1234"</span><span class="p">,</span> <span class="nv">$dbtype</span><span class="p">);</span> <span class="c1">// others
@@ -948,49 +954,49 @@
 <span class="p">));</span>
 <span class="cp">?&gt;</span>
 </code></pre>
-                        <p>Initialise the helper</p>
+                            <p>Initialise the helper</p>
 
-                        <p><strong>new SQLHelper($SuperSQL)</strong></p>
+                            <p><strong>new SQLHelper($SuperSQL)</strong></p>
 
-                        <ul>
-                            <li><code>(SuperSQL)SuperSQL</code> - SuperSQL object</li>
-                        </ul>
+                            <ul>
+                                <li><code>(SuperSQL)SuperSQL</code> - SuperSQL object</li>
+                            </ul>
 
-                        <p><strong>new SQLHelper($host,$db,$user,$pass,$options)</strong></p>
+                            <p><strong>new SQLHelper($host,$db,$user,$pass,$options)</strong></p>
 
-                        <ul>
-                            <li><code>(String)host</code> - Host to connect to</li>
-                            <li><code>(String)db</code> - DB name</li>
-                            <li><code>(String)user</code> - Username</li>
-                            <li><code>(String)pass</code> - Password</li>
-                            <li><code>(Array)options</code> - Options (Optional)</li>
-                        </ul>
+                            <ul>
+                                <li><code>(String)host</code> - Host to connect to</li>
+                                <li><code>(String)db</code> - DB name</li>
+                                <li><code>(String)user</code> - Username</li>
+                                <li><code>(String)pass</code> - Password</li>
+                                <li><code>(Array)options</code> - Options (Optional)</li>
+                            </ul>
 
-                        <p><strong>new SQLHelper($connect)</strong></p>
+                            <p><strong>new SQLHelper($connect)</strong></p>
 
-                        <ul>
-                            <li><code>(Array)connect</code> - Array of connection data - Uses Helper::connect</li>
-                        </ul>
-                        <h2 id='change'>Change</h2>
-                        <p><strong>$SQLHelper-&gt;change($id)</strong></p>
+                            <ul>
+                                <li><code>(Array)connect</code> - Array of connection data - Uses Helper::connect</li>
+                            </ul>
+                            <h2 id='change'>Change</h2>
+                            <p><strong>$SQLHelper-&gt;change($id)</strong></p>
 
-                        <p>Changes the selected connection</p>
+                            <p>Changes the selected connection</p>
 
-                        <ul>
-                            <li><code>(Int)id</code> - Connection id</li>
-                        </ul>
-                        <h2 id='getcon'>getCon</h2>
-                        <p><strong>$SQLHelper-&gt;getCon($all = false)</strong></p>
+                            <ul>
+                                <li><code>(Int)id</code> - Connection id</li>
+                            </ul>
+                            <h2 id='getcon'>getCon</h2>
+                            <p><strong>$SQLHelper-&gt;getCon($all = false)</strong></p>
 
-                        <ul>
-                            <li><code>(Bool)all</code> - if true, will return all connections. If not, then will only return the selected one</li>
-                        </ul>
-                        <h2 id='select-2'>SELECT</h2>
-                        <p><strong>$SQLHelper-&gt;SELECT($table,$columns,$where,$join,$limit/$append)</strong></p>
+                            <ul>
+                                <li><code>(Bool)all</code> - if true, will return all connections. If not, then will only return the selected one</li>
+                            </ul>
+                            <h2 id='select-2'>SELECT</h2>
+                            <p><strong>$SQLHelper-&gt;SELECT($table,$columns,$where,$join,$limit/$append)</strong></p>
 
-                        <p>The SELECT query</p>
-                        <h2 id='selectmap'>SELECTMAP</h2>
-                        <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+                            <p>The SELECT query</p>
+                            <h2 id='selectmap'>SELECTMAP</h2>
+                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="nv">$SQLHelper</span><span class="o">-&gt;</span><span class="na">SELECTMAP</span><span class="p">(</span><span class="s2">"test"</span><span class="p">,</span><span class="k">array</span><span class="p">(</span>
     <span class="s2">"name[username]"</span><span class="p">,</span>
     <span class="s2">"id"</span><span class="p">,</span>
@@ -1036,96 +1042,96 @@ Output:
 */</span>
 <span class="cp">?&gt;</span>
 </code></pre>
-                        <p><strong>$SQLHelper-&gt;SELECTMAP($table,$map,$where,$join,$limit/$append)</strong></p>
+                            <p><strong>$SQLHelper-&gt;SELECTMAP($table,$map,$where,$join,$limit/$append)</strong></p>
 
-                        <p>The SELECT query for source-mapping.</p>
-                        <h2 id='insert-2'>INSERT</h2>
-                        <p><strong>$SQLHelper-&gt;INSERT($table,$data)</strong></p>
+                            <p>The SELECT query for source-mapping.</p>
+                            <h2 id='insert-2'>INSERT</h2>
+                            <p><strong>$SQLHelper-&gt;INSERT($table,$data)</strong></p>
 
-                        <p>The INSERT query. </p>
-                        <h2 id='update-2'>UPDATE</h2>
-                        <p><strong>$SQLHelper-&gt;UPDATE($table,$data,$where)</strong></p>
+                            <p>The INSERT query. </p>
+                            <h2 id='update-2'>UPDATE</h2>
+                            <p><strong>$SQLHelper-&gt;UPDATE($table,$data,$where)</strong></p>
 
-                        <p>The UPDATE query.</p>
-                        <h2 id='delete-2'>DELETE</h2>
-                        <p><strong>$SQLHelper-&gt;DELETE($table,$where)</strong></p>
+                            <p>The UPDATE query.</p>
+                            <h2 id='delete-2'>DELETE</h2>
+                            <p><strong>$SQLHelper-&gt;DELETE($table,$where)</strong></p>
 
-                        <p>The DELETE query.</p>
-                        <h2 id='replace'>REPLACE</h2>
-                        <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+                            <p>The DELETE query.</p>
+                            <h2 id='replace'>REPLACE</h2>
+                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="nv">$SQLHelper</span><span class="o">-&gt;</span><span class="na">REPLACE</span><span class="p">(</span><span class="s2">"luggage"</span><span class="p">,[</span>
     <span class="s2">"items"</span><span class="o">=&gt;</span><span class="k">array</span><span class="p">(</span><span class="s2">"bomb"</span><span class="o">=&gt;</span><span class="s2">"pillow"</span><span class="p">,</span><span class="s2">"poison"</span><span class="o">=&gt;</span><span class="s2">"perfume"</span><span class="p">)</span>
 <span class="p">]);</span> <span class="c1">// UPDATE `luggage` SET `items` = REPLACE(REPLACE(`items`,'bomb','pillow'),'poison','perfume');
 </span><span class="cp">?&gt;</span>
 </code></pre>
-                        <p><strong>$SQLHelper-&gt;REPLACE($table,$data,$where)</strong></p>
+                            <p><strong>$SQLHelper-&gt;REPLACE($table,$data,$where)</strong></p>
 
-                        <ul>
-                            <li><code>(String|Array)table</code> - table(s) to replace in</li>
-                            <li><code>(Array)data</code> - columns to replace</li>
-                            <li><code>(Array)where</code> - conditional statements</li>
-                        </ul>
-                        <h2 id='get'>get</h2>
-                        <p><strong>$SQLHelper-&gt;get($table,$columns,$where,$join)</strong></p>
+                            <ul>
+                                <li><code>(String|Array)table</code> - table(s) to replace in</li>
+                                <li><code>(Array)data</code> - columns to replace</li>
+                                <li><code>(Array)where</code> - conditional statements</li>
+                            </ul>
+                            <h2 id='get'>get</h2>
+                            <p><strong>$SQLHelper-&gt;get($table,$columns,$where,$join)</strong></p>
 
-                        <p>Gets the first row</p>
-                        <h2 id='count'>count</h2>
-                        <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+                            <p>Gets the first row</p>
+                            <h2 id='count'>count</h2>
+                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="k">echo</span> <span class="nv">$SQLHelper</span><span class="o">-&gt;</span><span class="na">count</span><span class="p">(</span><span class="s2">"table"</span><span class="p">,</span><span class="k">array</span><span class="p">(</span> <span class="c1">// returns row count (int)
 </span><span class="s2">"condition"</span> <span class="o">=&gt;</span> <span class="mi">1</span>
 <span class="p">);</span>
 </code></pre>
-                        <p><strong>$SQLHelper-&gt;count($table,$where,$join)</strong></p>
+                            <p><strong>$SQLHelper-&gt;count($table,$where,$join)</strong></p>
 
-                        <p>Get num of rows</p>
-                        <h2 id='max'>max</h2>
-                        <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+                            <p>Get num of rows</p>
+                            <h2 id='max'>max</h2>
+                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="k">echo</span> <span class="nv">$SQLHelper</span><span class="o">-&gt;</span><span class="na">max</span><span class="p">(</span><span class="s2">"table"</span><span class="p">,</span><span class="s2">"column"</span><span class="p">);</span> <span class="c1">// Returns biggest value for column
 </span></code></pre>
-                        <p><strong>$SQLHelper-&gt;max($table,$column,$where,$join)</strong></p>
+                            <p><strong>$SQLHelper-&gt;max($table,$column,$where,$join)</strong></p>
 
-                        <p>Get the maximum value of a column</p>
-                        <h2 id='min'>min</h2>
-                        <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+                            <p>Get the maximum value of a column</p>
+                            <h2 id='min'>min</h2>
+                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="k">echo</span> <span class="nv">$SQLHelper</span><span class="o">-&gt;</span><span class="na">min</span><span class="p">(</span><span class="s2">"table"</span><span class="p">,</span><span class="s2">"column"</span><span class="p">);</span> <span class="c1">// Returns smallest value for column
 </span></code></pre>
-                        <p><strong>$SQLHelper-&gt;min($table,$column,$where,$join)</strong></p>
+                            <p><strong>$SQLHelper-&gt;min($table,$column,$where,$join)</strong></p>
 
-                        <p>Get the minimum value of a column</p>
-                        <h2 id='avg'>avg</h2>
-                        <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+                            <p>Get the minimum value of a column</p>
+                            <h2 id='avg'>avg</h2>
+                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="k">echo</span> <span class="nv">$SQLHelper</span><span class="o">-&gt;</span><span class="na">avg</span><span class="p">(</span><span class="s2">"table"</span><span class="p">,</span><span class="s2">"column"</span><span class="p">);</span> <span class="c1">// Returns average value for column
 </span></code></pre>
-                        <p><strong>$SQLHelper-&gt;avg($table,$column,$where,$join)</strong></p>
+                            <p><strong>$SQLHelper-&gt;avg($table,$column,$where,$join)</strong></p>
 
-                        <p>Get the average value of a column</p>
-                        <h2 id='sum'>sum</h2>
-                        <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+                            <p>Get the average value of a column</p>
+                            <h2 id='sum'>sum</h2>
+                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="k">echo</span> <span class="nv">$SQLHelper</span><span class="o">-&gt;</span><span class="na">min</span><span class="p">(</span><span class="s2">"table"</span><span class="p">,</span><span class="s2">"column"</span><span class="p">);</span> <span class="c1">// Returns sum of values in the column
 </span></code></pre>
-                        <p><strong>$SQLHelper-&gt;sum($table,$column,$where,$join)</strong></p>
+                            <p><strong>$SQLHelper-&gt;sum($table,$column,$where,$join)</strong></p>
 
-                        <p>Get the sum of values in a column</p>
-                        <h2 id='create'>create</h2>
-                        <p><strong>$SQLHelper-&gt;create($table,$data)</strong></p>
+                            <p>Get the sum of values in a column</p>
+                            <h2 id='create'>create</h2>
+                            <p><strong>$SQLHelper-&gt;create($table,$data)</strong></p>
 
-                        <p>Creates a table</p>
+                            <p>Creates a table</p>
 
-                        <ul>
-                            <li><code>(String)table</code> - Table name to create</li>
-                            <li><code>(Array)data</code> - Array of keys and types</li>
-                        </ul>
-                        <h2 id='drop'>drop</h2>
-                        <p><strong>$SQLHelper-&gt;drop($table)</strong></p>
+                            <ul>
+                                <li><code>(String)table</code> - Table name to create</li>
+                                <li><code>(Array)data</code> - Array of keys and types</li>
+                            </ul>
+                            <h2 id='drop'>drop</h2>
+                            <p><strong>$SQLHelper-&gt;drop($table)</strong></p>
 
-                        <p>Removes a table</p>
+                            <p>Removes a table</p>
 
-                        <ul>
-                            <li><code>(String)table</code> - Table name to delete</li>
-                        </ul>
-                        <h1 id='advanced'>Advanced</h1>
-                        <h2 id='transactions'>Transactions</h2>
-                        <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+                            <ul>
+                                <li><code>(String)table</code> - Table name to delete</li>
+                            </ul>
+                            <h1 id='advanced'>Advanced</h1>
+                            <h2 id='transactions'>Transactions</h2>
+                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">transact</span><span class="p">(</span><span class="k">function</span> <span class="p">()</span> <span class="p">{</span>
 
 <span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">DELETE</span><span class="p">(</span><span class="s2">"citizens"</span><span class="p">,[</span>
@@ -1136,16 +1142,16 @@ Output:
 </span><span class="p">});</span>
 <span class="cp">?&gt;</span>
 </code></pre>
-                        <p><strong>SuperSQL-&gt;transact($call);</strong></p>
+                            <p><strong>SuperSQL-&gt;transact($call);</strong></p>
 
-                        <ul>
-                            <li><code>(Callable)call</code> - Transaction Function. Return false to rollback</li>
-                        </ul>
-                        <h2 id='logging'>Logging</h2>
-                        <blockquote>
-                            <p>Logging</p>
-                        </blockquote>
-                        <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+                            <ul>
+                                <li><code>(Callable)call</code> - Transaction Function. Return false to rollback</li>
+                            </ul>
+                            <h2 id='logging'>Logging</h2>
+                            <blockquote>
+                                <p>Logging</p>
+                            </blockquote>
+                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">dev</span><span class="p">();</span> <span class="c1">// Turn on logging
 </span>
 <span class="o">...</span> <span class="c1">// do some queries
@@ -1153,18 +1159,18 @@ Output:
 <span class="k">echo</span> <span class="nb">json_encode</span><span class="p">(</span><span class="nv">$a</span><span class="o">-&gt;</span><span class="na">getLog</span><span class="p">());</span> <span class="c1">// Get some data
 </span><span class="cp">?&gt;</span>
 </code></pre>
-                        <p>You find something isnt working for your website. You either:</p>
+                            <p>You find something isnt working for your website. You either:</p>
 
-                        <ol>
-                            <li>Rage quit, break everything, scream &quot;I #%@&amp;$@! HATE SUPERSQL&quot;</li>
-                            <li>Use the log function to figure out whats wrong - LIKE A CIVILISED PERSON</li>
-                        </ol>
+                            <ol>
+                                <li>Rage quit, break everything, scream &quot;I #%@&amp;$@! HATE SUPERSQL&quot;</li>
+                                <li>Use the log function to figure out whats wrong - LIKE A CIVILISED PERSON</li>
+                            </ol>
 
-                        <p>To enable the logger, do <code>$SuperSQL-&gt;dev()</code>. Then make some queries.</p>
+                            <p>To enable the logger, do <code>$SuperSQL-&gt;dev()</code>. Then make some queries.</p>
 
-                        <p>Afterwords, do <code>$SuperSQL-&gt;getLog()</code> to get the log.</p>
-                        <h3 id='da-log-what-does-it-mean'>Da log - What does it mean?</h3>
-                        <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+                            <p>Afterwords, do <code>$SuperSQL-&gt;getLog()</code> to get the log.</p>
+                            <h3 id='da-log-what-does-it-mean'>Da log - What does it mean?</h3>
+                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="nv">$log</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">[</span>
     <span class="s2">"SELECT * FROM `table` WHERE `test` = ?"</span><span class="p">,</span> <span class="c1">// SQL base
@@ -1174,17 +1180,17 @@ Output:
 <span class="p">]</span>
 <span class="cp">?&gt;</span>
 </code></pre>
-                        <ul>
-                            <li>SQL - SQL base. <code>?</code> are replaced with values</li>
-                            <li>Values - Initial values with types. NOTE: This is bound onto the SQL base string</li>
-                            <li>Insert - Multi-query array</li>
-                        </ul>
-                        <h2 id='modelock'>modeLock</h2>
-                        <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+                            <ul>
+                                <li>SQL - SQL base. <code>?</code> are replaced with values</li>
+                                <li>Values - Initial values with types. NOTE: This is bound onto the SQL base string</li>
+                                <li>Insert - Multi-query array</li>
+                            </ul>
+                            <h2 id='modelock'>modeLock</h2>
+                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
 <span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">modeLock</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
 <span class="cp">?&gt;</span>
 </code></pre>
-                        <p>Modelock locks the fetch mode. By default, fetching is dynamic for performance. However, if you want to have it fetch all rows at the start, then set to true.</p>
+                            <p>Modelock locks the fetch mode. By default, fetching is dynamic for performance. However, if you want to have it fetch all rows at the start, then set to true.</p>
 
         </div>
         <div class="dark-box">
