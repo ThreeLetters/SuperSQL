@@ -391,11 +391,10 @@ class Parser
         $num = 0;
         $sql = '';
         foreach ($dt as $key => &$val) {
-            preg_match('/^(?<r>\#)?(?:(?:\[(?<a>.{2})\])?(?:\[(?<b>.{2})\])?)?(?<out>.*)/', $key, $matches); 
+            preg_match('/^(?<r>\#)?(?:(?:\[(?<a>.{2})\])(?:(?:\[(?<b>.{2})\])(?:\[(?<c>.{2})\])?)?)?(?<out>.*)/', $key, $matches); 
             $raw  = ($matches['r'] === '#');
             $arg  = $matches['a'];
             $key  = $matches['out'];
-            $arg2 = $matches['b'];
             $newJoin     = $join;
             $newOperator = $operator;
             $type        = $raw ? false : self::getType($key);
@@ -403,11 +402,11 @@ class Parser
             $useBind     = $arr && !isset($val[0]);
             if ($arg && ($arg === '||' || $arg === '&&')) {
                 $newJoin = ($arg === '||') ? ' OR ' : ' AND ';
-                $arg     = $arg2;
+                $arg     = $matches['b'];
                 if ($arr && $arg && ($arg === '||' || $arg === '&&')) {
                     $join    = $newJoin;
                     $newJoin = ($arg === '||') ? ' OR ' : ' AND ';
-                    $arg     = self::getArg($key);
+                    $arg     = $matches['c'];
                 }
             }
             $between = false;
