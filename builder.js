@@ -318,12 +318,14 @@ ${minify(main)}\n\
 var a = out + complete,
     b = out + completeMin,
     c = out + helper,
-    d = out + minify(helper) + "\n?>";
+    d = out + minify(helper) + "\n?>",
+    e = out + minify(connector) + minify(adv) + minify(main) + minify(helper) + '\n?>';
 
 var dir1 = __dirname + "/dist/SuperSQL.php",
     dir2 = __dirname + "/dist/SuperSQL_min.php",
     dir3 = __dirname + "/dist/SuperSQL_helper.php",
-    dir4 = __dirname + "/dist/SuperSQL_helper_min.php";
+    dir4 = __dirname + "/dist/SuperSQL_helper_min.php",
+    dir5 = __dirname + '/dist/SuperSQL_complete.php';
 
 fs.writeFileSync(dir1, a);
 fs.writeFileSync(dir2, b);
@@ -331,6 +333,8 @@ fs.writeFileSync(dir2, b);
 
 fs.writeFileSync(dir3, c);
 fs.writeFileSync(dir4, d);
+
+fs.writeFileSync(dir5, e);
 
 var readme = "## Files\n\
 \n\
@@ -358,6 +362,7 @@ var sizes = `\
 * \`SuperSQL_min.php\` - ${b.length} Chars (${size(dir2)} MB)\n\
 * \`SuperSQL_helper.php\` - ${c.length} Chars (${size(dir3)} MB)\n\
 * \`SuperSQL_helper_min.php\` - ${d.length} Chars (${size(dir4)} MB)\n\
+* \`SuperSQL_complete_min.php\` - ${e.length} Chars (${size(dir5)} MB)\n\
 \n\
 ## Hashes\n\
 \n\
@@ -366,6 +371,7 @@ var sizes = `\
 * SuperSQL_min.php - ${hash(b)}\n\
 * SuperSQL_helper.php - ${hash(c)}\n\
 * SuperSQL_helper_min.php - ${hash(d)}\n\
+* SuperSQL_complete.php - ${hash(e)}\n\
 \`\`\`\n\n`;
 
 
