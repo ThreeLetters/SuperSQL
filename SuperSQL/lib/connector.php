@@ -116,7 +116,7 @@ class SQLResponse implements \ArrayAccess, \Iterator
      */
     function error()
     {
-        return $this->errorData;
+        return $this->error;
     }
     /**
      * Gets data from the query

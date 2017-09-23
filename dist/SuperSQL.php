@@ -4,7 +4,7 @@
  License: MIT (https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE)
  Source: https://github.com/ThreeLetters/SQL-Library
  Build: v1.1.5
- Built on: 20/09/2017
+ Built on: 23/09/2017
 */
 
 namespace SuperSQL;
@@ -96,7 +96,7 @@ class SQLResponse implements \ArrayAccess, \Iterator
     }
     function error()
     {
-        return $this->errorData;
+        return $this->error;
     }
     function getData($current = false)
     {
