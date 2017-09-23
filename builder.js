@@ -262,7 +262,7 @@ function minify(str, options) {
 
     }
     return out.join("");
-    
+
 }
 
 var fs = require("fs");
@@ -366,10 +366,77 @@ var sizes = `\
 * SuperSQL_min.php - ${hash(b)}\n\
 * SuperSQL_helper.php - ${hash(c)}\n\
 * SuperSQL_helper_min.php - ${hash(d)}\n\
-\`\`\`\n`;
+\`\`\`\n\n`;
 
 
 readme += sizes;
 
-fs.writeFileSync(__dirname + "/dist/README.md", readme);
-console.log("Compiled files into dist");
+
+var exec = require('child_process').exec;
+
+exec('php -v', function (error, version, err) {
+    if (error) throw error;
+    if (err) throw err;
+
+    function round(num) {
+        return (Math.round(num * 10000) / 10000)
+    }
+
+    exec('php ' + __dirname + '/profile.php', function (err, out, er) {
+        if (err) throw err;
+        if (er) throw er;
+
+        var data = JSON.parse(out);
+
+        var sum = 0;
+        data.data.forEach((d) => {
+            sum += (d.end - d.start);
+        })
+
+
+        var avg = sum / data.data.length;
+        console.log(round(avg) + 'ms average time, ' + round(sum) + 'ms sum');
+
+        var insert1 = stats('insert1'),
+            insert = stats('insert'),
+            select = stats('select'),
+            select2 = stats('select2'),
+            select3 = stats('select3'),
+            update = stats('update'),
+            d = stats('delete');
+        var performance = `## Performance\n\n\
+Profiled on PHP v${data.version}, ${data.data.length} loops\n\
+\n\
+\n\
+${round(avg)}ms Average Time, Sum: ${round(sum)}ms\n\n\
+### Specifics\n\n\
+| Name                    |  Avg   |  Sum   |\n\
+|-------------------------|--------|--------|\n\
+| 1 Row Insert            | ${insert1[0]} | ${insert1[1]} |\n\
+| 100 R Insert W Temp     | ${insert[0]} | ${insert[1]} |\n\
+| Select *                | ${select[0]} | ${select[1]} |\n\
+| Select * W Cast         | ${select2[0]} | ${select2[1]} |\n\
+| Select * W Cast W where | ${select3[0]} | ${select3[1]} |\n\
+| 1 Row Update            | ${update[0]} | ${update[1]} |\n\
+| Delete                  | ${d[0]} | ${d[1]} |\n`;
+
+
+        function stats(prop) {
+            var sum = 0;
+            var error = false;
+            data.data.forEach((d) => {
+                sum += (d[prop].end - d[prop].start);
+                if (d.error) error = d.error
+            });
+
+            return [round(sum / data.data.length), round(sum), error];
+        }
+        readme += performance;
+
+        fs.writeFileSync(__dirname + "/dist/README.md", readme);
+        console.log("Compiled files into dist");
+
+    })
+
+
+})
