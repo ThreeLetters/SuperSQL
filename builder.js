@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 
-var version = "1.1.0";
+var version = "1.1.5";
 
 var today = new Date();
 var dd = today.getDate();
@@ -251,12 +251,18 @@ function minify(str, options) {
             for (; i < len; i++) {
                 if (str[i + 1] != " ") break;
             }
+        } else if (char === 'f' && str[i + 1] === 'u' && str[i + 2] === 'n' && str[i + 3] === 'c' && str[i + 4] === 't' && str[i + 5] === 'i' && str[i + 6] === 'o' && str[i + 7] === 'n') {
+            i += 7;
+            varMap = {};
+            varIndex = [0];
+            out.push('function')
         } else {
             out.push(char)
         }
 
     }
     return out.join("");
+    
 }
 
 var fs = require("fs");

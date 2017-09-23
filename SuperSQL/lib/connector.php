@@ -24,23 +24,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 // BUILD BETWEEN
-class Response implements \ArrayAccess, \Iterator
+class SQLResponse implements \ArrayAccess, \Iterator
 {
     public $result;
     public $affected;
     public $ind = 0;
-    public $error;
-    public $errorData;
+    public $error = false;
     public $outTypes;
     public $complete = true;
     /**
      * Gets data from a query
      */
-    function __construct($data, $error, &$outtypes, $mode)
+    function __construct($data, $error, $outtypes, $mode)
     {
-        $this->error = !$error;
         if (!$error) {
-            $this->errorData = $data->errorInfo();
+            $this->error = $data->errorInfo();
         } else {
             $this->outTypes = $outtypes;
             if ($mode === 0) { // fetch all
@@ -86,7 +84,7 @@ class Response implements \ArrayAccess, \Iterator
         while ($this->fetchNextRow()) {
         }
     }
-    function map(&$row, &$outtypes)
+    private function map(&$row, &$outtypes)
     {
         foreach ($outtypes as $col => $dt) {
             if (isset($row[$col])) {
@@ -118,7 +116,7 @@ class Response implements \ArrayAccess, \Iterator
      */
     function error()
     {
-        return $this->error ? $this->errorData : false;
+        return $this->errorData;
     }
     /**
      * Gets data from the query
@@ -136,13 +134,9 @@ class Response implements \ArrayAccess, \Iterator
      *
      * @returns {Int}
      */
-    function getAffected()
+    function rowCount()
     {
         return $this->affected;
-    }
-    function countRows()
-    {
-        return count($this->result);
     }
     // BEGIN ARRAYACCESS
     function offsetSet($offset, $value) // do nothing
@@ -208,7 +202,7 @@ class Response implements \ArrayAccess, \Iterator
         return $this->offsetExists($this->ind);
     }
 }
-class Connector
+class SQLConnector
 {
     public $db;
     public $log = array();
@@ -221,12 +215,7 @@ class Connector
      */
     function __construct($dsn, $user, $pass)
     {
-        try {
-            $this->db = new \PDO($dsn, $user, $pass);
-        }
-        catch (\PDOException $e) {
-            throw new \Exception($e->getMessage());
-        }
+        $this->db = new \PDO($dsn, $user, $pass);
     }
     /**
      * Queries database
@@ -247,7 +236,7 @@ class Connector
                 $obj
             ));
         if ($mode !== 3) {
-            return new Response($q, $e, $outtypes, $mode);
+            return new SQLResponse($q, $e, $outtypes, $mode);
         } else {
             return $q;
         }
@@ -261,7 +250,7 @@ class Connector
      *
      * @returns {SQLResponse|SQLResponse[]}
      */
-    function _query(&$sql, $values, &$insert, &$outtypes = null, $mode = 0)
+    function _query($sql, $values, $insert, $outtypes = null, $mode = 0)
     {
         $q = $this->db->prepare($sql);
         if ($this->dev)
@@ -275,16 +264,16 @@ class Connector
         }
         $e = $q->execute();
         if (!isset($insert[0])) { // Single query
-            return new Response($q, $e, $outtypes, $mode);
+            return new SQLResponse($q, $e, $outtypes, $mode);
         } else { // Multi Query
             $responses = array();
-            array_push($responses, new Response($q, $e, $outtypes, 0));
+            array_push($responses, new SQLResponse($q, $e, $outtypes, 0));
             foreach ($insert as $key => $value) {
                 foreach ($value as $k => &$val) {
                     $values[$k][0] = $val;
                 }
                 $e = $q->execute();
-                array_push($responses, new Response($q, $e, $outtypes, 0));
+                array_push($responses, new SQLResponse($q, $e, $outtypes, 0));
             }
             return $responses;
         }
