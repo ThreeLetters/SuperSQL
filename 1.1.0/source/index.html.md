@@ -36,7 +36,7 @@ $SuperSQL = SQLHelper::connect($host,$db,$user,$pass);
 ?>
 ```
 
-![SuperSQL](https://img.shields.io/badge/SuperSQL-v1.1.5-brightgreen.svg)
+![SuperSQL](https://img.shields.io/badge/SuperSQL-v1.1.0-brightgreen.svg)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/ThreeLetters/SuperSQL/master/LICENSE)
 [![Docs](https://img.shields.io/badge/Docs-supersql.tk-blue.svg)](http://supersql.tk)
 [![GitHub stars](https://img.shields.io/github/stars/ThreeLetters/SuperSQL.svg)](https://github.com/ThreeLetters/SuperSQL/stargazers)
@@ -187,39 +187,6 @@ $where = array(
 ?>
 ```
 
-> Full text search
-
-```php
-<?php
-$where = array(
-    '[MM]' => array(
-    'column1',
-    'column2',
-    'column3',
-    'keyword' => 'myKeyword'
-    )
-); // (MATCH(`column1`,`column2`,`column3`) AGAINST ('myKeyword'))
-
-$where = array(
-    '[MM][NN]' => array(
-    'column1',
-    'column2',
-    'column3',
-    'keyword' => 'myKeyword'
-    )
-); // (MATCH(`column1`,`column2`,`column3`) AGAINST ('myKeyword' IN NATURAL LANGUAGE MODE))
-
-/*
-[
-'NN' => 'IN NATURAL LANGUAGE MODE',
-'NQ' => 'IN NATURAL LANGUAGE MODE WITH QUERY EXPANSION',
-'BB' => 'IN BOOLEAN MODE',
-'QQ' => 'WITH QUERY EXPANSION'
-];
-*/
-?>
-```
-
 Conditional statements are extremly customisable. WHERE and JOIN clauses are conditional statements. 
 
 <aside class="success">
@@ -317,68 +284,6 @@ Binds dont have to be reproduced in the second or more arrays. You can put it in
 <aside class="notice">
 If there are key collisions with binds - no problem! You can reproduce the bind in the second or more arrays too.
 </aside>
-
-## Templates
-
-> Templates with insert/update
-
-```php
-<?php
-$toInsert = array( // array of items to insert
-    array(
-    'name' => 'user1',
-    'userID' => 0,
-    'password' => '123',
-    'data' => $userData
-    ),
-    array(
-    'name' => 'user2',
-    'userID' => 1,
-    'password' => '321',
-    'data' => $userData2
-    )
-);
-$SuperSQL->insert('users',array(
-    array(
-        'name[str]',
-        'userID[int]',
-        'password[str]',
-        'data[json]'
-    ),
-    $toInsert
-));
-?>
-```
-
-> Templates with conditional statements
-
-```php
-<?php
-$where = array(
-array(
-    '[>>]column1[int]',
-    'column2[str]',
-    '[||]column3[str]' => [3]
-),
-array(
-    array(
-    'column1' => 3,
-    'column2' => 4,
-    'column3' => ['a','b','c']
-    ),
-    array(
-    'column1' => '1',
-    'column2' => 'lol',
-    'column3' => ['d','e','g']
-    )
-);
-); 
-// WHERE `column1` > 3 AND `column2` = '4' AND (`column3` = 'a' OR `column3` = 'b' OR `column4` = 'c')
-// WHERE `column1` > 1 AND `column2` = 'lol' AND (`column3` = 'd' OR `column3` = 'e' OR `column4` = 'g')
-?>
-```
-
-Templates allow for easier access. They allow you to just supply the data format, and give an array of data to use.
 
 ## Key-collisions
 
@@ -921,70 +826,11 @@ $log = [
 * Values - Initial values with types. NOTE: This is bound onto the SQL base string
 * Insert - Multi-query array
 
-### EasyLog
+## modeLock
+```php
+<?php
+$SuperSQL->modeLock(true);
+?>
+```
 
-Easy log is for beginners. If the above syntax is too advanced, then use the SQLHelper->getLog function. It will return the queries as a array of strings.
-
-## SQLConnector
-
-The SQLConnector class is what connects to the database. It also handles queries. It includes the SQLResponse object. You can access an instance of the connector through `$SuperSQL->con`.
-
-### Properties
-
-* `$db` - PDO object
-* `$dev` - True if in dev mode
-* `$log` - Log (Only for dev)
-
-### Methods
-
-* `query` - Queries database
-* `_query` - Advanced query
-* `close` - Closes database
-
-## SQLResponse
-
-The SQL Response object is returned whenever a query is executed
-
-`class SQLResponse implements ArrayAccess, Iterator`
-
-### Properties
-
-* `result` - Array of rows
-* `affected` - Num of rows affected
-* `ind` - Iterator index
-* `error` - Error property
-* `outTypes` - Type mapping data
-* `complete` - Tells whether query is complete
-* `stmt` - PDO statement
-
-### Methods
-
-* `close` - Closes connection
-* `error` - Checks for error
-* `getData` - Gets all rows
-* `rowCount` - Gets num rows affected
-* [ArrayAccess](http://php.net/manual/en/class.arrayaccess.php) methods
-* [Iterator](http://php.net/manual/en/class.iterator.php) methods
-
-## Parser
-
-Static class containing the parser for SuperSQL
-
-### Methods
-
-* `select`\`insert`\`update`\`delete` - Query building
-* `getArg` - Gets a argument from string
-* `getType` - Gets a type from a string (casting)
-* `isRaw` - Checks whether a string has # in the beginning
-* `isSpecial` - Checks whether a type is special
-* `append`/`append2` - Multiquery
-* `stripArgs` - Strips all args from a string
-* `quote` - Quotes a column name
-* `quoteArray` - Quotes items in an array
-* `table` - Builds table section of query
-* `value` - Escapes and builds the values
-* `rmComments` - Removes comments from string
-* `conditions` - Constructs conditional statements
-* `join` - Constructs JOIN queries
-* `where` - Constructs WHERE
-* `columns` - Constructs columns
+Modelock locks the fetch mode. By default, fetching is dynamic for performance. However, if you want to have it fetch all rows at the start, then set to true.

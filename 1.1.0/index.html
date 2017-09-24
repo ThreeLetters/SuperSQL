@@ -322,9 +322,6 @@
                         <a href="#multi-queries" class="toc-h2 toc-link" data-title="Basics">Multi-queries</a>
                     </li>
                     <li>
-                        <a href="#templates" class="toc-h2 toc-link" data-title="Basics">Templates</a>
-                    </li>
-                    <li>
                         <a href="#key-collisions" class="toc-h2 toc-link" data-title="Basics">Key-collisions</a>
                     </li>
                     <li>
@@ -430,13 +427,7 @@
                         <a href="#logging" class="toc-h2 toc-link" data-title="Advanced">Logging</a>
                     </li>
                     <li>
-                        <a href="#sqlconnector" class="toc-h2 toc-link" data-title="Advanced">SQLConnector</a>
-                    </li>
-                    <li>
-                        <a href="#sqlresponse" class="toc-h2 toc-link" data-title="Advanced">SQLResponse</a>
-                    </li>
-                    <li>
-                        <a href="#parser" class="toc-h2 toc-link" data-title="Advanced">Parser</a>
+                        <a href="#modelock" class="toc-h2 toc-link" data-title="Advanced">modeLock</a>
                     </li>
                 </ul>
             </li>
@@ -471,7 +462,7 @@
 <span class="nv">$SuperSQL</span> <span class="o">=</span> <span class="nx">SQLHelper</span><span class="o">::</span><span class="na">connect</span><span class="p">(</span><span class="nv">$host</span><span class="p">,</span><span class="nv">$db</span><span class="p">,</span><span class="nv">$user</span><span class="p">,</span><span class="nv">$pass</span><span class="p">);</span>
 <span class="cp">?&gt;</span>
 </code></pre>
-            <p><img src="https://img.shields.io/badge/SuperSQL-v1.1.5-brightgreen.svg" alt="SuperSQL" />
+            <p><img src="https://img.shields.io/badge/SuperSQL-v1.1.0-brightgreen.svg" alt="SuperSQL" />
                 <a href="https://raw.githubusercontent.com/ThreeLetters/SuperSQL/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="GitHub license" /></a>
                 <a href="http://supersql.tk"><img src="https://img.shields.io/badge/Docs-supersql.tk-blue.svg" alt="Docs" /></a>
                 <a href="https://github.com/ThreeLetters/SuperSQL/stargazers"><img src="https://img.shields.io/github/stars/ThreeLetters/SuperSQL.svg" alt="GitHub stars" /></a>
@@ -607,38 +598,6 @@
 </span><span class="p">);</span>
 <span class="cp">?&gt;</span>
 </code></pre>
-            <blockquote>
-                <p>Full text search</p>
-            </blockquote>
-            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
-<span class="nv">$where</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
-    <span class="s1">'[MM]'</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
-    <span class="s1">'column1'</span><span class="p">,</span>
-    <span class="s1">'column2'</span><span class="p">,</span>
-    <span class="s1">'column3'</span><span class="p">,</span>
-    <span class="s1">'keyword'</span> <span class="o">=&gt;</span> <span class="s1">'myKeyword'</span>
-    <span class="p">)</span>
-<span class="p">);</span> <span class="c1">// (MATCH(`column1`,`column2`,`column3`) AGAINST ('myKeyword'))
-</span>
-<span class="nv">$where</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
-    <span class="s1">'[MM][NN]'</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
-    <span class="s1">'column1'</span><span class="p">,</span>
-    <span class="s1">'column2'</span><span class="p">,</span>
-    <span class="s1">'column3'</span><span class="p">,</span>
-    <span class="s1">'keyword'</span> <span class="o">=&gt;</span> <span class="s1">'myKeyword'</span>
-    <span class="p">)</span>
-<span class="p">);</span> <span class="c1">// (MATCH(`column1`,`column2`,`column3`) AGAINST ('myKeyword' IN NATURAL LANGUAGE MODE))
-</span>
-<span class="cm">/*
-[
-'NN' =&gt; 'IN NATURAL LANGUAGE MODE',
-'NQ' =&gt; 'IN NATURAL LANGUAGE MODE WITH QUERY EXPANSION',
-'BB' =&gt; 'IN BOOLEAN MODE',
-'QQ' =&gt; 'WITH QUERY EXPANSION'
-];
-*/</span>
-<span class="cp">?&gt;</span>
-</code></pre>
             <p>Conditional statements are extremly customisable. WHERE and JOIN clauses are conditional statements. </p>
 
             <aside class="success">
@@ -735,64 +694,6 @@
                             <aside class="notice">
                                 If there are key collisions with binds - no problem! You can reproduce the bind in the second or more arrays too.
                             </aside>
-                            <h2 id='templates'>Templates</h2>
-                            <blockquote>
-                                <p>Templates with insert/update</p>
-                            </blockquote>
-                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
-<span class="nv">$toInsert</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span> <span class="c1">// array of items to insert
-</span>    <span class="k">array</span><span class="p">(</span>
-    <span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'user1'</span><span class="p">,</span>
-    <span class="s1">'userID'</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="p">,</span>
-    <span class="s1">'password'</span> <span class="o">=&gt;</span> <span class="s1">'123'</span><span class="p">,</span>
-    <span class="s1">'data'</span> <span class="o">=&gt;</span> <span class="nv">$userData</span>
-    <span class="p">),</span>
-    <span class="k">array</span><span class="p">(</span>
-    <span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'user2'</span><span class="p">,</span>
-    <span class="s1">'userID'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="s1">'password'</span> <span class="o">=&gt;</span> <span class="s1">'321'</span><span class="p">,</span>
-    <span class="s1">'data'</span> <span class="o">=&gt;</span> <span class="nv">$userData2</span>
-    <span class="p">)</span>
-<span class="p">);</span>
-<span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">insert</span><span class="p">(</span><span class="s1">'users'</span><span class="p">,</span><span class="k">array</span><span class="p">(</span>
-    <span class="k">array</span><span class="p">(</span>
-        <span class="s1">'name[str]'</span><span class="p">,</span>
-        <span class="s1">'userID[int]'</span><span class="p">,</span>
-        <span class="s1">'password[str]'</span><span class="p">,</span>
-        <span class="s1">'data[json]'</span>
-    <span class="p">),</span>
-    <span class="nv">$toInsert</span>
-<span class="p">));</span>
-<span class="cp">?&gt;</span>
-</code></pre>
-                            <blockquote>
-                                <p>Templates with conditional statements</p>
-                            </blockquote>
-                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
-<span class="nv">$where</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
-<span class="k">array</span><span class="p">(</span>
-    <span class="s1">'[&gt;&gt;]column1[int]'</span><span class="p">,</span>
-    <span class="s1">'column2[str]'</span><span class="p">,</span>
-    <span class="s1">'[||]column3[str]'</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span>
-<span class="p">),</span>
-<span class="k">array</span><span class="p">(</span>
-    <span class="k">array</span><span class="p">(</span>
-    <span class="s1">'column1'</span> <span class="o">=&gt;</span> <span class="mi">3</span><span class="p">,</span>
-    <span class="s1">'column2'</span> <span class="o">=&gt;</span> <span class="mi">4</span><span class="p">,</span>
-    <span class="s1">'column3'</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">'a'</span><span class="p">,</span><span class="s1">'b'</span><span class="p">,</span><span class="s1">'c'</span><span class="p">]</span>
-    <span class="p">),</span>
-    <span class="k">array</span><span class="p">(</span>
-    <span class="s1">'column1'</span> <span class="o">=&gt;</span> <span class="s1">'1'</span><span class="p">,</span>
-    <span class="s1">'column2'</span> <span class="o">=&gt;</span> <span class="s1">'lol'</span><span class="p">,</span>
-    <span class="s1">'column3'</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">'d'</span><span class="p">,</span><span class="s1">'e'</span><span class="p">,</span><span class="s1">'g'</span><span class="p">]</span>
-    <span class="p">)</span>
-<span class="p">);</span>
-<span class="p">);</span> 
-<span class="c1">// WHERE `column1` &gt; 3 AND `column2` = '4' AND (`column3` = 'a' OR `column3` = 'b' OR `column4` = 'c')
-// WHERE `column1` &gt; 1 AND `column2` = 'lol' AND (`column3` = 'd' OR `column3` = 'e' OR `column4` = 'g')
-</span><span class="cp">?&gt;</span>
-</code></pre>
-                            <p>Templates allow for easier access. They allow you to just supply the data format, and give an array of data to use.</p>
                             <h2 id='key-collisions'>Key-collisions</h2>
                             <p>Since SuperSQL uses associative arrays, key collisions can occur. To solve this problem, add &quot;#id (replace id with something)&quot; to the key.</p>
 
@@ -1284,66 +1185,12 @@ Output:
                                 <li>Values - Initial values with types. NOTE: This is bound onto the SQL base string</li>
                                 <li>Insert - Multi-query array</li>
                             </ul>
-                            <h3 id='easylog'>EasyLog</h3>
-                            <p>Easy log is for beginners. If the above syntax is too advanced, then use the SQLHelper-&gt;getLog function. It will return the queries as a array of strings.</p>
-                            <h2 id='sqlconnector'>SQLConnector</h2>
-                            <p>The SQLConnector class is what connects to the database. It also handles queries. It includes the SQLResponse object. You can access an instance of the connector through <code>$SuperSQL-&gt;con</code>.</p>
-                            <h3 id='properties'>Properties</h3>
-                            <ul>
-                                <li><code>$db</code> - PDO object</li>
-                                <li><code>$dev</code> - True if in dev mode</li>
-                                <li><code>$log</code> - Log (Only for dev)</li>
-                            </ul>
-                            <h3 id='methods'>Methods</h3>
-                            <ul>
-                                <li><code>query</code> - Queries database</li>
-                                <li><code>_query</code> - Advanced query</li>
-                                <li><code>close</code> - Closes database</li>
-                            </ul>
-                            <h2 id='sqlresponse'>SQLResponse</h2>
-                            <p>The SQL Response object is returned whenever a query is executed</p>
-
-                            <p><code>class SQLResponse implements ArrayAccess, Iterator</code></p>
-                            <h3 id='properties-2'>Properties</h3>
-                            <ul>
-                                <li><code>result</code> - Array of rows</li>
-                                <li><code>affected</code> - Num of rows affected</li>
-                                <li><code>ind</code> - Iterator index</li>
-                                <li><code>error</code> - Error property</li>
-                                <li><code>outTypes</code> - Type mapping data</li>
-                                <li><code>complete</code> - Tells whether query is complete</li>
-                                <li><code>stmt</code> - PDO statement</li>
-                            </ul>
-                            <h3 id='methods-2'>Methods</h3>
-                            <ul>
-                                <li><code>close</code> - Closes connection</li>
-                                <li><code>error</code> - Checks for error</li>
-                                <li><code>getData</code> - Gets all rows</li>
-                                <li><code>rowCount</code> - Gets num rows affected</li>
-                                <li><a href="http://php.net/manual/en/class.arrayaccess.php">ArrayAccess</a> methods</li>
-                                <li><a href="http://php.net/manual/en/class.iterator.php">Iterator</a> methods</li>
-                            </ul>
-                            <h2 id='parser'>Parser</h2>
-                            <p>Static class containing the parser for SuperSQL</p>
-                            <h3 id='methods-3'>Methods</h3>
-                            <ul>
-                                <li><code>select</code>`insert<code>\</code>update<code>\</code>delete` - Query building</li>
-                                <li><code>getArg</code> - Gets a argument from string</li>
-                                <li><code>getType</code> - Gets a type from a string (casting)</li>
-                                <li><code>isRaw</code> - Checks whether a string has # in the beginning</li>
-                                <li><code>isSpecial</code> - Checks whether a type is special</li>
-                                <li><code>append</code>/<code>append2</code> - Multiquery</li>
-                                <li><code>stripArgs</code> - Strips all args from a string</li>
-                                <li><code>quote</code> - Quotes a column name</li>
-                                <li><code>quoteArray</code> - Quotes items in an array</li>
-                                <li><code>table</code> - Builds table section of query</li>
-                                <li><code>value</code> - Escapes and builds the values</li>
-                                <li><code>rmComments</code> - Removes comments from string</li>
-                                <li><code>conditions</code> - Constructs conditional statements</li>
-                                <li><code>join</code> - Constructs JOIN queries</li>
-                                <li><code>where</code> - Constructs WHERE</li>
-                                <li><code>columns</code> - Constructs columns</li>
-                            </ul>
+                            <h2 id='modelock'>modeLock</h2>
+                            <pre class="highlight php tab-php"><code><span class="cp">&lt;?php</span>
+<span class="nv">$SuperSQL</span><span class="o">-&gt;</span><span class="na">modeLock</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+<span class="cp">?&gt;</span>
+</code></pre>
+                            <p>Modelock locks the fetch mode. By default, fetching is dynamic for performance. However, if you want to have it fetch all rows at the start, then set to true.</p>
 
         </div>
         <div class="dark-box">
