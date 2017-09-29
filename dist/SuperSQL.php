@@ -4,7 +4,7 @@
  License: MIT (https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE)
  Source: https://github.com/ThreeLetters/SQL-Library
  Build: v1.1.5
- Built on: 23/09/2017
+ Built on: 29/09/2017
 */
 
 namespace SuperSQL;
@@ -561,7 +561,8 @@ class Parser
                 }
             } else {
                 foreach ($columns as $i => $val) {
-                    $a = self::getType($val);
+                    $raw = self::isRaw($val);
+                    $a = $raw ? false : self::getType($val);
                     $alias = false;
                     if ($a) { 
                         $alias = $a;
@@ -584,7 +585,7 @@ class Parser
                     if ($i !== 0) {
                         $sql .= ', ';
                     }
-                    $sql .= self::quote($val);
+                    $sql .= $raw ? $val : self::quote($val);
                     if ($alias)
                         $sql .= ' AS `' . $alias . '`';
                 }

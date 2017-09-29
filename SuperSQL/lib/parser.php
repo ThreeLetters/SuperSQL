@@ -406,7 +406,8 @@ class Parser
                 }
             } else {
                 foreach ($columns as $i => $val) {
-                    $a = self::getType($val);
+                    $raw = self::isRaw($val);
+                    $a = $raw ? false : self::getType($val);
                     $alias = false;
                     if ($a) { // name[alias][type]
                         $alias = $a;
@@ -429,7 +430,7 @@ class Parser
                     if ($i !== 0) {
                         $sql .= ', ';
                     }
-                    $sql .= self::quote($val);
+                    $sql .= $raw ? $val : self::quote($val);
                     if ($alias)
                         $sql .= ' AS `' . $alias . '`';
                 }
