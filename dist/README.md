@@ -28,16 +28,16 @@
 Profiled on PHP v7.1.4, 30 loops
 
 
-0.0472ms Average Time, Sum: 1.4169ms
+0.0393ms Average Time, Sum: 1.1784ms
 
 ### Specifics
 
 | Name                    |  Avg   |  Sum   |
 |-------------------------|--------|--------|
-| 1 Row Insert            | 0.003 | 0.091 |
-| 100 R Insert W Temp     | 0.0347 | 1.0397 |
-| Select *                | 0.0014 | 0.0408 |
-| Select * W Cast         | 0.0012 | 0.0363 |
-| Select * W Cast W where | 0.0014 | 0.041 |
-| 1 Row Update            | 0.0031 | 0.0919 |
-| Delete                  | 0.0024 | 0.071 |
+| 1 Row Insert            | 0.0026 | 0.079 |
+| 100 R Insert W Temp     | 0.029 | 0.8703 |
+| Select *                | 0.001 | 0.0301 |
+| Select * W Cast         | 0.0011 | 0.0324 |
+| Select * W Cast W where | 0.0011 | 0.0342 |
+| 1 Row Update            | 0.0023 | 0.07 |
+| Delete                  | 0.0019 | 0.058 |
