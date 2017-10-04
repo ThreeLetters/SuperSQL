@@ -218,12 +218,12 @@ class Parser
      *
      * @returns {String}
      */
-    static function conditions($dt, &$values, &$map = false, &$index = 0, $join = ' AND ', $operator = ' = ', $parent = '')
+    static function conditions($dt, &$values, &$map = false, &$index = 0, $multi2 = false, $join = ' AND ', $operator = ' = ', $parent = '')
     {
         $num = 0;
         $sql = '';
         foreach ($dt as $key => $val) {
-            if (is_int($key)) 
+            if ($multi2 && is_int($key)) 
                 $key = $val;   
             preg_match('/^(?<r>\#)?(?:(?:\[(?<a>.{2})\])(?:(?:\[(?<b>.{2})\])(?:\[(?<c>.{2})\])?)?)?(?<out>.*)/', $key, $m); // 14 steps
             $raw  = ($m['r'] === '#');
@@ -282,7 +282,7 @@ class Parser
             if ($arr) {
                 $sql .= '(';
                 if ($useBind) {
-                    $sql .= self::conditions($val, $values, $map, $index, $newJoin, $newOperator, $parent . '/' . $key);
+                    $sql .= self::conditions($val, $values, $map, $index, $multi2, $newJoin, $newOperator, $parent . '/' . $key);
                 } else {
                     if ($map !== false && !$raw) {
                         $map[$key]                 = $index;
@@ -305,10 +305,9 @@ class Parser
                             array_push($values, self::value($type, $val[1]));
                         }
                     } else {
-                        $m = isset($val[1]);
-                        $len = $m ? count($val) : $val[0];
+                        $len = $multi2 ? $val[0] : count($val);
                         for ($k = 0; $k < $len; $k++) {
-                            $v = $m ? $val[$k] : '';
+                            $v = $multi2 ? '' : $val[$k];
                             if ($k !== 0)
                                 $sql .= $newJoin;
                             ++$index;
@@ -369,15 +368,14 @@ class Parser
             }
         }
     }
-    static function WHERE(&$sql,$where,&$values,&$insert,$i = 0) {
+    static function WHERE(&$sql,$where,&$values,&$insert,&$i = 0) {
         $sql .= ' WHERE ';
             if (isset($where[0])) {
-                 $index = array();
-                $sql .= self::conditions($where[0], $values, $index, $i);
-                $m = isset($where[1][0]);
+               $m = isset($where[1][0]);
+               $sql .= self::conditions($where[0], $values, $index, $i, $m);
                 self::append2($insert, $index, $m ? $where[1] : $where, $values,$m);
             } else {
-                $sql .= self::conditions($where, $values);
+                $sql .= self::conditions($where, $values, $index, $i);
             }
     }
     static function columns($columns, &$sql, &$outTypes)
