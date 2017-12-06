@@ -7,20 +7,20 @@
 
 ### Sizes
 
-* `SuperSQL.php` - 28250 Chars (28.3 MB)
-* `SuperSQL_min.php` - 12501 Chars (12.5 MB)
+* `SuperSQL.php` - 28413 Chars (28.4 MB)
+* `SuperSQL_min.php` - 12593 Chars (12.6 MB)
 * `SuperSQL_helper.php` - 11234 Chars (11.2 MB)
 * `SuperSQL_helper_min.php` - 5558 Chars (5.6 MB)
-* `SuperSQL_complete_min.php` - 17779 Chars (17.8 MB)
+* `SuperSQL_complete_min.php` - 17871 Chars (17.9 MB)
 
 ## Hashes
 
 ```
-* SuperSQL.php - 6b8a0ca5b29cc2941e243eedfaaf6a43
-* SuperSQL_min.php - f8e4fa363345276e1a908322ef10b969
-* SuperSQL_helper.php - e89949fcc3b648c678b4ff55c14ec4c0
-* SuperSQL_helper_min.php - 8376bf405228152b1b37a5e659ab3287
-* SuperSQL_complete.php - c50b9ae64111ba60684ac7e98b7d686e
+* SuperSQL.php - 384e2b0983336f63f344920ecb9af69f
+* SuperSQL_min.php - 364fe31e0f443b1d4dd0db066e4d1bce
+* SuperSQL_helper.php - a51136f4d7f18f300d7aa580b671bb46
+* SuperSQL_helper_min.php - 932d6c473e9ab4c87c17319ed2723192
+* SuperSQL_complete.php - 749d3090a380be2552dd7818bc301148
 ```
 
 ## Performance
@@ -28,16 +28,16 @@
 Profiled on PHP v7.1.4, 30 loops
 
 
-0.0393ms Average Time, Sum: 1.1784ms
+0.0175ms Average Time, Sum: 0.5255ms
 
 ### Specifics
 
 | Name                    |  Avg   |  Sum   |
 |-------------------------|--------|--------|
-| 1 Row Insert            | 0.0026 | 0.079 |
-| 100 R Insert W Temp     | 0.029 | 0.8703 |
-| Select *                | 0.001 | 0.0301 |
-| Select * W Cast         | 0.0011 | 0.0324 |
-| Select * W Cast W where | 0.0011 | 0.0342 |
-| 1 Row Update            | 0.0023 | 0.07 |
-| Delete                  | 0.0019 | 0.058 |
+| 1 Row Insert            | 0.0009 | 0.0285 |
+| 100 R Insert W Temp     | 0.0132 | 0.3957 |
+| Select *                | 0.0005 | 0.0139 |
+| Select * W Cast         | 0.0004 | 0.0132 |
+| Select * W Cast W where | 0.0005 | 0.0144 |
+| 1 Row Update            | 0.0011 | 0.0323 |
+| Delete                  | 0.0009 | 0.0256 |

@@ -489,6 +489,8 @@ class Parser
                     }
                     if (isset($limit['ORDER'])) {
                         $sql .= ' ORDER BY ' . self::quote($limit['ORDER']);
+                    } else if (isset($limit['!ORDER'])) {
+                        $sql .= ' ORDER BY ' . self::quote($limit['ORDER']) . ' DESC';
                     }
                     if (isset($limit['LIMIT'])) {
                         $sql .= ' LIMIT ' . (int) $limit['LIMIT'];

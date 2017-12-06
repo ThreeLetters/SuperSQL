@@ -4,7 +4,7 @@
  License: MIT (https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE)
  Source: https://github.com/ThreeLetters/SQL-Library
  Build: v1.1.5
- Built on: 04/10/2017
+ Built on: 06/12/2017
 */
 
 namespace SuperSQL;
@@ -18,6 +18,7 @@ class SQLResponse implements \ArrayAccess, \Iterator
     public $error = false;
     public $outTypes;
     public $complete = true;
+    public $stmt;
     function __construct($data, $error, $outtypes, $mode)
     {
         if (!$error) {
@@ -633,6 +634,8 @@ class Parser
                     }
                     if (isset($limit['ORDER'])) {
                         $sql .= ' ORDER BY ' . self::quote($limit['ORDER']);
+                    } else if (isset($limit['!ORDER'])) {
+                        $sql .= ' ORDER BY ' . self::quote($limit['ORDER']) . ' DESC';
                     }
                     if (isset($limit['LIMIT'])) {
                         $sql .= ' LIMIT ' . (int) $limit['LIMIT'];

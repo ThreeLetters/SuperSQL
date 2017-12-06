@@ -32,6 +32,7 @@ class SQLResponse implements \ArrayAccess, \Iterator
     public $error = false;
     public $outTypes;
     public $complete = true;
+    public $stmt;
     /**
      * Gets data from a query
      */
