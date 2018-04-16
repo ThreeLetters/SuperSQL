@@ -161,12 +161,16 @@ class Parser
                 if ($i !== 0)
                     $sql .= ', ';
                 $sql .= '`' . $val . '`';
-                if ($t)
+                if ($alias)
                     $sql .= ' AS `' . $alias . '`';
             }
             return $sql;
         } else {
-            return '`' . $table . '`';
+            $alias = self::getType($table);
+            $sql = '`' . $table . '`';
+            if ($alias)
+                $sql .= ' AS `' . $alias . '`';
+            return $sql;
         }
     }
     static function value($type, $value)
