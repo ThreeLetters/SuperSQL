@@ -140,8 +140,7 @@ class SQLHelper
     }
     function get($table, $columns = array(), $where = array(), $join = null)
     {
-        $d = $this->s->SELECT($table, $columns, $where, $join, 1)->getData();
-        return ($d && $d[0]) ? $d[0] : false;
+         return $this->s->SELECT($table, $columns, $where, $join, 1)[0];
     }
     function create($table, $data)
     {
