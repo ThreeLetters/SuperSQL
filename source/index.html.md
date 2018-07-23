@@ -509,7 +509,7 @@ $SuperSQL->SELECT("users", [], null, [
     'HAVING' => 'COUNT(`users`) > 10',
     'LIMIT' => 5,
     'OFFSET' => 2,
-    'ORDER' => 'column'
+    'ORDER' => 'column' // You can also do '!ORDER' => column for DESCending order
 ]); // SELECT * FROM `users` GROUP BY `user_group` HAVING COUNT(`users`) > 10 LIMIT 5 OFFSET 2 ORDER BY `column`
 ?>
 ```

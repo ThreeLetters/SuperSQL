@@ -901,7 +901,7 @@
     <span class="s1">'HAVING'</span> <span class="o">=&gt;</span> <span class="s1">'COUNT(`users`) &gt; 10'</span><span class="p">,</span>
     <span class="s1">'LIMIT'</span> <span class="o">=&gt;</span> <span class="mi">5</span><span class="p">,</span>
     <span class="s1">'OFFSET'</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span>
-    <span class="s1">'ORDER'</span> <span class="o">=&gt;</span> <span class="s1">'column'</span>
+    <span class="s1">'ORDER'</span> <span class="o">=&gt;</span> <span class="s1">'column'</span><span class='c1'> // You can also do '!ORDER' => column for DESCending order</span>
 <span class="p">]);</span> <span class="c1">// SELECT * FROM `users` GROUP BY `user_group` HAVING COUNT(`users`) &gt; 10 LIMIT 5 OFFSET 2 ORDER BY `column`
 </span><span class="cp">?&gt;</span>
 </code></pre>
