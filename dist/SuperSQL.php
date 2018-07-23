@@ -3,8 +3,8 @@
  Author: Andrews54757
  License: MIT (https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE)
  Source: https://github.com/ThreeLetters/SQL-Library
- Build: v1.1.5
- Built on: 16/04/2018
+ Build: v1.1.6
+ Built on: 23/07/2018
 */
 
 namespace SuperSQL;
@@ -639,7 +639,7 @@ class Parser
                     if (isset($limit['ORDER'])) {
                         $sql .= ' ORDER BY ' . self::quote($limit['ORDER']);
                     } else if (isset($limit['!ORDER'])) {
-                        $sql .= ' ORDER BY ' . self::quote($limit['ORDER']) . ' DESC';
+                        $sql .= ' ORDER BY ' . self::quote($limit['!ORDER']) . ' DESC';
                     }
                     if (isset($limit['LIMIT'])) {
                         $sql .= ' LIMIT ' . (int) $limit['LIMIT'];
@@ -793,7 +793,12 @@ class SuperSQL
     }
     function SELECT($table, $columns = array(), $where = array(), $join = null, $limit = false)
     {
-        if ((is_int($join) || is_string($join) || isset($join[0])) && !$limit) {
+        if (!$limit && (isset($join['ORDER']) ||
+                        isset($join['!ORDER']) || 
+                        isset($join['GROUP']) || 
+                        isset($join['LIMIT']) || 
+                        isset($join['OFFSET']) || 
+                        is_int($join) || is_string($join) || isset($join[0]))) {
             $limit = $join;
             $join  = null;
         }

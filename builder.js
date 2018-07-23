@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 
-var version = "1.1.5";
+var version = "1.1.6";
 
 var today = new Date();
 var dd = today.getDate();
