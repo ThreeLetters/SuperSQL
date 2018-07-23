@@ -53,7 +53,7 @@ class SuperSQL
      */
     function SELECT($table, $columns = array(), $where = array(), $join = null, $limit = false)
     {
-        if (!$limit && (isset($join['ORDER']) ||
+        if (!$limit && $join && (isset($join['ORDER']) ||
                         isset($join['!ORDER']) || 
                         isset($join['GROUP']) || 
                         isset($join['LIMIT']) || 
