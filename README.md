@@ -1,7 +1,7 @@
 # SuperSQL
 ![SuperSQL](https://img.shields.io/badge/SuperSQL-v1.1.5-brightgreen.svg)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/ThreeLetters/SuperSQL/master/LICENSE)
-[![Docs](https://img.shields.io/badge/Docs-supersql.tk-blue.svg)](http://supersql.tk)
+[![Docs](https://img.shields.io/badge/Docs-Github-blue.svg)](https://threeletters.github.io/SuperSQL)
 [![GitHub stars](https://img.shields.io/github/stars/ThreeLetters/SuperSQL.svg)](https://github.com/ThreeLetters/SuperSQL/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ThreeLetters/SuperSQL.svg)](https://github.com/ThreeLetters/SuperSQL/network)
 
