@@ -6,7 +6,7 @@
 [![GitHub forks](https://img.shields.io/github/forks/ThreeLetters/SuperSQL.svg)](https://github.com/ThreeLetters/SuperSQL/network)
 
 
-The most lightest, efficient and most powerful php sql database framework. Allows you to quickly and securely develop anything using sql databases.
+The **most** lightest, efficient and most powerful php sql database framework. Allows you to quickly and securely develop anything using sql databases.
 
 ## Purpose
 
@@ -16,12 +16,27 @@ The most lightest, efficient and most powerful php sql database framework. Allow
 ### Main Features
 
 1. Very small - 27.4KB one file (Unminified, `dist/SuperSQL.php`. Minified version: 12.4KB)
-2. Simple and easy - Very easy to learn. SuperSQL was designed to be easy and simple, to the ability that a noob can use it.
+    * You can also choose whether you want an optional helper class.
+2. Simple and easy - Very easy to learn. SuperSQL was designed to be easy and simple, to the point that a noob can use it.
+    * Straight forward syntax ```SELECT * FROM `table` ``` is `db->select("table");`
+    * String syntax is standardised. Its allways `'[operator1][op2][op3...]column[alias][type]'=>value`
 3. Compatability - Supports all major SQL databases
+    * Uses the [PDO](http://php.net/manual/en/book.pdo.php) API for widespread support
 4. Efficiency - This module was built with speed and efficiency in mind.
+    * Internal optimizations to make sure there is little overhead as possible
+    * Dynamic SQLResponse class so you only fetch a row when you use it (`$response[0]` will only fetch the first row)
 5. Complexity - This module allows you to make all kinds of complex queries.
+    * Multi-table queries to execute queries on multiple tables at once
+    * Multi-value queries to execute queries with multiple values
+    * Templates to pass sets of data in as a group
+    * Type casting and aliases
+    * DISTINCT, GROUP, LIMIT/OFFSET, INSERT [INTO], and more supported
+    * Raw input available
 6. Security - This module prevents SQL injections, so hackers bye bye!
-7. Availability - This module is FREE. Licensed under the [MIT license](https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE).
+    * Uses PDO's prepare/bindParam/execute system with types
+7. Availability & Integration - This module is FREE. Licensed under the [MIT license](https://github.com/ThreeLetters/SuperSQL/blob/master/LICENSE).
+    * Use it as you wish! Only remember to give credit.
+    * Also available on composer
 
 ## Usage
 You may either
@@ -95,12 +110,12 @@ Full documentation is here: https://threeletters.github.io/SuperSQL
 While on the most basic level, SuperSQL and Medoo are the same, they are quite different.
 
 * Response class - SuperSQL has a response class to access crucial information, such as errors
-* Helper - SuperSQL comes with a helper class, with helper functions, while meedoo has it built right in.
+* Helper - SuperSQL comes with an optional advanced helper class, with helper functions, while medoo has a simple one built right in.
 * Smaller & lightweight - SuperSQL is smaller than medoo
 * Development - SuperSQL's code is well structured and it is commented - so you can understand it more
 * SuperSQL is faster - Using xdebug, we found that superSQL's parser is faster than medoo's. (x1000,100%)
 * SuperSQL is less confusing. (EG, ``SELECT * FROM `table` `` is just `$SuperSQL->select('table');`)
-* SuperSQL has more features - (EG, multi-querying, dynamic responses)
+* SuperSQL has more features - (EG, multi-querying, dynamic responses, distinct, etc...)
 
 **How fast is superSQL compared to Medoo?**
 
@@ -108,7 +123,7 @@ While on the most basic level, SuperSQL and Medoo are the same, they are quite d
 
 **Whats the difference between this an SlickInject?**
 
-SuperSQL uses the same concepts and design as slickInject. However, supersql is much much more advanced.
+SuperSQL uses the same concepts and design as SlickInject. However, SuperSQL has more complex features.
 
 **Eww, why PDO**
 
