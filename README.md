@@ -84,7 +84,7 @@ It will build to `/dist/SuperSQL*.php`
 
 ## Documentation
 
-Full documentation is here: http://supersql.tk/
+Full documentation is here: https://threeletters.github.io/SuperSQL
 
 ![supersql.tk](https://user-images.githubusercontent.com/13282284/29477701-7e6385c6-8437-11e7-9e87-74a12393c49a.png)
 
