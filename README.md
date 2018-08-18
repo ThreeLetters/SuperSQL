@@ -6,12 +6,12 @@
 [![GitHub forks](https://img.shields.io/github/forks/ThreeLetters/SuperSQL.svg)](https://github.com/ThreeLetters/SuperSQL/network)
 
 
-The **most** lightest, efficient and most powerful php sql database framework. Allows you to quickly and securely develop anything using sql databases.
+A light, efficient and powerful php sql database framework. Allows you to quickly and securely develop anything using SQL databases.
 
 ## Purpose
 
-1. To provide a very fast and efficient way to edit sql databases.
-2. To provide an easy method of access.
+1. To provide a very fast and efficient way to use SQL databases.
+2. To provide an easy way to use SQL databases safely.
 
 ### Main Features
 
@@ -105,13 +105,17 @@ Full documentation is here: https://threeletters.github.io/SuperSQL
 
 ## FAQ
 
+**What is a SQLResponse?**
+
+SQLResponse is the object returned from a query. It implements the ArrayAccess and Iterator interfaces, and so can be accessed and iterated through like an array. When you do access a row or iterate through, a function is called and fetches the row from the database, and caches it. If all rows are fetched, then the connection is deleted as it does not have to be used anymore.
+
 **Whats the difference between this and Medoo?**
 
 While on the most basic level, SuperSQL and Medoo are the same, they are quite different.
 
 * Response class - SuperSQL has a response class to access crucial information, such as errors
 * Helper - SuperSQL comes with an optional advanced helper class, with helper functions, while medoo has a simple one built right in.
-* Smaller & lightweight - SuperSQL is smaller than medoo
+* Smaller & lightweight - SuperSQL is smaller than Medoo, yet has more features.
 * Development - SuperSQL's code is well structured and it is commented - so you can understand it more
 * SuperSQL is faster - Using xdebug, we found that superSQL's parser is faster than medoo's. (x1000,100%)
 * SuperSQL is less confusing. (EG, ``SELECT * FROM `table` `` is just `$SuperSQL->select('table');`)
@@ -125,9 +129,9 @@ While on the most basic level, SuperSQL and Medoo are the same, they are quite d
 
 SuperSQL uses the same concepts and design as SlickInject. However, SuperSQL has more complex features.
 
-**Eww, why PDO**
+**Why use PDO instead of Mysqli?**
 
-PDO is much better than mysqli. Main reason because it supports so many different databases. Also, PDO is easier.
+PDO is much more versatile than mysqli. Main reason is because it supports so many different databases while mysqli only supports one.
 
 **How did you make the documentation?**
 
@@ -142,7 +146,7 @@ The nice documentation was created using [Slate - Check it out](https://github.c
 Contributing is open. If you want to contribute, make a pull request. Please use the [PEAR format](https://pear.php.net/manual/en/standards.php).
 
 > NOTE: 
-> please do not do [] for array. Please use array() instead
+> please do not do `[]` for array. Please use `array()` instead. This is for backwards compatability.
 
 ## License
 
