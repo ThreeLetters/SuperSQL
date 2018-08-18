@@ -572,7 +572,7 @@ $SuperSQL->UPDATE("citizens",array(
 * `(Array)where` - Conditional statements
 
 <aside class="notice">
-You can also use some special operators on the data argument. Example: `$SuperSQL->UPDATE("test", ["increment[+=]" => 1]);`. Available: `+=`, `-=`, `/=`, `*=`.
+You can also use some special operators on the data argument. Example: `$SuperSQL->UPDATE("test", ["[+=]increment" => 1]);`. Available: `+=`, `-=`, `/=`, `*=`.
 </aside>
 
 ## DELETE
