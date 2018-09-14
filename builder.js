@@ -414,7 +414,7 @@ exec('php -v', function (error, version, err) {
 Profiled on PHP v${data.version}, ${data.data.length} loops\n\
 \n\
 \n\
-${round(avg)}ms Average Time, Sum: ${round(sum)}ms\n\n\
+${round(avg)}sec Average Time, Sum: ${round(sum)}sec\n\n\
 ### Specifics\n\n\
 | Name                    |  Avg   |  Sum   |\n\
 |-------------------------|--------|--------|\n\
