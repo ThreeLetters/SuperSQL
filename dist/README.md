@@ -16,11 +16,11 @@
 ## Hashes
 
 ```
-* SuperSQL.php - 2d1797d1e0185d1f4aecfb9868392a18
-* SuperSQL_min.php - 2d840638b4a8d854c0cf2eb1b70982a3
-* SuperSQL_helper.php - a994557ff31f0bc500ccf474467cc44a
-* SuperSQL_helper_min.php - cd229ac7df1aff5ae71843948a78dd45
-* SuperSQL_complete.php - 3ec45950b173df277f91e11716e21839
+* SuperSQL.php - 9322fa11120332928cdcef907d0c9739
+* SuperSQL_min.php - be4de07786d750be3ba34c7f1835365a
+* SuperSQL_helper.php - 97b60f80a572d8bda6995a0d4bbbda11
+* SuperSQL_helper_min.php - b9144d655d6394a82ed6c11314ae4f2f
+* SuperSQL_complete.php - 63ce7c6146feaa3178791a26da67f8d6
 ```
 
 ## Performance
@@ -28,16 +28,16 @@
 Profiled on PHP v7.1.4, 30 loops
 
 
-0.021ms Average Time, Sum: 0.6296ms
+0.0054sec Average Time, Sum: 0.1611sec
 
 ### Specifics
 
 | Name                    |  Avg   |  Sum   |
 |-------------------------|--------|--------|
-| 1 Row Insert            | 0.001 | 0.0304 |
-| 100 R Insert W Temp     | 0.0161 | 0.4818 |
-| Select *                | 0.0005 | 0.0163 |
-| Select * W Cast         | 0.0006 | 0.0168 |
-| Select * W Cast W where | 0.0006 | 0.0176 |
-| 1 Row Update            | 0.0012 | 0.0367 |
-| Delete                  | 0.0009 | 0.0277 |
+| 1 Row Insert            | 0.0005 | 0.0136 |
+| 100 R Insert W Temp     | 0.0027 | 0.0818 |
+| Select *                | 0.0004 | 0.011 |
+| Select * W Cast         | 0.0003 | 0.0098 |
+| Select * W Cast W where | 0.0003 | 0.0077 |
+| 1 Row Update            | 0.0005 | 0.0162 |
+| Delete                  | 0.0007 | 0.0208 |

@@ -344,6 +344,16 @@ class Parser
         }
         return $sql;
     }
+    /**
+     * Constructs the JOIN statement
+     *
+     * @param {Object|Array} join - Join information
+     * @param {String} sql - Query string
+     * @param {Array} values - Output values
+     * @param {Integer} i - Value Index
+     *
+     * @returns {String}
+     */
     static function JOIN($join, &$sql, &$values, &$i)
     {
         foreach ($join as $key => &$val) {
@@ -372,6 +382,16 @@ class Parser
             }
         }
     }
+    /**
+     * Constructs the WHERE statement
+     *
+     * @param {String} sql - Query string
+     * @param {Object|Array} where - Where information
+     * @param {Array} values - Output values
+     * @param {Integer} i - Value Index
+     *
+     * @returns {String}
+     */
     static function WHERE(&$sql,$where,&$values,&$insert,&$i = 0) {
         $sql .= ' WHERE ';
             if (isset($where[0])) {
@@ -382,6 +402,15 @@ class Parser
                 $sql .= self::conditions($where, $values, $index, $i);
             }
     }
+    /**
+     * Constructs the column string for the SELECT query
+     *
+     * @param {Object|Array} where - Column information
+     * @param {String} sql - Query string
+     * @param {Array} outTypes - Output types
+     *
+     * @returns {String}
+     */
     static function columns($columns, &$sql, &$outTypes)
     {
         $into = '';

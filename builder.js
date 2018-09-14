@@ -401,7 +401,7 @@ exec('php -v', function (error, version, err) {
 
 
         var avg = sum / data.data.length;
-        console.log(round(avg) + 'ms average time, ' + round(sum) + 'ms sum');
+        console.log(round(avg) + 'sec average time, ' + round(sum) + 'sec sum');
 
         var insert1 = stats('insert1'),
             insert = stats('insert'),

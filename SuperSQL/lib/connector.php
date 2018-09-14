@@ -58,6 +58,9 @@ class SQLResponse implements \ArrayAccess, \Iterator
             $this->affected = $data->rowCount();
         }
     }
+    /**
+     * Tries to close the connection and resets cursor.
+     */
     function close()
     {
         $this->complete = true;
@@ -66,6 +69,9 @@ class SQLResponse implements \ArrayAccess, \Iterator
             $this->stmt = null;
         }
     }
+    /**
+     * Gets next row from database
+     */
     private function fetchNextRow()
     {
         $row = $this->stmt->fetch(\PDO::FETCH_ASSOC);
@@ -80,11 +86,17 @@ class SQLResponse implements \ArrayAccess, \Iterator
             return false;
         }
     }
+    /**
+     * Gets all rows from database
+     */
     private function fetchAll()
     {
         while ($this->fetchNextRow()) {
         }
     }
+    /**
+     * Casts values to correct types
+     */
     private function map(&$row, &$outtypes)
     {
         foreach ($outtypes as $col => $dt) {
@@ -186,18 +198,30 @@ class SQLResponse implements \ArrayAccess, \Iterator
             return false;
         }
     }
+    /**
+     * resets pointer
+     */
     function rewind()
     {
         $this->ind = 0;
     }
+    /**
+     * Get current row
+     */
     function current()
     {
         return $this->result[$this->ind];
     }
+    /**
+     * Get pointer
+     */
     function key()
     {
         return $this->ind;
     }
+    /**
+     * Alias for offsetExsists
+     */
     function valid()
     {
         return $this->offsetExists($this->ind);
