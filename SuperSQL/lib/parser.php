@@ -635,20 +635,24 @@ class Parser
                 if ($temp) $val = $data[1][0][$key];
                 $sql .= '`' . $key . '` = ';
                 if ($arg) {
-                    $sql .= '`' . $key . '` ';
-                    switch ($arg) {
-                        case '+=':
-                            $sql .= '+ ?';
-                            break;
-                        case '-=':
-                            $sql .= '- ?';
-                            break;
-                        case '/=':
-                            $sql .= '/ ?';
-                            break;
-                        case '*=':
-                            $sql .= '* ?';
-                            break;
+                    if ($arg == '.=') {
+                        $sql .= 'CONCAT(' . $key . ',?)';
+                    } else {
+                        $sql .= '`' . $key . '` ';
+                        switch ($arg) {
+                            case '+=':
+                                $sql .= '+ ?';
+                                break;
+                            case '-=':
+                                $sql .= '- ?';
+                                break;
+                            case '/=':
+                                $sql .= '/ ?';
+                                break;
+                            case '*=':
+                                $sql .= '* ?';
+                                break;
+                        }
                     }
                 } else $sql .= '?';
                 $m   = (!$type || !self::isSpecial($type)) && is_array($val);
